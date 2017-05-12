@@ -9,6 +9,6 @@ Team members:
 	Marthinus Richter u15160671
 
 Prefered projects in order: 
-	EPI-USE_IoT-Homecare
-	RetroRabbit_AI Game Playing Agent 
-	Compiax -Computational Graphing Tool 
+	EPI-USE_IoT-Homecare https://www.overleaf.com/9519053fxkqnbvdvnkb#/34506774/
+	RetroRabbit_AI Game Playing Agent https://www.overleaf.com/9520172kcvhgbskmpyy
+	Compiax -Computational Graphing Tool https://www.overleaf.com/9520184kmyytmghfhnp
