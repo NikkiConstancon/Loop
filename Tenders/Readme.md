@@ -8,7 +8,7 @@ Hristian Vitrychenko  (15006442)
 	
 Nikki Constancon (u15011713)
 	
-Juan Dupreez (u15189016)
+Juan du Preez (u15189016)
 	
 Gregory Austin (u14039712)
 		

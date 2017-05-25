@@ -1,0 +1,79 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{eso-pic}
+\usepackage{ragged2e}
+\renewcommand\thepage{- \arabic{page} -}
+%Logo
+\newcommand\Highlight{%
+	\put(0,150){%
+		\parbox[b][\paperheight]{\paperwidth}{%
+		\vfill
+		\centering
+		\includegraphics[width=\paperwidth, height=10cm]{logo.jpg}%
+		\vfill
+}}}
+%Swirl
+\newcommand\Swirl{%
+	\put(50,270){%
+		\parbox[b][\paperheight]{\paperwidth}{%
+		\vfill
+		\centering
+		\includegraphics[width=20cm, height=20cm]{background.png}%
+		\vfill
+}}}
+\usepackage{graphicx}
+\graphicspath{{../images/}}
+
+\AddToShipoutPicture*{\Highlight}
+\AddToShipoutPictureBG{%
+	\ifnum\value{page}>1
+	\AtPageLowerLeft{\Swirl}%
+    \fi
+    }%
+    
+\begin{document}
+
+{\fontfamily{phv}\selectfont % change phv to get new fonts for whole document
+\font\myfont=cmr12 at 20pt
+
+\begin{center}
+
+
+\begin{minipage}{0.75\linewidth}
+
+
+\vspace*{250pt}
+\title{ \rule{\linewidth}{2pt} \\
+\textbf{\normalfont\fontsize{35}{35}\scshape\selectfont IoT HomeCare System}\\
+\textbf{\normalfont\fontsize{35}{35}\scshape\selectfont Manual}\\}
+\author{   
+        Hristian Vitrychenko\\
+        Nikki Constancon \\
+        Juan du Preez\\
+        Gregory Austin \\
+        Marthinus Richter 
+}
+\date{\today \\ \rule{\linewidth}{2pt}}
+
+
+\maketitle
+\thispagestyle{empty}
+
+\end{minipage}
+\end{center}
+\pagebreak
+	
+	\section{Application}
+    	
+        \subsection{Subsection}
+        
+        	\subsubsection{Sub-subsection}
+        	
+    \section{Raspberry Pi}
+    	
+        \subsection{Subsection}
+        
+        	\subsubsection{Sub-subsection}
+   
+			
+\end{document}

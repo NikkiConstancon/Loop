@@ -1,0 +1,177 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{eso-pic}
+\usepackage{ragged2e}
+\renewcommand\thepage{- \arabic{page} -}
+%Logo
+\newcommand\Highlight{%
+	\put(0,150){%
+		\parbox[b][\paperheight]{\paperwidth}{%
+		\vfill
+		\centering
+		\includegraphics[width=\paperwidth, height=10cm]{logo.jpg}%
+		\vfill
+}}}
+%Swirl
+\newcommand\Swirl{%
+	\put(50,270){%
+		\parbox[b][\paperheight]{\paperwidth}{%
+		\vfill
+		\centering
+		\includegraphics[width=20cm, height=20cm]{background.png}%
+		\vfill
+}}}
+\usepackage{graphicx}
+\graphicspath{{../images/}}
+
+\AddToShipoutPicture*{\Highlight}
+\AddToShipoutPictureBG{%
+	\ifnum\value{page}>1
+	\AtPageLowerLeft{\Swirl}%
+    \fi
+    }%
+    
+\begin{document}
+
+{\fontfamily{phv}\selectfont % change phv to get new fonts for whole document
+\font\myfont=cmr12 at 20pt
+
+\begin{center}
+
+
+\begin{minipage}{0.75\linewidth}
+
+
+\vspace*{250pt}
+\title{ \rule{\linewidth}{2pt} \\
+\textbf{\normalfont\fontsize{35}{35}\scshape\selectfont IoT HomeCare System}\\
+\textbf{\normalfont\fontsize{35}{35}\scshape\selectfont SRS}\\}
+\author{   
+        Hristian Vitrychenko\\
+        Nikki Constancon \\
+        Juan du Preez\\
+        Gregory Austin \\
+        Marthinus Richter 
+}
+\date{\today \\ \rule{\linewidth}{2pt}}
+
+
+\maketitle
+\thispagestyle{empty}
+
+\end{minipage}
+\end{center}
+\pagebreak
+	
+	\section{Introduction}
+    	
+        \subsection{Purpose}
+        
+        
+    	\subsection{Scope}
+    	
+    	
+        \subsection{Definitions, Acronyms, and Abbreviations}
+			\begin{itemize}
+  				\item 	
+			\end{itemize}
+			
+			
+        \subsection{References}
+			{IEEE Recommended Practice for Software Requirements Specifications}
+	
+	
+        \subsection{Overview}
+	
+	
+\pagebreak
+	\section{Overall Description}
+		 
+		 
+        \subsection{Product Perspective}
+        
+        
+        	\subsubsection{System Interface}
+        	
+
+            \subsubsection{User Interface}
+            
+
+            \subsubsection{Hardware Interface}
+            
+            
+            \subsubsection{Software Interface} 
+                       
+            
+            \subsubsection{Communications Interface} 
+            
+            
+            \subsubsection{Memory}
+            
+            
+            \subsubsection{Operations}
+            	
+           
+		\subsection{Product Functions} 
+		
+		
+	
+    	\subsection{User Characteristics}  
+
+   
+   
+    	\subsection{Assumptions and Dependencies}
+    	
+\pagebreak
+
+	\section{Specific Requirements}
+   
+   
+    	\subsection{Functional Requirements}
+    	
+    	
+        \subsubsection{Actor-System Interaction Models}	
+			{
+				\noindent\textbf{UC: nameHere}
+				\begin{flushleft}
+					\begin{tabular}{ |p{7cm}|p{7cm}| } 
+   						\hline
+  						\multicolumn{2}{|p{\textwidth}|}{\textbf{Precondition:} Info..} \\
+ 						\hline
+						\textbf {Actor: } & \textbf{System: }\\ 
+						\hline
+						 & 0: such\\ 
+						\hline
+ 						1:TUCBW such &\\ 
+						\hline
+						3: TUCEW such & \\
+  						\hline
+  						\multicolumn{2}{|p{\textwidth}|}{\textbf{Postcondition: Info..}} \\
+  						 \hline
+
+				\end{tabular}
+
+			\end{flushleft}
+			\begin{center}
+    			Table 1: Description
+			\end{center}
+
+		\subsubsection{Traceability Matrix}	
+		
+		
+        \subsection{Performance Requirements}
+        
+        
+        \subsection{Design Constraints}
+        
+        
+        \subsection{Software System Attributes}
+        
+		
+        \subsection{Other Requirements}
+			\begin{itemize}
+  				\item 
+			\end{itemize}	
+			
+			
+\end{document}
