@@ -16,11 +16,11 @@ Marthinus Richter  ( u15160671)
 
 ###  Tenders
 
-EPI-USE_IoT-Homecare
+EPI-USE_IoT-Homecare at https://www.overleaf.com/read/xpcqcpxmgzbq
 
 
-RetroRabbit_AI Game Playing Agent 
+RetroRabbit_AI Game Playing Agent at https://www.overleaf.com/read/vhwhbmfcqdrk
 
 
-Compiax -Computational Graphing Tool 
+Compiax -Computational Graphing Tool at https://www.overleaf.com/read/cgpkcfgnvvvz
 
