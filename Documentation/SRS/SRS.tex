@@ -196,6 +196,16 @@
 			\begin{itemize}
   				\item
 			\end{itemize}
+			 \subsubsection{Peripheral Control Requirements}
+        	\begin{enumerate}
+            	\item{Location of Peripheral Control Functionality\\ Peripheral control will be located on each raspberry pi device as all peripherals are connected to it via arduinos.}
+            	\item{Peripheral control access\\Peripheral control will be accessed through the mobile application where the caretaker or whoever has access to it will have options for manipulating attached devices through a user interface.}
+                \item{Processing user requests\\Once the user chooses how to manipulate a peripheral from the application, the request is sent to the cloud and relayed to the raspberry pi. There, the pi processes the request and invokes the correct function.}
+                \item{Processing Requests from Pi\\ Requests coming from the cloud will be decoded and the correct device will be picked out for control. Once the device is identified, the pi will pick out the appropriate requested functionality for said device and run it.}
+                \item{Device Monitoring\\The status of each device will be monitored by the pi and any user requests that go out of range of set parameters for that specific device will trigger error messages.}
+                \item{Error responses\\If the pi realizes that the requests are invalid, it will send the appropriate error message back through the cloud and to the users mobile application where it will be presented as an alert.}
+                \item{Successful responses\\ If the request fits the parameters of the device, the device will respond accordingly and a success message will be sent through the cloud and to the users mobile application, notifying them that the action was completed successfully.}
+            \end{enumerate}
 	\subsection{Non-functional requirements}
     \subsubsection{UI Accessibility Requirements and Constraints}
      \begin{enumerate}
