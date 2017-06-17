@@ -33,6 +33,14 @@
     \fi
     }%
 
+%Set default path for \input{…} akin to \graphicspath{…}
+%https://tex.stackexchange.com/a/79060
+\makeatletter
+\providecommand*{\input@path}{}
+\edef\input@path{{./FunctionalRequirements/}{./NonFunctionalRequirements/}{./OverallDescription/}{}\input@path}% prepend
+\makeatother
+
+
 \begin{document}
 
 {\fontfamily{phv}\selectfont % change phv to get new fonts for whole document
@@ -73,10 +81,9 @@
     	\subsection{Scope}
 
 
-        \subsection{Definitions, Acronyms, and Abbreviations}
-			\begin{itemize}
-  				\item
-			\end{itemize}
+		\input{DefinitionsAcronymsAndAbbreviations.tex}
+		
+        
 
 
         \subsection{References}
@@ -118,8 +125,7 @@
 		\subsection{Product Functions}
 
 
-
-    	\subsection{User Characteristics}
+		\input{UserCharacteristics.tex}
 
 
 
@@ -131,58 +137,15 @@
 
 
     	\subsection{Functional Requirements}
-
-
-        \subsubsection{Actor-System Interaction Models}
-			{
-				\noindent\textbf{UC: nameHere}
-				\begin{flushleft}
-					\begin{tabular}{ |p{7cm}|p{7cm}| }
-   						\hline
-  						\multicolumn{2}{|p{\textwidth}|}{\textbf{Precondition:} Info..} \\
- 						\hline
-						\textbf {Actor: } & \textbf{System: }\\
-						\hline
-						 & 0: such\\
-						\hline
- 						1:TUCBW such &\\
-						\hline
-						3: TUCEW such & \\
-  						\hline
-  						\multicolumn{2}{|p{\textwidth}|}{\textbf{Postcondition: Info..}} \\
-  						 \hline
-
-				\end{tabular}
-
-			\end{flushleft}
-			\begin{center}
-    			Table 1: Description
-			\end{center}
-
-		\subsubsection{Traceability Matrix}
-		\subsubsection{Real-Time Data requirements(most of these are actually non-functional)}
-        	\begin{enumerate}
-            	\item{Keep the data moving\\process messages ‘in-stream’, without any requirement to store them to perform any operation or sequence of operations.}
-                \item{Query using QL on streams\\relying on low-level programming schemes results in long development cycles and high maintenance costs. Process moving real-time data using a high-level language such as SQL.}
-                \item{Handle stream imperfections\\ built-in mechanisms to provide resiliency against stream ‘imperfections’ including missing and out-of-order data.}
-                \item{Generate predictable outcomes\\Time series data must be processed in a predictable manner to ensure the results of processing are deterministic and repeatable.}
-                \item{Integrate stored and streaming data\\have the capability to efficiently store, modify, and access state information, and combine it with live streaming data. For seamless integration, the system should use a uniform language when dealing with either type of data.}
-                \item{Guarantee data safety and availability\\ ensure that the applications are up and available, and the integrity of the data maintained at all times, despite failures.}
-                \item{Partition and scale applications automatically\\ it should be possible to split an application over multiple machines for scalability (as the volume of input streams or the complexity of processing increases) without the developer having to write low-level code.}
-                \item{Process and respond instantaneously\\a highly-optimized, minimal overhead execution engine to deliver real-time response for high-volume applications.}
-            \end{enumerate}
+			\input{Actor-SystemInteractionModels.tex}
+	        
+			\subsubsection{Traceability Matrix}
+			
+			\input{AccessRequirements.tex}
+			\input{Real-TimeDataRequirements.tex}
+			\input{NotificationsRequirements.tex}
 	    
-	    \subsubsection{Notifications Requirements}
-        	\begin{enumerate}
-            	\item{Location of Notifications Subsystem\\ The Notification functionality will be located on the cloud server as it is more reliable and has easier access to patient data rather than having it on each mobile application where it increases the application size.}
-            	\item{Real-time Monitoring of Patient Data\\Patient data received is compared to stats that have been deemed normal before the data is stored in the Cassandra database. Deviations from the norm trigger notification functionality, but data is stored as normal anyway.}
-                \item{Judging severity\\Notification functionality will then assess the severity of the patient data that triggered the response and determine its severity.}
-                \item{Reacting Accordingly Based On Severity\\ Once severity is established, the Notification functionality will decide on the appropriate response based on the severity. For example, if the patients blood sugar level is slightly bellow average, a low level response will be issued.}
-                \item{Types of Responses\\The responses that will be chosen from will range from a small notification on the application itself, to an urgent alert with sound, to an emergency SMS on the caretakers mobile devices.}
-                \item{Format of Notifications\\Notifications will be precise, short and as to the point as possible. Especially for emergency alerts. They may also provide minimal advice for the specific situation but should definitely not be considered replacements for medically professional approaches. They are to be read quickly and with ease so as to minimize the time to react appropriately.}
-                \item{Notify Nearest Medical Professional\\ If severity is judged to be too great for a caretaker to handle, the application may notify the nearest medical facility with all needed details such as address and condition of patient.}
-            \end{enumerate}
-
+	    
         \subsection{Performance Requirements}
 
 
@@ -196,95 +159,11 @@
 			\begin{itemize}
   				\item
 			\end{itemize}
-			 \subsubsection{Peripheral Control Requirements}
-        	\begin{enumerate}
-            	\item{Location of Peripheral Control Functionality\\ Peripheral control will be located on each raspberry pi device as all peripherals are connected to it via arduinos.}
-            	\item{Peripheral control access\\Peripheral control will be accessed through the mobile application where the caretaker or whoever has access to it will have options for manipulating attached devices through a user interface.}
-                \item{Processing user requests\\Once the user chooses how to manipulate a peripheral from the application, the request is sent to the cloud and relayed to the raspberry pi. There, the pi processes the request and invokes the correct function.}
-                \item{Processing Requests from Pi\\ Requests coming from the cloud will be decoded and the correct device will be picked out for control. Once the device is identified, the pi will pick out the appropriate requested functionality for said device and run it.}
-                \item{Device Monitoring\\The status of each device will be monitored by the pi and any user requests that go out of range of set parameters for that specific device will trigger error messages.}
-                \item{Error responses\\If the pi realizes that the requests are invalid, it will send the appropriate error message back through the cloud and to the users mobile application where it will be presented as an alert.}
-                \item{Successful responses\\ If the request fits the parameters of the device, the device will respond accordingly and a success message will be sent through the cloud and to the users mobile application, notifying them that the action was completed successfully.}
-            \end{enumerate}
-	\subsection{Non-functional requirements}
-    \subsubsection{UI Accessibility Requirements and Constraints}
-     \begin{enumerate}
-   \item Material Design usability requirements
-
-   		\begin{enumerate}
-    		\item{Clear}
-            	\begin{enumerate}
-                	\item{Clearly visible elements}
-                    \item{Sufficient contrast and size}
-                    \item{A clear hierarchy of importance}
-                    \item{Key information discernable at a glance}
-            	\end{enumerate}
-        	\item{Robust}
-            	\begin{enumerate}
-                	\item{Navigate: Give users confidence in knowing where they are in the app and what is important.}
-                    \item{Understand important tasks: Reinforce important information through multiple visual and textual cues. Use color, shape, text, and motion to communicate what is happening.}
-                    \item{Access the app: Include appropriate content labelling to accommodate users who experience a text-only version of your app.}
-            	\end{enumerate}
-        	\item{Specific}
-            Assistive technology helps increase, maintain, or improve the functional capabilities of individuals with disabilities, through devices like screen readers, magnification devices. This is especially the case with IoT Homecare.
-        \end{enumerate}
-   \item Colour and Contrast
-     \begin{enumerate}
-       \item Accessible colour palette\\
-       Choose primary, secondary, and accent colors for the app that support usability. Ensure sufficient color contrast between elements so that users with low vision can see and use the app.
-
-       \item Contrast ratios \\
-       Contrast ratios represent how different a color is from another color, commonly written as 1:1 or 21:1
-       \begin{enumerate}
-         \item Small text should have a contrast ratio of at least 4.5:1 against its background.
-         \item Large text (at 14 pt bold/18 pt regular and up) should have a contrast ratio of at least 3:1 against its background.
-         \item Icons or other critical elements should also use the above recommended contrast ratios.
-
-       \end{enumerate}
-       \item{For users who are colorblind, or cannot see differences in color, include design elements in addition to color that ensure they receive the same amount of information. Use multiple visual cues to communicate important states. Use elements such as strokes, indicators, patterns, texture, or text to describe actions and content.}
-     \end{enumerate}
-    \item{Sound and Motion}
-    	\begin{enumerate}
-        	\item{Sound\\Give visual alternatives to sound, and vice versa. Provide closed captions, a transcript, or another visual alternatives to critical audio elements and sound alerts.}
-            \item{Motion\\- Enable content that moves, scrolls, or blinks automatically to be paused, stopped, or hidden if it lasts more than than five seconds.\\
-- Limit flashing content to three times in a one-second period to meet flash and red flash thresholds.\\
-- Avoid flashing large central regions of the screen.}
-        \end{enumerate}
-
-    \item{Style}
-    	\begin{enumerate}
-        	\item{Touch Targets\\To help users who aren't able to see the screen properly or who have motor-dexterity problems, to tap elements in the app. Touch targets are the parts of the screen that respond to user input. They extend beyond the visual bounds of an element. \\- Touch targets should be at least 48 x 48 dp. \\- They should be be separated by 8dp of space or more to ensure balanced information density and usability. }
-            \item{Grouping Items\\Keeping related items in proximity to one another is helpful for those who have low vision or may have trouble focusing on the screen.}
-            \item{Fonts\\To improve readability users can increase font size}
-        \end{enumerate}
-    \item{Hierarchy and focus}
-    	\begin{enumerate}
-        	\item{Hierarchy\\Place items on the screen according to their relative level of importance.}
-            \begin{enumerate}
-            	\item{Important actions: Place important actions at the top or bottom of the screen (reachable with shortcuts).}
-                \item{Related items: Place related items of a similar hierarchy next to each other.}
-            \end{enumerate}
-            \item{Focus order\\Input focus should follow the order of the visual layout, from the top to the bottom of the screen. It should traverse from the most important to the least important item.}
-            \item{Grouping\\Group similar items under headings that communicate what the groupings are. These groups organize content spatially.}
-            \item{Transitions\\
-- Focus traversal between screens and tasks should be as continuous as possible.\\
-- If a task is interrupted and then resumed, place focus on the element that was previously focused.}
-
-        \end{enumerate}
-    \item{Implementation  }
-    	\begin{enumerate}
-        \item{Use standard platform controls that are well known and standards used in most android applications.}
-        \item{Use scalable text and a spacious layout to accommodate users who may have large text, color correction, magnification, or other assistive settings turned on.}
-        \item{Any features with special accessibility considerations should be included in help documentation. Make help documentation relevant, accessible, and discoverable.}
-        \end{enumerate}
-    \item{Writing}
-    	\begin{enumerate}
-        	\item{Be succinct, keep content and accessibility text short and to the point. Avoid including control type or state in text }
-            \item{Indicate what an element does, use action verbs to indicate what an element or link does, not what an element looks like, so a visually impaired person can understand.}
-            \item{Don’t mention the exact gesture or interaction}
-            \item{Confirm actions, snackbars (Android) to confirm or acknowledge user actions that are destructive (like “Delete” or “Remove”) or difficult to undo. }
-
-        \end{enumerate}
-   \end{enumerate}
+		
+			\input{PeripheralControlRequirements.tex}
+			 
+		\subsection{Non-functional requirements}
+			\input{UIAccessibilityRequirementsAndConstraints.tex}
+    
 
 \end{document}
