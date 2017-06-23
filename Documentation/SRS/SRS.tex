@@ -37,7 +37,7 @@
 %https://tex.stackexchange.com/a/79060
 \makeatletter
 \providecommand*{\input@path}{}
-\edef\input@path{{./FunctionalRequirements/}{./NonFunctionalRequirements/}{./OverallDescription/}{}\input@path}% prepend
+\edef\input@path{{./FunctionalRequirements/}{./NonFunctionalRequirements/}{./OverallDescription/}{./PerformanceRequirements/}{./DesignConstraints/}{./Scope/}\input@path}% prepend
 \makeatother
 
 
@@ -80,7 +80,7 @@
 
     	\subsection{Scope}
 	
-		\input{Scope/scope.tex}
+			\input{scope.tex}
 
 
 		\input{DefinitionsAcronymsAndAbbreviations.tex}
@@ -93,6 +93,7 @@
 
 
         \subsection{Overview}
+			\input{overView.tex}
 
 
 \pagebreak
@@ -149,10 +150,10 @@
 	    
 	    
         \subsection{Performance Requirements}
-		\input{PerformanceRequirements/performanceRequirements.tex}
+		\input{performanceRequirements.tex}
 
         \subsection{Design Constraints}
-		\input{DesignConstraints/designConstraints.tex}
+		\input{designConstraints.tex}
 
         \subsection{Software System Attributes}
 
