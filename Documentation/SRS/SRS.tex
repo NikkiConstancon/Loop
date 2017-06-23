@@ -4,6 +4,13 @@
 \usepackage{ragged2e}
 \renewcommand\thepage{- \arabic{page} -}
 
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
 %Logo
 \newcommand\Highlight{%
 	\put(0,150){%
@@ -113,7 +120,7 @@
             \subsubsection{Software Interface}
 
 
-            \subsubsection{Communications Interface}
+            \input{CommunicationsInterface.tex}
 
 
             \subsubsection{Memory}
@@ -126,10 +133,7 @@
 
 
 		\input{UserCharacteristics.tex}
-
-
-
-    	\subsection{Assumptions and Dependencies}
+    	\input{AssumptionsAndDependencies.tex}
 
 \pagebreak
 
@@ -152,7 +156,7 @@
         \subsection{Design Constraints}
 
 
-        \subsection{Software System Attributes}
+        \input{SoftwareSystemAttributes.tex}
 
 
         \subsection{Other Requirements}
