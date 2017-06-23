@@ -1,11 +1,31 @@
 \subsection{User Characteristics}
-	Users will have a single account within the system, and will be associated with a specific IUID. A user will be a logical compound of User Roles, where each role has a contextual significants.
+
+//Not sure if this is in the correct format (might need some work)
+
+The system will provide features that is specifically intended for a \textit{patient} most likely to be an invalid. It may be assumed that \textit{patients} will fall under the elderly demographic, whoever, system support can easily be extended to included an array of bedridden conditions.
+
+The elderly have an tendency to be less inclined with mobile applications, and might have low technical skills regarding IoT related technologies (however this might be a gross generalization).
+
+It is thus preferable that a family member can stand in for the Patient that has sufficient technical skills to manage said \textit{patient's} account, or make authoritative decisions for medical procedures. This member will most likely be interested in real time monitoring facility to keep a close eye on their beloved.
+
+The \textit{patient} will require aid in most daily activities that may includes personal hygiene, prescription fulfillment, and minimal exercise. A \textit{care taker} will take on the responsibility to provide this aid. Such user should have the education and technical skills to handle the mobile application without difficulties.
+
+Elderly patients tend to develop open wounds due to bad blood circulation. As such wound nurses needs to dress the wound regularly. A nurse aught to have the expertise to work with relevant services provided by the system.
+
+Home doctors and doctors on standby aught to have the expertise to work with relevant services provided by the system.
+
+Researchers aught to have the expertise to work with relevant services provided by the system.
+
+In some cases one person may assume multiple responsibilities.
+
+To allow for loose coupling, each user will have a single account, and have a specific IUID associated with them. An user will be a logical compound of User Roles, where each role has a contextual significants.
+
 \subsubsection{User Role}
-\begin{enumerate}
-	\item{Affected}\\ The individual connected to medical peripherals. The peripherals will continuously monitor this individual's medical information and upload the gathered data to the Cloud. Routines will be performed on this individual by a set of Practitioners.
-	\item{Invoker}\\ The individual that may invoke actions of peripheral devices, given that they have surfactant authorization.
-	\item{Monitor}\\ The individual that has access to a specific Affected user's medical information.
-	\item{Practitioner}\\ The individual that performs specialized routines on the Affected. The Two main specialization branches are educated and uneducated practitioners. Educated practitioners are then further specialized into Care Workers, Nurses, and Doctors.
-	\item{Proxy}\\ The individual that will authorize a class of procedures to be performed on the Affected, or make queries on behalf of the Affected.
-	\item{Researcher}\\ The individual that may view anonymous and aggregated statistics gathered by the system.
-\end{enumerate}
+\begin{description}
+	\item [Patient] The individual connected to medical peripherals. The peripherals will continuously monitor this individual's medical information and upload the gathered data to the Cloud. Routines will be performed on this individual by a set of Practitioners.
+	\item [Invoker] The individual that may invoke actions of peripheral devices, given that they have surfactant authorization.
+	\item [Monitor] The individual that has access to a specific Patient's medical information.
+	\item [Practitioner] The individual that performs specialized routines on the Patient. The Two main specialization branches are educated and uneducated practitioners. Educated practitioners are then further specialized into Care Taker, Nurses, and Doctors.
+	\item [Proxy] The individual that will authorize a class of procedures to be performed on the Patient, or make queries on behalf of the Patient.
+	\item [Researcher] The individual that may view anonymous and aggregated statistics gathered by the system.
+\end{description}
