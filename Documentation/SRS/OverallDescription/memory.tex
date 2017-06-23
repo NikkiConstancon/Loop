@@ -1,0 +1,8 @@
+In terms of storage, most of the information that ReVA works with is stored on the remote cloud server in a Cassandra database after it
+has been formatted to adhere to standerdised medical record formats. Since the information is vast and vitally, medically important, Cassandra
+was chosen as it is capable of working with large amounts of data in a quick NoSQL manner with zero failure points.\\In terms of local storage
+as data is being transfered from device to device, Arduinos temporarily store very small data from attached sensors on their local storage. As
+the data from sensors is not very large, it does not hinder Arduino performance. The data then moves to the Raspberry Pi, where it is also placed 
+in local storage before it is sent through to the cloud. Once again, data is not large and does not hinder Pi performance. Information coming from the 
+cloud server reaches the mobile device and is stored in the mobile device's local storage. As the data that the mobile application reports is not 
+large, local storage is sufficient and does not hinder mobile device performance. 

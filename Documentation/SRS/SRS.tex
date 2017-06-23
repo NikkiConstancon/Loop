@@ -2,6 +2,7 @@
 \usepackage{graphicx}
 \usepackage{eso-pic}
 \usepackage{ragged2e}
+\usepackage{array}
 \renewcommand\thepage{- \arabic{page} -}
 
 
@@ -44,7 +45,7 @@
 %https://tex.stackexchange.com/a/79060
 \makeatletter
 \providecommand*{\input@path}{}
-\edef\input@path{{./FunctionalRequirements/}{./NonFunctionalRequirements/}{./OverallDescription/}{}\input@path}% prepend
+\edef\input@path{{./FunctionalRequirements/}{./NonFunctionalRequirements/}{./OverallDescription/}{./PerformanceRequirements/}{./DesignConstraints/}{./Scope/}\input@path}% prepend
 \makeatother
 
 
@@ -86,6 +87,8 @@
 
 
     	\subsection{Scope}
+	
+			\input{scope.tex}
 
 
 		\input{DefinitionsAcronymsAndAbbreviations.tex}
@@ -98,6 +101,7 @@
 
 
         \subsection{Overview}
+			\input{overView.tex}
 
 
 \pagebreak
@@ -108,28 +112,29 @@
 
 
         	\subsubsection{System Interface}
+				\input{systemInterface.tex}
 
-
-            \subsubsection{User Interfacddase}
+            \subsubsection{User Interface}
 
 
 
             \subsubsection{Hardware Interface}
-
+				\input{hardwareInterface.tex}
 
             \subsubsection{Software Interface}
-
+				\input{softwareInterface.tex}
 
             \input{CommunicationsInterface.tex}
 
 
             \subsubsection{Memory}
-
+		\input{memory.tex}
 
             \subsubsection{Operations}
-
+				\input{operations.tex}
 
 		\subsection{Product Functions}
+				\input{productFunctions.tex}
 
 
 		\input{UserCharacteristics.tex}
@@ -142,19 +147,20 @@
 
     	\subsection{Functional Requirements}
 			\input{Actor-SystemInteractionModels.tex}
+			\input{Use-CaseDiagrams.tex}
 	        
 			\subsubsection{Traceability Matrix}
-			
+				\input{TracebilityMatrix.tex}
 			\input{AccessRequirements.tex}
 			\input{Real-TimeDataRequirements.tex}
 			\input{NotificationsRequirements.tex}
 	    
 	    
         \subsection{Performance Requirements}
-
+		\input{performanceRequirements.tex}
 
         \subsection{Design Constraints}
-
+		\input{designConstraints.tex}
 
         \input{SoftwareSystemAttributes.tex}
 

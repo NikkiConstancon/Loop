@@ -1,0 +1,66 @@
+\subsubsection{UI Accessibility Requirements and Constraints}
+     \begin{enumerate}
+   \item Material Design usability requirements
+
+   		\begin{enumerate}
+    		\item{Clear}
+            	\begin{enumerate}
+                	\item{Clearly visible elements}
+                    \item{Sufficient contrast and size}
+                    \item{A clear hierarchy of importance}
+                    \item{Key information discernable at a glance}
+            	\end{enumerate}
+        	\item{Robust}
+            	\begin{enumerate}
+                	\item{Navigate: Give users confidence in knowing where they are in the app and what is important.}
+                    \item{Understand important tasks: Reinforce important information through multiple visual and textual cues. Use color, shape, text, and motion to communicate what is happening.}
+                    \item{Access the app: Include appropriate content labelling to accommodate users who experience a text-only version of your app.}
+            	\end{enumerate}
+        	\item{Specific}
+            Assistive technology helps increase, maintain, or improve the functional capabilities of individuals with disabilities, through devices like screen readers, magnification devices. This is especially the case with IoT Homecare.
+        \end{enumerate}
+   \item Colour and Contrast
+     \begin{enumerate}
+       \item Accessible colour palette\\
+       Choose primary, secondary, and accent colors for the app that support usability. Ensure sufficient color contrast between elements so that users with low vision can see and use the app.
+       \item{For users who are colorblind, or cannot see differences in color, include design elements in addition to color that ensure they receive the same amount of information. Use multiple visual cues to communicate important states. Use elements such as strokes, indicators, patterns, texture, or text to describe actions and content.}
+     \end{enumerate}
+    \item{Sound}
+
+        	\item{Sound\\Give visual alternatives to sound, and vice versa. Provide closed captions, a transcript, or another visual alternatives to critical audio elements and sound alerts.}
+
+    \item{Style}
+    	\begin{enumerate}
+        	\item{Touch Targets\\To help users who aren't able to see the screen properly or who have motor-dexterity problems, to tap elements in the app. Touch targets are the parts of the screen that respond to user input. They extend beyond the visual bounds of an element. }
+            \item{Grouping Items\\Keeping related items in proximity to one another is helpful for those who have low vision or may have trouble focusing on the screen.}
+            \item{Fonts\\To improve readability users can increase font size}
+        \end{enumerate}
+    \item{Hierarchy and focus}
+    	\begin{enumerate}
+        	\item{Hierarchy\\Place items on the screen according to their relative level of importance.}
+            \begin{enumerate}
+            	\item{Important actions: Place important actions at the top or bottom of the screen (reachable with shortcuts).}
+                \item{Related items: Place related items of a similar hierarchy next to each other.}
+            \end{enumerate}
+            \item{Focus order\\Input focus should follow the order of the visual layout, from the top to the bottom of the screen. It should traverse from the most important to the least important item.}
+            \item{Grouping\\Group similar items under headings that communicate what the groupings are. These groups organize content spatially.}
+            \item{Transitions\\
+- Focus traversal between screens and tasks should be as continuous as possible.\\
+- If a task is interrupted and then resumed, place focus on the element that was previously focused.}
+
+        \end{enumerate}
+    \item{Implementation  }
+    	\begin{enumerate}
+        \item{Use standard platform controls that are well known and standards used in most android applications.}
+        \item{Use scalable text and a spacious layout to accommodate users who may have large text, color correction, magnification, or other assistive settings turned on.}
+        \item{Any features with special accessibility considerations should be included in help documentation. Make help documentation relevant, accessible, and discoverable.}
+        \end{enumerate}
+    \item{Writing}
+    	\begin{enumerate}
+        	\item{Be succinct, keep content and accessibility text short and to the point. Avoid including control type or state in text }
+            \item{Indicate what an element does, use action verbs to indicate what an element or link does, not what an element looks like, so a visually impaired person can understand.}
+            \item{Don’t mention the exact gesture or interaction}
+            \item{Confirm actions, snackbars (Android) to confirm or acknowledge user actions that are destructive (like “Delete” or “Remove”) or difficult to undo. }
+
+        \end{enumerate}
+   \end{enumerate}
