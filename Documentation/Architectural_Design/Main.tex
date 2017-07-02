@@ -1,0 +1,117 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{eso-pic}
+\usepackage{ragged2e}
+\usepackage{array}
+\renewcommand\thepage{- \arabic{page} -}
+
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+%Logo
+\newcommand\Highlight{%
+	\put(0,150){%
+		\parbox[b][\paperheight]{\paperwidth}{%
+		\vfill
+		\centering
+		\includegraphics[width=\paperwidth, height=10cm]{logo.jpg}%
+		\vfill
+}}}
+%Swirl
+\newcommand\Swirl{%
+	\put(50,270){%
+		\parbox[b][\paperheight]{\paperwidth}{%
+		\vfill
+		\centering
+		\includegraphics[width=20cm, height=20cm]{background.png}%
+		\vfill
+}}}
+\graphicspath{{../images/}}
+\usepackage{graphicx}
+
+
+\AddToShipoutPicture*{\Highlight}
+\AddToShipoutPictureBG{%
+	\ifnum\value{page}>1
+	\AtPageLowerLeft{\Swirl}%
+    \fi
+    }%
+
+%Set default path for \input{…} akin to \graphicspath{…}
+%https://tex.stackexchange.com/a/79060
+\makeatletter
+\providecommand*{\input@path}{}
+\edef\input@path{{./FunctionalRequirements/}{./NonFunctionalRequirements/}{./OverallDescription/}{./PerformanceRequirements/}{./DesignConstraints/}{./Scope/}\input@path}% prepend
+\makeatother
+
+
+\begin{document}
+
+{\fontfamily{phv}\selectfont % change phv to get new fonts for whole document
+\font\myfont=cmr12 at 20pt
+
+\begin{center}
+
+
+\begin{minipage}{0.75\linewidth}
+
+
+\vspace*{250pt}
+\title{ \rule{\linewidth}{2pt} \\
+\textbf{\normalfont\fontsize{35}{35}\scshape\selectfont IoT HomeCare System}\\
+\textbf{\normalfont\fontsize{35}{35}\scshape\selectfont Architectural Design}\\}
+\author{
+        Hristian Vitrychenko\\
+        Nikki Constancon \\
+        Juan du Preez\\
+        Gregory Austin \\
+        Marthinus Richter
+}
+\date{\today \\ \rule{\linewidth}{2pt}}
+
+
+\maketitle
+\thispagestyle{empty}
+
+\end{minipage}
+\end{center}
+\pagebreak
+
+\clearpage
+
+\section{Architecture Overview}
+%\input{introduction/architecture_overview}
+
+\clearpage
+\section{External Interface Requirements}
+%\input{introduction/external_interface_requirements}
+
+\clearpage
+\section{Performance Requirements}
+%\input{introduction/performance_requirements}
+
+\clearpage
+\section{Design Constraints}
+%\input{introduction/design_constraints}
+
+\pagebreak
+\section{Deployment Diagram}
+%\input{introduction/deployment_diagram}
+
+\pagebreak
+\section{Subsystem Architectural Requirements}
+  \subsection{Collection}
+\clearpage
+  \subsection{Recording}
+\clearpage
+  \subsection{Reporting}
+\clearpage
+  \subsection{Notification}
+\clearpage
+  \subsection{Access}
+  
+\end{document}
