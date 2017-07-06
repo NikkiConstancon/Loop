@@ -2,7 +2,16 @@
 \usepackage{graphicx}
 \usepackage{eso-pic}
 \usepackage{ragged2e}
+\usepackage{array}
 \renewcommand\thepage{- \arabic{page} -}
+
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
 %Logo
 \newcommand\Highlight{%
 	\put(0,150){%
@@ -21,8 +30,9 @@
 		\includegraphics[width=20cm, height=20cm]{background.png}%
 		\vfill
 }}}
-\usepackage{graphicx}
 \graphicspath{{../images/}}
+\usepackage{graphicx}
+
 
 \AddToShipoutPicture*{\Highlight}
 \AddToShipoutPictureBG{%
@@ -30,7 +40,15 @@
 	\AtPageLowerLeft{\Swirl}%
     \fi
     }%
-    
+
+%Set default path for \input{…} akin to \graphicspath{…}
+%https://tex.stackexchange.com/a/79060
+\makeatletter
+\providecommand*{\input@path}{}
+\edef\input@path{{./FunctionalRequirements/}{./NonFunctionalRequirements/}{./OverallDescription/}{./PerformanceRequirements/}{./DesignConstraints/}{./Scope/}\input@path}% prepend
+\makeatother
+
+
 \begin{document}
 
 {\fontfamily{phv}\selectfont % change phv to get new fonts for whole document
@@ -46,12 +64,12 @@
 \title{ \rule{\linewidth}{2pt} \\
 \textbf{\normalfont\fontsize{35}{35}\scshape\selectfont IoT HomeCare System}\\
 \textbf{\normalfont\fontsize{35}{35}\scshape\selectfont SRS}\\}
-\author{   
+\author{
         Hristian Vitrychenko\\
         Nikki Constancon \\
         Juan du Preez\\
         Gregory Austin \\
-        Marthinus Richter 
+        Marthinus Richter
 }
 \date{\today \\ \rule{\linewidth}{2pt}}
 
@@ -62,116 +80,100 @@
 \end{minipage}
 \end{center}
 \pagebreak
-	
+
 	\section{Introduction}
-    	
+
         \subsection{Purpose}
-        
-        
+
+
     	\subsection{Scope}
-    	
-    	
-        \subsection{Definitions, Acronyms, and Abbreviations}
-			\begin{itemize}
-  				\item 	
-			\end{itemize}
-			
-			
+	
+			\input{scope.tex}
+
+
+		\input{DefinitionsAcronymsAndAbbreviations.tex}
+		
+        
+
+
         \subsection{References}
 			{IEEE Recommended Practice for Software Requirements Specifications}
-	
-	
+
+
         \subsection{Overview}
-	
-	
+			\input{overView.tex}
+
+
 \pagebreak
 	\section{Overall Description}
-		 
-		 
+
+
         \subsection{Product Perspective}
-        
-        
+
+
         	\subsubsection{System Interface}
-        	
+				\input{systemInterface.tex}
 
             \subsubsection{User Interface}
-            
+
+
 
             \subsubsection{Hardware Interface}
-            
-            
-            \subsubsection{Software Interface} 
-                       
-            
-            \subsubsection{Communications Interface} 
-            
-            
-            \subsubsection{Memory}
-            
-            
-            \subsubsection{Operations}
-            	
-           
-		\subsection{Product Functions} 
-		
-		
-	
-    	\subsection{User Characteristics}  
+				\input{hardwareInterface.tex}
 
-   
-   
-    	\subsection{Assumptions and Dependencies}
-    	
+            \subsubsection{Software Interface}
+				\input{softwareInterface.tex}
+
+            \input{CommunicationsInterface.tex}
+
+
+            \subsubsection{Memory}
+		\input{memory.tex}
+
+            \subsubsection{Operations}
+				\input{operations.tex}
+
+		\subsection{Product Functions}
+				\input{productFunctions.tex}
+
+
+		\input{UserCharacteristics.tex}
+    	\input{AssumptionsAndDependencies.tex}
+
 \pagebreak
 
 	\section{Specific Requirements}
-   
-   
+
+
     	\subsection{Functional Requirements}
-    	
-    	
-        \subsubsection{Actor-System Interaction Models}	
-			{
-				\noindent\textbf{UC: nameHere}
-				\begin{flushleft}
-					\begin{tabular}{ |p{7cm}|p{7cm}| } 
-   						\hline
-  						\multicolumn{2}{|p{\textwidth}|}{\textbf{Precondition:} Info..} \\
- 						\hline
-						\textbf {Actor: } & \textbf{System: }\\ 
-						\hline
-						 & 0: such\\ 
-						\hline
- 						1:TUCBW such &\\ 
-						\hline
-						3: TUCEW such & \\
-  						\hline
-  						\multicolumn{2}{|p{\textwidth}|}{\textbf{Postcondition: Info..}} \\
-  						 \hline
-
-				\end{tabular}
-
-			\end{flushleft}
-			\begin{center}
-    			Table 1: Description
-			\end{center}
-
-		\subsubsection{Traceability Matrix}	
-		
-		
+			\input{Actor-SystemInteractionModels.tex}
+			\input{Use-CaseDiagrams.tex}
+	        
+			\subsubsection{Traceability Matrix}
+				\input{TracebilityMatrix.tex}
+			\input{AccessRequirements.tex}
+			\input{Real-TimeDataRequirements.tex}
+			\input{NotificationsRequirements.tex}
+	    
+	    
         \subsection{Performance Requirements}
-        
-        
+		\input{performanceRequirements.tex}
+
         \subsection{Design Constraints}
-        
-        
-        \subsection{Software System Attributes}
-        
-		
+		\input{designConstraints.tex}
+
+        \input{SoftwareSystemAttributes.tex}
+
+
         \subsection{Other Requirements}
 			\begin{itemize}
-  				\item 
-			\end{itemize}	
-			
-			
+  				\item
+			\end{itemize}
+		
+			\input{PeripheralControlRequirements.tex}
+			 
+		\subsection{Non-functional requirements}
+			\input{UIAccessibilityRequirementsAndConstraints.tex}
+    
+
 \end{document}

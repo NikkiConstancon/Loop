@@ -1,0 +1,14 @@
+\subsubsection{Communications Interface}
+\begin{enumerate}
+	\item \textit{Inter}-communications within the holistic system will strictly implement the publish-subscribe pattern to facilitate the diversity in connection permutations. This will allow sufficient abstraction while maintaining fine grained control, such that maintenance and overhead is minimized while scalability is improved within the context of message passing.
+	\begin{enumerate}
+		\item Special precautions will be made to ensure that subscribers will receive \textit{critical} messages, or alternatively to invoke the appropriate fall back procedure in the event that said message fails to arrive at the subscriber(s).
+		
+		\item Publishers will push to a single broker per logical subsystem, where messages may be handled appropriately within the context of said subsystem. The handling of messages will always include store and forward functions, and my perform sorting into priorities if it is required.
+		
+		\item Both topic-based and content-based filtering will be applied within the system as to provide a grater range of potential services.
+	\end{enumerate}
+	\item \textit{Intra}-communications does not have strict restrictions, though event-driven paradigms are highly favorable.
+\end{enumerate}
+
+
