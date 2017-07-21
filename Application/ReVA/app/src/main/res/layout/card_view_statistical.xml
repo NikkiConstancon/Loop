@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:baselineAligned="false">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/card_view_real_time">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/heart_rate"
+                android:id="@+id/img_heart_rate_icon"
+                android:contentDescription="@string/heart_rate_image" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/img_heart_rate_icon"
+                android:textStyle="bold"
+                android:text="@string/heart_rate"
+                android:textSize="20sp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_alignParentTop="true"
+                android:id="@+id/txt_heartRateStat"
+                tools:ignore="RtlHardcoded" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/img_heart_rate_icon"
+                android:textStyle="bold"
+                android:text="Minimum"
+                android:textSize="20sp"
+                android:layout_marginTop="15dp"
+                android:id="@+id/txt_heart_min"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_heart_min"
+                android:text="62bpm"
+                android:textSize="20sp"
+                android:layout_marginTop="15dp"
+                android:id="@+id/txt_heart_min_val"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/img_heart_rate_icon"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold"
+            android:text="Maximum"
+            android:textSize="20sp"
+            android:layout_marginTop="15dp"
+            android:id="@+id/txt_heart_max"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txt_heart_max"
+                android:layout_centerHorizontal="true"
+                android:text="105bpm"
+                android:textSize="20sp"
+                android:layout_marginTop="15dp"
+                android:id="@+id/txt_heart_max_val"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/img_heart_rate_icon"
+                android:layout_alignParentRight="true"
+                android:textStyle="bold"
+                android:text="Average"
+                android:textSize="20sp"
+                android:layout_marginTop="15dp"
+                android:id="@+id/txt_heart_avg"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txt_heart_avg"
+                android:layout_alignParentRight="true"
+                android:text="82bpm"
+                android:textSize="20sp"
+                android:layout_marginTop="15dp"
+                android:id="@+id/txt_heart_avg_val"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>
