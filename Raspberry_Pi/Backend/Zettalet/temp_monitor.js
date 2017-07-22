@@ -10,7 +10,7 @@ util.inherits(StateMachineDevice, Device);
 StateMachineDevice.prototype.init = function(config) {
   // Set up the state machine
     config
-      .type('state_machine')
+      .type('temp_monitor')
       .state('off')
       .name('temp_monitor')
       .stream('value', this.streamValue);
@@ -38,5 +38,5 @@ StateMachineDevice.prototype.turnOn = function(cb) {
 StateMachineDevice.prototype.streamValue = function(stream) {
   setInterval(function(){
     stream.write(35+Math.random()*4);
-  }, 5000);
+  }, 1000);
 }

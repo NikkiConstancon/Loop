@@ -27,7 +27,12 @@
 #Zetta
 *.peers
 *.devices
-node_modules
+
+node_modules/express-cassandra/
+node_modules/zetta-insulin-pump-mock-driver/
+node_modules/zetta-mock-heartbeat-sensor/
+node_modules/zetta-thermometer-mock-driver/
+node_modules/zetta-glucose-meter-mock-driver/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
