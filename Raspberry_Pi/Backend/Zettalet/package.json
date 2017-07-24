@@ -9,6 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "zetta": "^1.4.0"
+    "zetta": "^1.4.0",
+    "express-cassandra": "~1.9.0",
+    "zetta-glucose-meter-mock-driver": "0.0.3",
+    "zetta-insulin-pump-mock-driver": "0.0.1",
+    "zetta-mock-heartbeat-sensor": "~0.4.0",
+    "zetta-thermometer-mock-driver": "~0.1.1"
   }
 }
