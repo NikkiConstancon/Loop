@@ -1,8 +1,1 @@
 language: node_js
-node_js:
-  - "5"
-before_script:
-  - npm install
-script:
-  - node Raspberry_Pi/Backend/Zettar/Zettar.js &
-  - node Raspberry_Pi/Backend/Zettalet/zettalet.js
