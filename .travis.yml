@@ -10,4 +10,4 @@ script:
   - cd ..
   - cd Zettalet
   - npm install
-  - node zettalet.js
+  - node zettalet.js &
