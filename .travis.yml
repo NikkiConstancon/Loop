@@ -8,5 +8,6 @@ script:
   - npm install
   - node Zettar.js &
   - cd ..
+  - cd Zettalet
   - npm install
   - node zettalet.js
