@@ -1,6 +1,9 @@
 [![Stories in Ready](https://badge.waffle.io/NikkiConstancon/Loop.png?label=ready&title=Ready)](https://waffle.io/NikkiConstancon/Loop?utm_source=badge)
 
 
+[![Build Status](https://travis-ci.org/NikkiConstancon/Loop.png)](https://travis-ci.org/NikkiConstancon/Loop)
+
+
 <a href="https://teamup.com/ksvm8gnf581c12nn86" target="_blank"> :calendar:
 
 
