@@ -4,5 +4,5 @@ node_js:
 before_script:
   - npm install
 script:
-  - node Zettar.js &
-  - zettalet.js
+  - node Raspberry_Pi/Backend/Zettar/Zettar.js &
+  - node Raspberry_Pi/Backend/Zettalet/zettalet.js
