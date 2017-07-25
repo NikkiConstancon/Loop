@@ -20,7 +20,7 @@ Because we used the Zetta IoT platform, we used their architecture for collectin
 	These two classes are concrete implementations of the Device class. They will be the drivers which communicate with the actual devices whether through USB, a serial connection, Bluetooth, or Wi-fi. Note also that each Device has a Formatter class.
 
 	\item \textbf{Formatter}\\
-	This class is used by the devices to format the data into specific medical or functional formats. The purpose is to pre-process the data before sending it, so as to maximise the ease of use by the other modules. It has one abstract function which would be partilaly or completely completed by the concrete counterparts.
+	This class is used by the devices to format the data into specific medical or functional formats. The purpose is to pre-process the data before sending it, so as to maximise the ease of use by the other modules. It has one abstract function which would be partially or completely completed by the concrete counterparts.
 
 	\item \textbf{HeartRateFormatter and TemperatureFormatter}\\
 	These are just the concrete classes which implement the formatData() function specifically to each Device.

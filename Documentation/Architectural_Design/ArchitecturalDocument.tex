@@ -45,7 +45,7 @@
 %https://tex.stackexchange.com/a/79060
 \makeatletter
 \providecommand*{\input@path}{}
-\edef\input@path{{./FunctionalRequirements/}{./NonFunctionalRequirements/}{./OverallDescription/}{./PerformanceRequirements/}{./DesignConstraints/}{./Scope/}\input@path}% prepend
+\edef\input@path{{./DataCollection/}{./Introduction/}{./OverallDescription/}{./UserInterface/}\input@path}% prepend
 \makeatother
 
 
@@ -84,17 +84,17 @@
 \clearpage
 
 \section{Introduction}
-\input{Introduction/architecture_overview.tex}
+\input{architecture_overview.tex}
 
 \clearpage
 \section{Overall Description}
-\input{OverallDescription/overall_description.tex}
+\input{overall_description.tex}
 
 \clearpage
 \section{Detailed Artifact Descriptions}
 	\subsection{Raspberry Pi Environment}
 		\subsubsection{Data Collection}
-		\input{DataCollection/data_collection.tex}
+		\input{data_collection.tex}
 	\subsection{Cloud Server Environment}
 		\subsubsection{Pub/Sub Server}
 		\subsubsection{Data Storage}
@@ -103,7 +103,7 @@
 		\subsubsection{User Management}
 	\subsection{Android Application Environment}	
 		\subsubsection{User Interface}
-		\input{UserInterface/interface.tex}
+		\input{interface.tex}
 		\subsubsection{Data Pull}
 		\subsubsection{Advice}
 		
