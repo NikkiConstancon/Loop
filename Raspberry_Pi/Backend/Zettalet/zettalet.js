@@ -7,7 +7,7 @@ zetta()
 	.name('Stream Device Server')
 	.use(scout)
 	.use(display)
-	.link('http://127.0.0.1:3009')
+	.link('http://197.242.150.255:3009')
 	.listen(6000, function(){
     	console.log('Zettelet is running: 6000');
 	});
