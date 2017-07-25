@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  android:paddingBottom="@dimen/spacing_single"
+  android:paddingLeft="@dimen/spacing_double"
+  android:paddingRight="@dimen/spacing_double"
+  android:paddingTop="@dimen/spacing_single">
+
+  <include
+    android:id="@+id/row_1"
+    layout="@layout/merge_row_action_input_multiple" />
+
+  <include
+    android:id="@+id/row_2"
+    layout="@layout/merge_row_action_input_multiple" />
+
+  <include
+    android:id="@+id/row_3"
+    layout="@layout/merge_row_action_input_multiple" />
+
+  <include
+    android:id="@+id/row_4"
+    layout="@layout/merge_row_action_input_multiple" />
+
+  <include
+    android:id="@+id/row_5"
+    layout="@layout/merge_row_action_input_multiple" />
+
+  <include
+    android:id="@+id/row_6"
+    layout="@layout/merge_row_action_input_multiple" />
+
+  <android.support.v7.widget.AppCompatButton
+    android:id="@+id/list_item_action_button"
+    style="@android:style/TextAppearance.Small"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:text="walk" />
+
+</LinearLayout>
