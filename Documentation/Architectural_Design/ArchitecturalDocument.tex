@@ -45,7 +45,7 @@
 %https://tex.stackexchange.com/a/79060
 \makeatletter
 \providecommand*{\input@path}{}
-\edef\input@path{{./DataCollection/}{./Introduction/}{./OverallDescription/}{./UserInterface/}\input@path}% prepend
+\edef\input@path{{./DataCollection/}{./Introduction/}{./DataStorage/}{./OverallDescription/}{./UserInterface/}\input@path}% prepend
 \makeatother
 
 
@@ -93,18 +93,30 @@
 \clearpage
 \section{Detailed Artifact Descriptions}
 	\subsection{Raspberry Pi Environment}
+	
 		\subsubsection{Data Collection}
-		\input{data_collection.tex}
+			\input{data_collection.tex}
+		
 	\subsection{Cloud Server Environment}
+	
 		\subsubsection{Pub/Sub Server}
+		
 		\subsubsection{Data Storage}
-		\subsubsection{Statistics}Us
+			\input{DataStorage.tex}
+			
+		\subsubsection{Statistics}
+		
 		\subsubsection{Notification}
+		
 		\subsubsection{User Management}
+		
 	\subsection{Android Application Environment}	
+	
 		\subsubsection{User Interface}
-		\input{interface.tex}
+			\input{interface.tex}
+			
 		\subsubsection{Data Pull}
+		
 		\subsubsection{Advice}
 		
 \clearpage
