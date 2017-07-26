@@ -1,22 +1,21 @@
-var manager = require('./databaseManager');
+var dbMan = require('./databaseManager');
 var util = require('util');
+var logger = require('./revaLog');
 
 
-var UserManager = module.exports = function (){
-    manager.call(this);
-}
-
-util.inherits(UserManager, manager);
-
-
-UserManager.prototype.addUser = function(user){
-	console.log('Adding User');
-		new this.models.instance.users(user).save(function(err){
-        if(err) {
-            console.log(err);
-            return;
-        }else{
-            console.log('User Added Successfully!');
-        }
-	});
+var UserManager = module.exports = {
+    addUser: function (user) {
+        dbMan.try(function() {
+            new dbMan.models.instance.users(user).save(function (err) {
+                if (err) {
+                    logger.error(err);
+                    return;
+                } else {
+                    logger.debug('User Added Successfully!');
+                }
+            });
+        }).errorcb = function() {//optional callback
+            logger.error('UserManager:addUser faild');
+        };
+    }
 }
