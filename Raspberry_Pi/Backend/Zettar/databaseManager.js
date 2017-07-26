@@ -17,42 +17,46 @@ var self = module.exports = {
     models: models,///expose express-cassandra
     connected: false,///set to true if connected
 
-    ///The function passed will only exicute if a connection is established.
-    ///if not initally connected, intermidiate checks will be made to test if a connection has been made
-    /// for a maximum number of 'MAX_TRYS'
-    ///if 'MAX_TRYS' is reached and the error callback 'errorcb' was defined, then 'errorcb' will be called.
-    try: function(fun) {
-        var maxFailHandeler = function () {
-            logger.error('databaseManager:try max fails encountered. TODO: notify tech support');
-        }
-        var context = {};
-        var args = arguments;
-        if (!self.connected) {
-            if (globalTryFails < MAX_GLOBAL_TRY_FAILS) {
-                var tiks = MAX_TRYS;
-                var timeoutFun = function () {
-                    logger.debug('databaseManager:try tick');
-                    if (!self.connected) {
-                        if (tiks-- > 0) {
-                            setTimeout(timeoutFun, TRYS_INTERVALS);
-                        } else {
-                            globalTryFails++;
-                            !(globalTryFails < MAX_GLOBAL_TRY_FAILS) && maxFailHandeler();
-                            logger.error('databaseManager:try failed, global fail count: ' + globalTryFails);
-                            if (context.errorcb) {
-                                context.errorcb();
-                            }
-                        }
-                    } else {
-                        fun(args);
-                    }
-                };
-                setTimeout(timeoutFun, TRYS_INTERVALS);
-            } else {
-                maxFailHandeler();
+    /**
+    @brief: as a promise, will ensure a connectd db. Will make @param retry number of attempts to connect if no connection
+        is established
+    @TODO: handle faliurs, e.g. notify tech support etc.
+    @return: a promise
+    **/
+    try: (retry, intervals) => {
+        return new Promise(function (resolve, reject) {
+            var maxFailHandeler = function () {
+                msg = '#databaseManager#try max fails encountered. TODO: notify tech support';
+                logger.error(msg)
+                reject(msg)
             }
-        }
-        return context;
+            if (!self.connected) {
+                if (globalTryFails < MAX_GLOBAL_TRY_FAILS) {
+                    var tiks = retry || MAX_TRYS
+                    var timeoutFun = function () {
+                        logger.debug('#databaseManager#try tick')
+                        if (!self.connected) {
+                            if (tiks-- > 0) {
+                                setTimeout(timeoutFun, TRYS_INTERVALS)
+                            } else {
+                                globalTryFails++
+                                !(globalTryFails < MAX_GLOBAL_TRY_FAILS) && maxFailHandeler()
+                                var msg = '#databaseManager#try failed, global fail count: ' + globalTryFails;
+                                logger.error(msg)
+                                reject(msg)
+                            }
+                        } else {
+                            resolve(self)
+                        }
+                    };
+                    setTimeout(timeoutFun, intervals || TRYS_INTERVALS)
+                } else {
+                    maxFailHandeler()
+                }
+            } else {
+                resolve(self)
+            }
+        })
     }
 };
 
@@ -86,7 +90,7 @@ models.setDirectory(modelsDir).bind(
         }
     },
     function(err) {
-        if (err) logger.error(err.message);
+        if (err) logger.error('#DatabaseManager: ls' + err.message);
         else {
             self.connected = true;
             logger.info('Cassandra connect to ' + dbHostAddress + ':' + dbHostPort + ' timeuuid:', models.timeuuid());

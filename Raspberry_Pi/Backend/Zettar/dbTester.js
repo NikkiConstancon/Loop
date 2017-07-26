@@ -7,4 +7,4 @@ setTimeout(function() {
      dbManager1.addUser({name: 'Nikki2', surname: 'Con', age: 21});
      dbManager2.addInstance({patientName: 'Nikki', device: 'Con', time: 21});
 
-  }, 0);
+  }, 1000);
