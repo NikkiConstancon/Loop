@@ -1,6 +1,27 @@
-var manager = require('./databaseManager');
+var dbMan = require('./databaseManager');
 var util = require('util');
+var logger = require('./revaLog');
 
+
+
+var patientDataManager = module.exports = {
+    addInstance: function (user) {
+        dbMan.try(function () {
+            new dbMan.models.instance.patientData(user).save(function (err) {
+                if (err) {
+                    logger.error(err);
+                    return;
+                } else {
+                    logger.debug('Instance Added Successfully!');
+                }
+            });
+        }).errorcb = function () {//optional callback
+            logger.error('patientDataManager:addInstance faild');
+        };
+    }
+}
+
+/*
 var patientDataManager = module.exports = function (){
     manager.call(this);
 }
@@ -19,3 +40,5 @@ patientDataManager.prototype.addInstance = function(data){
         }
 	});
 }
+
+*/
