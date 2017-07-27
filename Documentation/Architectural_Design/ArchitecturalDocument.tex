@@ -43,7 +43,7 @@
 %https://tex.stackexchange.com/a/79060
 \makeatletter
 \providecommand*{\input@path}{}
-\edef\input@path{{./DataCollection/}{./Introduction/}{./DataStorage/}{./OverallDescription/}{./UserInterface/}{./StatisticsSubsystem/}\input@path}% prepend
+\edef\input@path{{./DataCollection/}{./Introduction/}{./DataStorage/}{./DataPull/}{./StatisticsSubsystem/}{./OverallDescription/}{./UserInterface/}\input@path}% prepend
 \makeatother
 
 
@@ -104,10 +104,8 @@
 			
 			\input{DataStorage.tex}
 			
-		\newpage
 		\subsubsection{Statistics}
 			\input{statisticsSubsystem.tex}
-		
 		\subsubsection{Notification}
 		
 		\subsubsection{User Management}
@@ -118,7 +116,7 @@
 			\input{interface.tex}
 			
 		\subsubsection{Data Pull}
-		
+			\input{DataPull.tex}
 		\subsubsection{Advice}
 		
 \clearpage
