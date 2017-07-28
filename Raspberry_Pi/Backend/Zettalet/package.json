@@ -1,0 +1,20 @@
+{
+  "name": "Zettalet",
+  "version": "0.0.0",
+  "description": "npm install the following  zetta  zetta-glucose-meter-mock-driver  zetta-insulin-pump-mock-driver  zetta-mock-heartbeat-sensor  zetta-thermometer-mock-driver",
+  "main": "zettalet.js",
+  "dependencies": {
+    "express-cassandra": "~1.9.0",
+    "zetta": "~1.5.0",
+    "zetta-glucose-meter-mock-driver": "~0.0.3",
+    "zetta-insulin-pump-mock-driver": "~0.0.1",
+    "zetta-mock-heartbeat-sensor": "~0.4.0",
+    "zetta-thermometer-mock-driver": "~0.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node zettalet"
+  },
+  "author": "",
+  "license": "BSD-2-Clause"
+}
