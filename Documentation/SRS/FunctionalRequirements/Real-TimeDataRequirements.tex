@@ -1,5 +1,5 @@
 \subsubsection{Real-Time Data requirements(most of these are actually non-functional)}
-\begin{enumerate}
+\begin{itemize}
 	\item{Keep the data moving\\process messages ‘in-stream’, without any requirement to store them to perform any operation or sequence of operations.}
 	\item{Query using QL on streams\\relying on low-level programming schemes results in long development cycles and high maintenance costs. Process moving real-time data using a high-level language such as SQL.}
 	\item{Handle stream imperfections\\ built-in mechanisms to provide resiliency against stream ‘imperfections’ including missing and out-of-order data.}
@@ -8,4 +8,4 @@
 	\item{Guarantee data safety and availability\\ ensure that the applications are up and available, and the integrity of the data maintained at all times, despite failures.}
 	\item{Partition and scale applications automatically\\ it should be possible to split an application over multiple machines for scalability (as the volume of input streams or the complexity of processing increases) without the developer having to write low-level code.}
 	\item{Process and respond instantaneously\\a highly-optimized, minimal overhead execution engine to deliver real-time response for high-volume applications.}
-\end{enumerate}
+\end{itemize}

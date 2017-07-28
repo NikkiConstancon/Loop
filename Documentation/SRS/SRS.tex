@@ -2,6 +2,7 @@
 \usepackage{graphicx}
 \usepackage{eso-pic}
 \usepackage{ragged2e}
+\usepackage{booktabs}
 \usepackage{array}
 \renewcommand\thepage{- \arabic{page} -}
 
@@ -84,16 +85,16 @@
 	\section{Introduction}
 
         \subsection{Purpose}
-
+			\input{purpose.tex}
 
     	\subsection{Scope}
-	
+
 			\input{scope.tex}
 
 
 		\input{DefinitionsAcronymsAndAbbreviations.tex}
-		
-        
+
+
 
 
         \subsection{References}
@@ -114,9 +115,10 @@
         	\subsubsection{System Interface}
 				\input{systemInterface.tex}
 
+			\pagebreak
             \subsubsection{User Interface}
-
-
+				\input{userInterface.tex}
+			\pagebreak
 
             \subsubsection{Hardware Interface}
 				\input{hardwareInterface.tex}
@@ -147,17 +149,14 @@
 
     	\subsection{Functional Requirements}
 			\input{Actor-SystemInteractionModels.tex}
-			\input{Use-CaseDiagrams.tex}
-	        
+			\input{Use-Cases.tex}
+			\input{FunctionalRequirementsList.tex}
+
 			\subsubsection{Traceability Matrix}
 				\input{TracebilityMatrix.tex}
 			\input{AccessRequirements.tex}
 			\input{Real-TimeDataRequirements.tex}
 			\input{NotificationsRequirements.tex}
-	    
-	    
-        \subsection{Performance Requirements}
-		\input{performanceRequirements.tex}
 
         \subsection{Design Constraints}
 		\input{designConstraints.tex}
@@ -166,14 +165,13 @@
 
 
         \subsection{Other Requirements}
-			\begin{itemize}
-  				\item
-			\end{itemize}
-		
+
 			\input{PeripheralControlRequirements.tex}
-			 
+
 		\subsection{Non-functional requirements}
 			\input{UIAccessibilityRequirementsAndConstraints.tex}
-    
+			\subsubsection{Performance Requirements}
+			\input{performanceRequirements.tex}
+
 
 \end{document}

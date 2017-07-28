@@ -1,36 +1,36 @@
 \subsubsection{Access Requirements}
-\begin{enumerate}
+\begin{itemize}
 	\item{Product Acquisition}
-	\begin{enumerate}
+	\begin{itemize}
 		\item End users shall download the android application onto their phone via Google Play Store. At which stage the application shall assume one of two states.
 		If the user's Google account have not yet been registered onto the system, then the application's shall enter the registration state, else the normal operational state is assumed.
 		\item Front end hardware shall be acquired by business transactions that is beyond the scope of this document. At the time hardware is deemed to be in an operational state, each components shall be uniquely addressable to a specific Affected user.
-	\end{enumerate}
+	\end{itemize}
 	
 	\item{User Authentication}
-	\begin{enumerate}
+	\begin{itemize}
 		\item Users shall be uniquely identified by an IUID that shall never be transmitted over unsecured mediums.
 		\item To allow coupling with third party authentication mechanisms, mappings shall be made between the external mechanism's account's EUID and the internal IUID.
 		\item Only external authentication mechanisms that is sufficiently secure shall be used.
 		\item Google Accounts shall be supported as an external authentication mechanisms.
 		\item The internal authentication system shall be designed such that additional external identifying mechanisms can be attached with no or minimal refactoring.
 		\item Protocols and procedures specified by relevant external authentication mechanisms shall be implemented and executed without exceptions.
-	\end{enumerate}
+	\end{itemize}
 	\item{User Authorization}
-	\begin{enumerate}
+	\begin{itemize}
 		\item Authorization shall be managed per User Role. This will allow fine grained access control that will enhance user experience while preserving sufficient security.
 		\item Depending on the security level, persistent authorization shall be passively granted given that a connection is made by a certified device, or a previously authenticated user. Higher level authorization shall require additional authentication, that may vary depending on the context. Said higher authorization may include, but is not limited to, passwords, patterns, biometrics, and certificates.
-	\end{enumerate}
+	\end{itemize}
 	\item{User Registration}
-	\begin{enumerate}
+	\begin{itemize}
 		\item Account registration shall be controlled by third party authentication mechanisms such as Google Accounts. At registration a IUID shall be allocated to the registering user and linked to the EUID. 
 		\item Account Holders shall further register to a set of User Roles, where applicable parties shall provide authorization before registration is committed.
 		\item Predefined collections of User Roles shall be available to simply the registration process. These collections shall include, but is not limited to; Invalid, Family Member, Care Worker, Wound Nurse, House Doctor.
 		
-		\item{!! DO WE NEED THIS? !!\\Back End Batch User Registration}
-		\begin{enumerate}
+		\item{Back End Batch User Registration}
+		\begin{itemize}
 			\item This class of registration shall be implemented to reduce tedium when large amounts of high level authorized users must be fed into the system.
 			\item System Users shall introduce a file obtained from medical facility into the system for parsing. Said file shall contain aggregated medical staff's details.
-		\end{enumerate}
-	\end{enumerate}
-\end{enumerate}
+		\end{itemize}
+	\end{itemize}
+\end{itemize}

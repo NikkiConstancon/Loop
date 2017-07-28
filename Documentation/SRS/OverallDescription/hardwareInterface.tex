@@ -1,18 +1,18 @@
 The hardware interface comprises of the following technologies: 
-\begin{enumerate}
-\item{Raspberry Pi\\The Raspberry Pi is the main medium for capturing all of the patient's vital's information. Attached Arduinos send sensory data
+\begin{itemize}
+\item{Raspberry Pi:\\The Raspberry Pi is the main medium for capturing all of the patient's vital's information. Attached Arduinos send sensory data
 to the Pi where it is processed, transformed and transfered to the main cloud server. The Pi keeps track of each Arduino and ensures that they all remain 
 functional and working correctly. The Pi will be stationed in the same vicinity as the patient.}
-\item{Arduino\\ Arduinos are the devices to which the sensors are attached. Several sensors may be attached to one Arduino. Several
+\item{Arduino:\\ Arduinos are the devices to which the sensors are attached. Several sensors may be attached to one Arduino. Several
 Arduinos may be attached to one Raspberry Pi. It acts as a gateway between the sensors and the Raspberry Pi, trafficking data in a 
 trackable manner. Helps manage sensors better.}
-\item{Sensors\\ Attached to Arduinos. The sensors comprise of several different types ranging from heart rate monitors to thermometers. They are 
+\item{Sensors:\\ Attached to Arduinos. The sensors comprise of several different types ranging from heart rate monitors to thermometers. They are 
 preferably wireless but may be wired if no alternative exists. Sensors are attatched to the bed-ridden patient and report sensory data to the Arduino.}
-\item{Server\\ The server is remotely located and accessed only through the cloud. The server is where the main functionality of ReVA comes into play. 
+\item{Server:\\ The server is remotely located and accessed only through the cloud. The server is where the main functionality of ReVA comes into play. 
 It stores the majority of all subscribed patient information and analyses real-time patient info, triggering alert functionality in emergency cases. It 
 communicates with all Raspberry Pi's, recieving patient information from all of them. It then reports the real-time and historical, statistical data to the mobile device of all 
 subscribed members and doctors the patient or family member has approved of.} 
-\item{Mobile Device\\ The android mobile application that is installed on all subscribed partie's mobile devices communicates solely with the cloud server,
+\item{Mobile Device:\\ The android mobile application that is installed on all subscribed partie's mobile devices communicates solely with the cloud server,
 recieving patient data from it. All of which is only possible if the subscribed party has access to the internet from their device. Parties also 
 also recieve alerts and notifications about the patient in emergency situations.}
-\end{enumerate}
+\end{itemize}

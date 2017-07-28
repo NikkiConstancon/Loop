@@ -23,6 +23,8 @@
 *.pdf
 *.gz
 *.synctex.gz
+*.out
+*.toc
 
 #Zetta
 *.peers
