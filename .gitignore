@@ -39,3 +39,20 @@ Raspberry_Pi/Backend/Zettar/node_modules/zetta-glucose-meter-mock-driver/
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+
+
+
+
+#Marthinus's work space
+Raspberry_Pi/Backend/Zettalet/.vs/
+Raspberry_Pi/Backend/Zettalet/Zettalet.njsproj
+Raspberry_Pi/Backend/Zettalet/Zettalet.njsproj.user
+Raspberry_Pi/Backend/Zettalet/Zettalet.sln
+Raspberry_Pi/Backend/Zettalet/bin/
+Raspberry_Pi/Backend/Zettalet/obj/
+Raspberry_Pi/Backend/Zettar/.vs/
+Raspberry_Pi/Backend/Zettar/Zettar.njsproj
+Raspberry_Pi/Backend/Zettar/Zettar.njsproj.user
+Raspberry_Pi/Backend/Zettar/Zettar.sln
+Raspberry_Pi/Backend/Zettar/bin/
+Raspberry_Pi/Backend/Zettar/obj/

@@ -10,11 +10,10 @@ util.inherits(StateMachineDevice, Device);
 StateMachineDevice.prototype.init = function(config) {
   // Set up the state machine
     config
-      .type('temp_monitor')
+      .type('state_machine')
       .state('off')
       .name('temp_monitor')
-      .stream('value', this.streamValue);
-
+      .stream('value', this.streamValue)
     config
       // Define the transitions allowed by the state machine
       .when('off', {allow: ['turn-on']})
