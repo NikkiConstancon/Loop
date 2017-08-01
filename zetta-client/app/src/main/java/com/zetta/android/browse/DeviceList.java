@@ -69,13 +69,12 @@ class DeviceList {
 
                         items.add(createDeviceListItem(server, device));
                         List<ZIKStream> allStreams = device.getAllStreams();
+                        //TODO: figure out how to add streams to the front page -- this is exactly what the device info page does, BUT it doesn't work here
                         for (ZIKStream stream : allStreams) {
                             if (stream.getTitle().equals("logs")) {
                                 continue;
                             }
-
                             items.add(createStreamListItem(serverStyle, device, stream));
-
                         }
                     }
                 }
@@ -88,7 +87,7 @@ class DeviceList {
          *
          * @param style
          * @param zikServer
-         * @return
+         * @return a ServerListItem that uses the serverName and the ZettaStyle
          */
         @NonNull
         private ServerListItem createServerListItem(@NonNull ZettaStyle style, @NonNull ZIKServer zikServer) {
@@ -99,7 +98,7 @@ class DeviceList {
         /**
          *
          * @param style
-         * @return
+         * @return a emptylistitem using a specific zetta style
          */
         @NonNull
         private ListItem.EmptyListItem createEmptyServerListItem(@NonNull ZettaStyle style) {
@@ -108,9 +107,9 @@ class DeviceList {
 
         /**
          *
-         * @param server
-         * @param device
-         * @return
+         * @param server the zetta server object in question
+         * @param device the device object in question
+         * @return a DeviceListItem based on the server and device and the state
          */
         @NonNull
         public DeviceListItem createDeviceListItem(@NonNull ZIKServer server, @NonNull ZIKDevice device) {
@@ -177,6 +176,7 @@ class DeviceList {
             );
         }
 
+        //TODO: somehow this _NEW_COPIED_FUNCTION_ in conjunction with other TODOs makes streaming possible
         private StreamListItem createStreamListItem(@NonNull ZettaStyle style,
                                                     @NonNull ZIKDevice device,
                                                     @NonNull ZIKStream zikStream) {

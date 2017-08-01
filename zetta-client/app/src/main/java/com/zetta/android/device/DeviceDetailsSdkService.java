@@ -38,7 +38,7 @@ class DeviceDetailsSdkService {
     public void startMonitoringDeviceUpdates(@NonNull final ZettaDeviceId deviceId,
                                              @NonNull final DeviceDetailsService.DeviceListener listener) {
         ZIKDeviceId zikDeviceId = new ZIKDeviceId(deviceId.getUuid().toString());
-        zettaSdkApi.startMonitoringDevice(
+        zettaSdkApi.startMonitoringDevice( // TODO: over here is where it monitors stream data!
             zikDeviceId,
             new ZettaSdkApi.ZikDeviceListener() {
                 @Override

@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class creates the main screen putting all elements together, toolbar, quickactions etc.
+ */
 public class DeviceListActivity extends AppCompatActivity {
 
     static {

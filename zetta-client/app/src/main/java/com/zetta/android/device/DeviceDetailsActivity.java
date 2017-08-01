@@ -119,7 +119,7 @@ public class DeviceDetailsActivity extends AppCompatActivity {
 
         @Override
         public void onDeviceLoadError() {
-            Toast.makeText(DeviceDetailsActivity.this, "Unrecoverable error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(DeviceDetailsActivity.this, "Device couldn't load", Toast.LENGTH_SHORT).show();
             deviceDetailsService.stopMonitoringDevice();
             finish();
         }
