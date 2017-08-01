@@ -1,13 +1,16 @@
 package com.zetta.android.browse;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.apigee.zettakit.ZIKDevice;
 import com.apigee.zettakit.ZIKServer;
+import com.apigee.zettakit.ZIKStream;
 import com.apigee.zettakit.ZIKTransition;
 import com.zetta.android.ListItem;
 import com.zetta.android.ZettaDeviceId;
 import com.zetta.android.ZettaStyle;
+import com.zetta.android.device.StreamListItem;
 import com.zetta.android.device.actions.ActionListItemParser;
 
 import java.math.BigDecimal;
@@ -19,8 +22,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+/**
+ * The DeviceList class contains a parser that uses the ZettaStyle parser and ActionListItem parser
+ */
 class DeviceList {
-
+    /**
+     *The parser that is used by the DeviceList class
+     */
     static class Parser {
 
         private static final Map<UUID, ZettaDeviceId> zettaDeviceIdCache = new HashMap<>();
@@ -29,11 +37,21 @@ class DeviceList {
         private final ZettaStyle.Parser zettaStyleParser;
         private final ActionListItemParser actionParser;
 
+        /**
+         * The main constructor that sets the style and action parsers
+         * @param zettaStyleParser to parse the style
+         * @param actionParser to parse actions
+         */
         public Parser(ZettaStyle.Parser zettaStyleParser, ActionListItemParser actionParser) {
             this.zettaStyleParser = zettaStyleParser;
             this.actionParser = actionParser;
         }
 
+        /**
+         * Calls all the servers and parses the styling and adds them to a list, does the same for devices
+         * @param servers a list of ZettaKit server items
+         * @return returns a list of all servers and devices with styling
+         */
         @NonNull
         public List<ListItem> createListItems(@NonNull List<ZIKServer> servers) {
             List<ListItem> items = new ArrayList<>();
@@ -47,7 +65,18 @@ class DeviceList {
                     items.add(createEmptyServerListItem(serverStyle));
                 } else {
                     for (ZIKDevice device : zikDevices) {
+
+
                         items.add(createDeviceListItem(server, device));
+                        List<ZIKStream> allStreams = device.getAllStreams();
+                        for (ZIKStream stream : allStreams) {
+                            if (stream.getTitle().equals("logs")) {
+                                continue;
+                            }
+
+                            items.add(createStreamListItem(serverStyle, device, stream));
+
+                        }
                     }
                 }
             }
@@ -55,17 +84,34 @@ class DeviceList {
             return items;
         }
 
+        /**
+         *
+         * @param style
+         * @param zikServer
+         * @return
+         */
         @NonNull
         private ServerListItem createServerListItem(@NonNull ZettaStyle style, @NonNull ZIKServer zikServer) {
             String serverName = zikServer.getName();
             return new ServerListItem(serverName, style);
         }
 
+        /**
+         *
+         * @param style
+         * @return
+         */
         @NonNull
         private ListItem.EmptyListItem createEmptyServerListItem(@NonNull ZettaStyle style) {
             return new ListItem.EmptyListItem("No devices online for this server", style);
         }
 
+        /**
+         *
+         * @param server
+         * @param device
+         * @return
+         */
         @NonNull
         public DeviceListItem createDeviceListItem(@NonNull ZIKServer server, @NonNull ZIKDevice device) {
             ZettaStyle style = zettaStyleParser.parseStyle(server, device);
@@ -73,6 +119,12 @@ class DeviceList {
             return createDeviceListItem(style, device, state);
         }
 
+        /**
+         *
+         * @param server
+         * @param device
+         * @return
+         */
         private String getState(@NonNull ZIKServer server, @NonNull ZIKDevice device) {
             String state = device.getState();
             Map serverPropsStyle = (Map) server.getProperties().get("style");
@@ -106,6 +158,13 @@ class DeviceList {
             return state;
         }
 
+        /**
+         *
+         * @param style
+         * @param device
+         * @param state
+         * @return
+         */
         @NonNull
         private DeviceListItem createDeviceListItem(@NonNull ZettaStyle style,
                                                     @NonNull ZIKDevice device,
@@ -118,6 +177,28 @@ class DeviceList {
             );
         }
 
+        private StreamListItem createStreamListItem(@NonNull ZettaStyle style,
+                                                    @NonNull ZIKDevice device,
+                                                    @NonNull ZIKStream zikStream) {
+            String stream = zikStream.getTitle();
+            String value = "";
+            Map<String, Object> properties = device.getProperties();
+            if (properties.containsKey(stream)) {
+                value = String.valueOf(properties.get(stream));
+            }
+            return new StreamListItem(
+                    getDeviceId(device),
+                    stream,
+                    value,
+                    style
+            );
+        }
+
+        /**
+         *
+         * @param device
+         * @return
+         */
         @NonNull
         private ZettaDeviceId getDeviceId(@NonNull ZIKDevice device) {
             UUID uuid = device.getDeviceId().getUuid();
@@ -130,6 +211,12 @@ class DeviceList {
             }
         }
 
+        /**
+         *
+         * @param zikServer
+         * @param zikDevice
+         * @return
+         */
         public List<ListItem> createQuickActions(@NonNull ZIKServer zikServer, @NonNull ZIKDevice zikDevice) {
             List<ListItem> listItems = new ArrayList<>();
             ZettaStyle style = zettaStyleParser.parseStyle(zikServer, zikDevice);
@@ -150,11 +237,21 @@ class DeviceList {
             return listItems;
         }
 
+        /**
+         *
+         * @param zikDevice
+         * @return
+         */
         @NonNull
         private ListItem.HeaderListItem createDeviceHeaderListItem(@NonNull ZIKDevice zikDevice) {
             return new ListItem.HeaderListItem(zikDevice.getName());
         }
 
+        /**
+         *
+         * @param style
+         * @return
+         */
         @NonNull
         private ListItem.EmptyListItem createEmptyQuickActionsListItem(@NonNull ZettaStyle style) {
             return new ListItem.EmptyListItem("No actions for this device.", style);

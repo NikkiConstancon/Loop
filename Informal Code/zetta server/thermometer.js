@@ -19,11 +19,7 @@ Thermometer.prototype.init = function(config) {
   config
     .name('Thermometer')
     .type('thermometer')
-    .state('ready')
-    .when('ready', {allow: ['make-not-ready']})
-    .when('not-ready', {allow: ['make-ready']})
-    .map('make-ready', this.makeReady)
-    .map('make-not-ready', this.makeNotReady)
+    
     .monitor('temperature');
 
   this._startMockData();

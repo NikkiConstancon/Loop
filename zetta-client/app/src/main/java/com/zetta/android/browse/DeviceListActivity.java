@@ -48,8 +48,7 @@ public class DeviceListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SdkProperties sdkProperties = SdkProperties.newInstance(this);
         DeviceListSdkService sdkService = new DeviceListSdkService();
-        DeviceListMockService mockService = new DeviceListMockService();
-        deviceListService = new DeviceListService(sdkProperties, sdkService, mockService);
+        deviceListService = new DeviceListService(sdkProperties, sdkService);
 
         setContentView(R.layout.device_list_activity);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

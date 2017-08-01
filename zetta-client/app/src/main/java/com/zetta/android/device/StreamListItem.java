@@ -7,7 +7,7 @@ import com.zetta.android.ListItem;
 import com.zetta.android.ZettaDeviceId;
 import com.zetta.android.ZettaStyle;
 
-class StreamListItem implements ListItem {
+public class StreamListItem implements ListItem {
 
     @NonNull private final ZettaDeviceId deviceId;
     @NonNull private final String stream;
