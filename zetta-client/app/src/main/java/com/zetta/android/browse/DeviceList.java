@@ -84,7 +84,7 @@ class DeviceList {
         }
 
         /**
-         *
+         * Creates a server list item
          * @param style
          * @param zikServer
          * @return a ServerListItem that uses the serverName and the ZettaStyle
@@ -96,7 +96,7 @@ class DeviceList {
         }
 
         /**
-         *
+         * Creates an item that represents an empty server
          * @param style
          * @return a emptylistitem using a specific zetta style
          */
@@ -106,7 +106,7 @@ class DeviceList {
         }
 
         /**
-         *
+         * Creates a device list item for a specific server
          * @param server the zetta server object in question
          * @param device the device object in question
          * @return a DeviceListItem based on the server and device and the state
@@ -119,10 +119,10 @@ class DeviceList {
         }
 
         /**
-         *
-         * @param server
-         * @param device
-         * @return
+         * Finds the state to show on the main page
+         * @param server the zetta server in question
+         * @param device the zetta device in question
+         * @return the state of the device
          */
         private String getState(@NonNull ZIKServer server, @NonNull ZIKDevice device) {
             String state = device.getState();
@@ -154,11 +154,11 @@ class DeviceList {
                     }
                 }
             }
-            return state;
+            return "bibi";
         }
 
         /**
-         *
+         * This helper function is called to create a new DeviceListItem (which is another private function)
          * @param style
          * @param device
          * @param state
@@ -195,9 +195,9 @@ class DeviceList {
         }
 
         /**
-         *
-         * @param device
-         * @return
+         * Fetches the ID of a device
+         * @param device the device object
+         * @return the ZettaDeviceId object
          */
         @NonNull
         private ZettaDeviceId getDeviceId(@NonNull ZIKDevice device) {
@@ -212,10 +212,10 @@ class DeviceList {
         }
 
         /**
-         *
+         * Creates the quick actions for each device according to their mapping on the device driver
          * @param zikServer
          * @param zikDevice
-         * @return
+         * @return a List of ListItems
          */
         public List<ListItem> createQuickActions(@NonNull ZIKServer zikServer, @NonNull ZIKDevice zikDevice) {
             List<ListItem> listItems = new ArrayList<>();
