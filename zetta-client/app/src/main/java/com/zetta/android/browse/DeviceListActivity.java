@@ -132,7 +132,7 @@ public class DeviceListActivity extends AppCompatActivity {
         updateState();
         if (deviceListService.hasRootUrl()) {
             deviceListService.getDeviceList(onDeviceListLoaded);
-            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
+            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate); //starts listening for stream updates
         }
     }
 
@@ -142,7 +142,7 @@ public class DeviceListActivity extends AppCompatActivity {
             if (deviceListWidget.isComputingLayout() || deviceListWidget.isAnimating()) {
                 return;
             }
-            adapter.update(listItems);
+            adapter.update(listItems); //when there is an update the list adapter is updated
         }
     };
 

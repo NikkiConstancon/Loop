@@ -18,6 +18,7 @@ var Thermometer = module.exports = function(opts) {
   this._counter = 0;
 
   this.style = extend(true, this.style, {properties: {
+    state: 'none'
     stateImage: {
       url: icon,
       tintMode: 'original'
@@ -34,25 +35,15 @@ util.inherits(Thermometer, Device);
 
 Thermometer.prototype.init = function(config) {
   config
-    .name('Thermometer')
     .type('thermometer')
-    .state(this.temperature)
+    .name('Thermometer')
+
+
     .monitor('temperature');
 
   this._startMockData();
 };
 
-Thermometer.prototype.makeReady = function(cb) {
-  this.state = 'ready';
-  this._startMockData();
-  cb();
-}
-
-Thermometer.prototype.makeNotReady = function(cb) {
-  this.state = 'not-ready'
-  this._stopMockData();
-  cb();
-}
 
 Thermometer.prototype._startMockData = function(cb) {
   var self = this;

@@ -46,6 +46,7 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             } else if (i == touchingPosition) {
                 Log.v("currently being touched not updating");
             } else {
+                // USING THIS ALLOWS A SINGLE ITEM IN A LIST TO BE UPDATED AND THE REST LEFT AS IS
                 this.listItems.remove(i);
                 this.listItems.add(i, listItem);
                 notifyItemChanged(i);

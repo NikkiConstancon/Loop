@@ -129,7 +129,7 @@ class DeviceListService {
     }
 
     public void startMonitoringAllDeviceUpdates(@NonNull final DevicesUpdateListener listener) {
-        Subscription subscription = getDeviceUpdatesObservable()
+        Subscription subscription = getDeviceUpdatesObservable() //backend code for stream monitoring
             .buffer(700, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

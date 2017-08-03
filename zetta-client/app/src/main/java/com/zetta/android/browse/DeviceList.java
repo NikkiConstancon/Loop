@@ -2,6 +2,7 @@ package com.zetta.android.browse;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.apigee.zettakit.ZIKDevice;
 import com.apigee.zettakit.ZIKServer;
@@ -68,14 +69,7 @@ class DeviceList {
 
 
                         items.add(createDeviceListItem(server, device));
-                        List<ZIKStream> allStreams = device.getAllStreams();
-                        //TODO: figure out how to add streams to the front page -- this is exactly what the device info page does, BUT it doesn't work here
-                        for (ZIKStream stream : allStreams) {
-                            if (stream.getTitle().equals("logs")) {
-                                continue;
-                            }
-                            items.add(createStreamListItem(serverStyle, device, stream));
-                        }
+
                     }
                 }
             }
@@ -128,6 +122,7 @@ class DeviceList {
             String state = device.getState();
             Map serverPropsStyle = (Map) server.getProperties().get("style");
             if (serverPropsStyle == null) {
+                Log.d("myTag", "This is my message");
                 return state;
             }
             Map entities = (Map) serverPropsStyle.get("entities");
