@@ -17,9 +17,17 @@
             android:layout_height="wrap_content"
             android:padding="10dp">
 
+            <com.jjoe64.graphview.GraphView
+                android:layout_width="match_parent"
+                android:layout_height="150dip"
+                android:layout_marginTop="20dp"
+                android:id="@+id/graphHeartRate" />
+
             <ImageView
                 android:layout_width="100dp"
                 android:layout_height="100dp"
+                android:layout_below="@id/graphHeartRate"
+                android:layout_marginTop="10dp"
                 android:src="@drawable/heart_rate"
                 android:id="@+id/img_heart_rate_icon"
                 android:contentDescription="@string/heart_rate_image" />
@@ -32,8 +40,8 @@
                 android:text="@string/heart_rate"
                 android:textSize="20sp"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="15dp"
-                android:layout_alignParentTop="true"
+                android:layout_below="@id/graphHeartRate"
+                android:layout_marginTop="30dp"
                 android:id="@+id/txt_heartRateStat"
                 tools:ignore="RtlHardcoded" />
             <TextView
@@ -51,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/txt_heart_min"
-                android:text="62bpm"
+                android:text="62 bpm"
                 android:textSize="20sp"
                 android:layout_marginTop="15dp"
                 android:id="@+id/txt_heart_min_val"
@@ -74,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/txt_heart_max"
                 android:layout_centerHorizontal="true"
-                android:text="105bpm"
+                android:text="105 bpm"
                 android:textSize="20sp"
                 android:layout_marginTop="15dp"
                 android:id="@+id/txt_heart_max_val"
@@ -97,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/txt_heart_avg"
                 android:layout_alignParentRight="true"
-                android:text="82bpm"
+                android:text="82 bpm"
                 android:textSize="20sp"
                 android:layout_marginTop="15dp"
                 android:id="@+id/txt_heart_avg_val"

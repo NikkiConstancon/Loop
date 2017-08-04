@@ -39,13 +39,27 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/txt_heartRate"
                 android:textStyle="bold"
-                android:text="@string/_85bpm"
+                android:text="@string/value"
                 android:textSize="50sp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="50dp"
                 android:layout_marginTop="25dp"
                 android:layout_alignParentTop="true"
                 android:id="@+id/txt_heart_rate_number"
                 tools:ignore="RtlHardcoded" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/txt_heart_rate_number"
+                android:text="@string/unit"
+                android:textSize="30sp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="45dp"
+                android:layout_alignParentTop="true"
+                android:id="@+id/txt_unit"
+                tools:ignore="RtlHardcoded" />
+
+
 
         </RelativeLayout>
 

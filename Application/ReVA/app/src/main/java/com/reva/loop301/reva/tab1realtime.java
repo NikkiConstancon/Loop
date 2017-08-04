@@ -16,6 +16,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+/**
+ * Tab class for real time data
+ */
 public class tab1realtime extends Fragment {
 
     RecyclerView recyclerView;
@@ -26,6 +29,13 @@ public class tab1realtime extends Fragment {
     String[] aboveText, value, extVal;
 
 
+    /**
+     * Overridden onCreateView, adapted for displaying real time data
+     * @param inflater holds the layout inflater for real time data
+     * @param container holds the view group for real time data
+     * @param savedInstanceState holds the bundle for real time data
+     * @return the view of the real time data
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

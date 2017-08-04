@@ -18,7 +18,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+/**
+ * Created by Hristian Vitrychenko on 04/07/2017.
+ */
 
+/**
+ * Class designed to help scrolling from real time data to statistical
+ * data to historical data. In short: tab page.
+ */
 public class MainActivity extends AppCompatActivity {
 
     /**
@@ -36,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    /**
+     * Overridden on create method, adapted to create a tabbed page
+     * @param savedInstanceState used to create an instance
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Overridden onCreateOptionsMenu, adapted to display tabs
+     * @param menu holds the menu for holding tabs
+     * @return true to show success
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -73,6 +89,12 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Overridden onOptionsItemSelected, adapted for tab purposes
+     * to scroll through pages.
+     * @param item holds the menu item of the time
+     * @return the item that was selected
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -99,6 +121,12 @@ public class MainActivity extends AppCompatActivity {
             super(fm);
         }
 
+        /**
+         * Overridden getItem to return instances of either real time tab page,
+         * statistical tab page or historical tab page
+         * @param position holds the position of the current page
+         * @return Nothing, simply meant to switch tabs
+         */
         @Override
         public Fragment getItem(int position) {
             switch (position) {
@@ -108,28 +136,32 @@ public class MainActivity extends AppCompatActivity {
                 case 1:
                     tab2statistical tab2 = new tab2statistical();
                     return tab2;
-                case 2:
-                    tab3historical tab3 = new tab3historical();
-                    return tab3;
             }
             return null;
         }
 
+        /**
+         * Overridden getCount to return the number of tabs
+         * @return the number of tabs you can scroll through
+         */
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
+        /**
+         * Overridden getPageTitle, adapted to return specific titles
+         * @param position holds the position of the page
+         * @return nothing
+         */
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
                     return "Real-Time Data";
                 case 1:
-                    return "Statistical Data";
-                case 2:
-                    return "Historical Data";
+                    return "Statistical and Historical Data";
             }
             return null;
         }

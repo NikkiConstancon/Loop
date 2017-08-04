@@ -12,7 +12,7 @@
     <EditText
         android:id="@+id/txt_register"
         android:layout_width="0dp"
-        android:layout_height="39dp"
+        android:layout_height="0dp"
         android:ems="10"
         android:inputType="none"
         android:labelFor="@id/txt_userMailReg"
@@ -26,9 +26,11 @@
         tools:text="Registration"
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="@+id/txt_age"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="2dp"
         tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="19dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -37,76 +39,71 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="249dp"
         android:layout_height="48dp"
-        android:layout_marginBottom="39dp"
         android:layout_marginStart="31dp"
         android:background="@android:color/holo_blue_dark"
         android:text="@string/textview"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
         tools:ignore="RtlHardcoded"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
         tools:text="Register"
-        android:layout_marginLeft="31dp" />
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="39dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="31dp"
+        android:onClick="registerPatient"/>
 
     <EditText
         android:id="@+id/txt_age"
         android:layout_width="46dp"
         android:layout_height="42dp"
-        android:layout_marginBottom="48dp"
-        android:layout_marginLeft="384dp"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="51dp"
         android:ems="10"
         android:inputType="none"
         android:labelFor="@+id/input_age"
         android:text="@string/textview"
-        app:layout_constraintBottom_toBottomOf="@+id/input_age"
-        app:layout_constraintLeft_toLeftOf="@+id/txt_register"
-        app:layout_constraintTop_toTopOf="@+id/txt_register"
-        app:layout_constraintVertical_bias="1.0"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
+        android:textColor="@android:color/background_dark"
+        tools:text="Age:"
         tools:layout_constraintTop_creator="1"
-        tools:text="Age:" />
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="@+id/txt_height"
+        android:layout_marginTop="58dp"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="60dp"
+        app:layout_constraintLeft_toLeftOf="@+id/input_age"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/input_age"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
         android:ems="10"
         android:hint="@string/_46"
         android:inputType="number"
-        app:layout_constraintBottom_toTopOf="@+id/txt_weight"
-        app:layout_constraintLeft_toLeftOf="@+id/txt_age"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1" />
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        app:layout_constraintRight_toRightOf="@+id/input_height"
+        android:layout_marginTop="100dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="@+id/input_height"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/txt_weight"
         android:layout_width="0dp"
         android:layout_height="41dp"
-        android:layout_marginBottom="159dp"
-        android:layout_marginEnd="33dp"
-        android:layout_marginLeft="31dp"
-        android:layout_marginRight="33dp"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="159dp"
         android:ems="10"
         android:inputType="none"
         android:labelFor="@+id/input_weight"
         android:text="@string/textview"
-        app:layout_constraintBottom_toBottomOf="@+id/input_height"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@+id/txt_height"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintTop_creator="1"
+        android:textColor="@android:color/background_dark"
+        tools:ignore="TextFields"
         tools:text="Weight (in kg): "
-        tools:ignore="TextFields" />
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        app:layout_constraintRight_toRightOf="@+id/input_weight"
+        android:layout_marginTop="19dp"
+        app:layout_constraintTop_toBottomOf="@+id/input_height"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="@+id/input_weight" />
 
     <EditText
         android:id="@+id/input_weight"
@@ -115,108 +112,116 @@
         android:ems="10"
         android:hint="@string/_65_5"
         android:inputType="numberDecimal"
+        android:layout_marginStart="31dp"
         tools:layout_constraintTop_creator="1"
-        android:layout_marginTop="7dp"
         app:layout_constraintTop_toBottomOf="@+id/txt_weight"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="@+id/txt_weight" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="31dp" />
 
     <EditText
         android:id="@+id/txt_height"
         android:layout_width="159dp"
         android:layout_height="41dp"
-        android:layout_marginBottom="62dp"
-        android:layout_marginLeft="31dp"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="62dp"
         android:ems="10"
         android:inputType="none"
         android:labelFor="@+id/input_height"
         android:text="@string/textview"
-        app:layout_constraintBottom_toTopOf="@+id/txt_reason"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/input_weight"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintTop_creator="1"
+        android:textColor="@android:color/background_dark"
+        tools:ignore="TextFields"
         tools:text="Height (in meters):"
-        tools:ignore="TextFields" />
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="@+id/txt_weight"
+        android:layout_marginTop="60dp"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="59dp"
+        app:layout_constraintLeft_toLeftOf="@+id/input_height"
+        app:layout_constraintTop_toTopOf="@+id/input_age" />
 
     <EditText
         android:id="@+id/input_height"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="54dp"
         android:ems="10"
         android:hint="@string/_1_72"
         android:inputType="number|numberDecimal"
-        app:layout_constraintBottom_toTopOf="@+id/rad_age"
-        app:layout_constraintLeft_toLeftOf="@+id/txt_height"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1" />
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        app:layout_constraintRight_toRightOf="@+id/txt_weight"
+        android:layout_marginTop="57dp"
+        app:layout_constraintTop_toBottomOf="@+id/input_age"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="@+id/txt_weight" />
 
     <EditText
         android:id="@+id/txt_reason"
         android:layout_width="236dp"
         android:layout_height="42dp"
-        android:layout_marginBottom="31dp"
-        android:layout_marginTop="13dp"
         android:ems="10"
         android:inputType="none"
         android:labelFor="@+id/input_height"
         android:text="@string/reason_for_being_bedridden"
-        app:layout_constraintBottom_toBottomOf="@+id/rad_age"
-        app:layout_constraintLeft_toLeftOf="@+id/input_height"
-        app:layout_constraintTop_toBottomOf="@+id/input_height"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintTop_creator="1" />
-
-    <RadioButton
-        android:id="@+id/rad_age"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/radiobuttonAge"
-        tools:text="Age"
+        android:textColor="@android:color/background_dark"
+        tools:layout_constraintTop_creator="1"
         tools:layout_constraintBottom_creator="1"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="200dp"
         tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="158dp"
-        app:layout_constraintLeft_toLeftOf="@+id/txt_reason" />
+        android:layout_marginBottom="201dp"
+        app:layout_constraintLeft_toLeftOf="@+id/input_weight"
+        app:layout_constraintTop_toTopOf="@+id/txt_height" />
 
-    <RadioButton
-        android:id="@+id/rad_illness"
+    <RadioGroup
+        android:id="@+id/radioGroupReg2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/radiobuttonIllness"
-        tools:text="Illness"
-        tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toTopOf="@+id/rad_accident"
-        android:layout_marginStart="4dp"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toRightOf="@+id/rad_accident"
-        android:layout_marginLeft="4dp" />
-
-    <RadioButton
-        android:id="@+id/rad_accident"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/radiobuttonAccident"
-        tools:text="Accident"
+        android:orientation="horizontal"
         tools:layout_constraintTop_creator="1"
-        app:layout_constraintTop_toBottomOf="@+id/rad_age"
+        app:layout_constraintTop_toBottomOf="@+id/txt_reason"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="@+id/rad_age" />
+        app:layout_constraintLeft_toLeftOf="@+id/txt_reason">
 
-    <RadioButton
-        android:id="@+id/rad_disability"
+        <RadioButton
+            android:id="@+id/rad_age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radiobuttonAge"
+            tools:text="Age" />
+
+        <RadioButton
+            android:id="@+id/rad_illness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginStart="40dp"
+            tools:text="Illness" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/radioGroupReg3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/radiobuttonDisability"
-        tools:text="Disability"
+        android:orientation="horizontal"
         tools:layout_constraintTop_creator="1"
-        app:layout_constraintTop_toBottomOf="@+id/rad_illness"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroupReg2"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="@+id/rad_illness" />
+        app:layout_constraintLeft_toLeftOf="@+id/radioGroupReg2">
+
+        <RadioButton
+            android:id="@+id/rad_accident"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Accident" />
+
+        <RadioButton
+            android:id="@+id/rad_disability"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            tools:text="Disability"
+            android:layout_marginStart="10dp" />
+    </RadioGroup>
+
 
 </android.support.constraint.ConstraintLayout>

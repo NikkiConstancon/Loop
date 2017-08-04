@@ -16,6 +16,9 @@ import java.util.ArrayList;
  * Created by Hristian Vitrychenko on 04/07/2017.
  */
 
+/**
+ * Tab class for statistical data
+ */
 public class tab2statistical  extends Fragment{
 
     RecyclerView recyclerView;
@@ -26,6 +29,13 @@ public class tab2statistical  extends Fragment{
     String[] aboveText, min, max, avg;
 
 
+    /**
+     * Overridden onCreateView, adapted for statistical data
+     * @param inflater holds the layout inflater for statistical data
+     * @param container holds the view group for statistical data
+     * @param savedInstanceState holds the Bundle for statistical data
+     * @return the view for statistical data
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
