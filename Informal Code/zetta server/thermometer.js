@@ -11,24 +11,24 @@ function degToRad(x) {
 
 var Thermometer = module.exports = function(opts) {
   Device.call(this);
-  this.temperature = 0;
+  this.vitals = 0;
   this._opts = opts || {};
   this._increment = this._opts['increment'] || 15;
   this._timeOut = null;
   this._counter = 0;
 
-  this.style = extend(true, this.style, {properties: {
+  /*this.style = extend(true, this.style, {properties: {
     state: 'none'
     stateImage: {
       url: icon,
       tintMode: 'original'
     },
-    temperature: {
+    vitals: {
       display: 'billboard',
       significantDigits: 2,
       symbol: '°C'
     }
-  }});
+  }});*/
 
 };
 util.inherits(Thermometer, Device);
@@ -39,7 +39,7 @@ Thermometer.prototype.init = function(config) {
     .name('Thermometer')
 
 
-    .monitor('temperature');
+    .monitor('vitals');
 
   this._startMockData();
 };
@@ -48,7 +48,7 @@ Thermometer.prototype.init = function(config) {
 Thermometer.prototype._startMockData = function(cb) {
   var self = this;
   this._timeOut = setInterval(function() {
-    self.temperature = (Math.sin(degToRad(self._counter)) + 1.0) * 37 - 2;
+    self.vitals = (Math.sin(degToRad(self._counter)) + 1.0) * 37 - 2;
     self._counter += self._increment;
   }, 100);
 }

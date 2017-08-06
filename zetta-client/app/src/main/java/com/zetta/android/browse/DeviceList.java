@@ -122,8 +122,17 @@ class DeviceList {
             String state = device.getState();
             Map serverPropsStyle = (Map) server.getProperties().get("style");
             if (serverPropsStyle == null) {
-                Log.d("myTag", "This is my message");
-                return state;
+                Map<String, Object> properties = device.getProperties();
+                String val = String.valueOf(properties.get("vitals"));
+
+
+                if (val != "null") {
+                    Double dub = Double.parseDouble(val);
+                    val = String.format( "%.2f", dub );
+                    return val;
+                } else {
+                    return state;
+                }
             }
             Map entities = (Map) serverPropsStyle.get("entities");
             String deviceType = device.getType();
