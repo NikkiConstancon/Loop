@@ -101,37 +101,73 @@
 	\pagebreak
 	\section{Functional requirements}
         
-	\subsection UC1: A user can view real time data gathered from a patient.
+	\subsection UC1: A user can view real time data gathered from a patient. 
+	\subsubsection{Service Contract}
+	\textbf{Implementation status:} implemented
+	\textbf{Primary Actors:} All users
+	\textbf{Functionality:} View real time data on patient(s)
+	\subsubsection{Description of current tests}
+	The data streaming consists of servers streaming data and the application displaying those data streams. We do this using the Nodejs package Zetta (which is already been tested), and an application that someone created to recieve zetta streams. These have both been tested already, thus to create our own tests would be redundant. 
+	\subsubsection{Future tests:}
+	Future tests will include capacity testing, to show that the application is scalable and can stream to many devices. 
 
 	\subsection UC2: A user can view historical data detailing a period of time.
+	\textbf{Implementation status:} unimplemented
 	
 	\subsection UC3: A user can view statistical data from over a period of time.
-
+	\textbf{Implementation status:} unimplemented
 	
 	\subsection UC4: A user can register to create an account and link to a particular patient.
+	\subsubsection{Service contract}
+	\textbf{Implementation status:} partly-implemented
+	\textbf{Primary Actors:} non-users
+	\textbf{Functionality} Type in details and register to become a new user. There is only local validation and forms currently implemented. Client-server communication for registration and user management is not yet implemented.
+	\subsubsection{Description of current tests}
+	There are unit tests for each input that test the validation of those inputs. So there are tests for email, passwords, usernames etc. All to make sure that the validation is correct. 
+	\subsubsection{Future tests:}
+	Unit tests that verify client-server communication is happening correctly and that users are registered properly. 
+
+
 	
 	\subsection UC5: A user can log in to his or her account.
+	\subsubsection{Service contract}
+	\textbf{Implementation status:} partly-implemented
+	\textbf{Primary Actors:} users
+	\textbf{Functionality} Type in details and login to use user features. There is only local validation and forms currently implemented. Client-server communication for login and user management is not yet implemented.
+	\subsubsection{Description of current tests}
+	There are unit tests for each input that test the validation of those inputs. So there are tests for email, passwords, usernames etc. All to make sure that the validation is correct. 
+	\subsubsection{Future tests:}
+	Unit tests that verify client-server communication is happening correctly and that users are logged in properly. 
 	
 	\subsection UC6: A user can log out of his or her account.
+	\textbf{Implementation status:} unimplemented
 	
-	\subsection UC7: A user can manage his or her account information.		
+	\subsection UC7: A user can manage his or her account information.	
+	\textbf{Implementation status:} unimplemented	
 
 	\subsection UC8: An admin user can manage other users' access rights.
+	\textbf{Implementation status:} unimplemented
 
 
 	\subsection UC9: A user, caregiver, or doctor can get notifications if something is wrong according to the data.
+	\textbf{Implementation status:} unimplemented
 
 	
 	\subsection UC10: A user can see all previous notifications.
+	\textbf{Implementation status:} unimplemented
 
 	\subsection UC11: A user can view general advice on the App.
+	\textbf{Implementation status:} unimplemented
 	
 	\subsection UC12: A user can add or remove medical persons' contact details to the app.
+	\textbf{Implementation status:} unimplemented
 
 	\subsection UC13: A user can configure devices remotely.
+	\textbf{Implementation status:} unimplemented
 
 		
 	\subsection UC14: A researcher can view the data in the database anonymously.	
+	\textbf{Implementation status:} unimplemented
 
 
     \section{Non-functional requirements}
