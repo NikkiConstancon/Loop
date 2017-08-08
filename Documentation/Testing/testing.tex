@@ -169,6 +169,12 @@
 	\subsection UC14: A researcher can view the data in the database anonymously.	
 	\textbf{Implementation status:} unimplemented
 
+	\subsection CRUD implementation related to database storage of user information and details. 
+	\textbf{Precondition:} The user manager is tested to ensure that arguments passed to the database manager are correctly formatted, i.e., that the json conforms to the database model. \\ \\ 
+	\\
+	\textbf{Postcondition:} Ensure that intended parameters are added to the database after successful query. \\
+
+	\textbf{Invariant:} Ensure that only intended parameters change within the related managers and database. 
 
     \section{Non-functional requirements}
     	\subsection{Usability test}
