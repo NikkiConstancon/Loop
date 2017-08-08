@@ -30,6 +30,13 @@
 	\AtPageLowerLeft{\Swirl}%
     \fi
     }%
+
+%Set default path for \input{…} akin to \graphicspath{…}
+%https://tex.stackexchange.com/a/79060
+\makeatletter
+\providecommand*{\input@path}{}
+\edef\input@path{{./ApplicationManual/}{./RaspberryPiManual/}{./Introduction/}\input@path}% prepend
+\makeatother
     
 \begin{document}
 
@@ -64,13 +71,15 @@
 \pagebreak
 
 \section{Introduction}	
-	\input{Introduction/introduction.tex}
+	\input{introduction.tex}
 	\pagebreak	
 \section{Application}   
-	\input{ApplicationManual/appManual.tex}
+	\input{UIDescription.tex}
+
+	\input{appManual.tex}
 	\pagebreak	     	
 \section{Raspberry Pi}
-	\input{RaspberryPiManual/piManual.tex}
+	\input{piManual.tex}
 	\pagebreak	
    
 			
