@@ -30,7 +30,7 @@
 	\AtPageLowerLeft{\Swirl}%
     \fi
     }%
-    
+
 \begin{document}
 
 {\fontfamily{phv}\selectfont % change phv to get new fonts for whole document
@@ -46,12 +46,12 @@
 \title{ \rule{\linewidth}{2pt} \\
 \textbf{\normalfont\fontsize{35}{35}\scshape\selectfont IoT HomeCare System}\\
 \textbf{\normalfont\fontsize{35}{35}\scshape\selectfont Testing}\\}
-\author{   
+\author{
         Hristian Vitrychenko\\
         Nikki Constancon \\
         Juan du Preez\\
         Gregory Austin \\
-        Marthinus Richter 
+        Marthinus Richter
 }
 \date{\today \\ \rule{\linewidth}{2pt}}
 
@@ -63,124 +63,139 @@
 \end{center}
 \pagebreak
 	\section{Introduction}
-	
-	The testing report is designed to describe all tests that have been done on the system and future tests to be done on the system. 
-	
+
+	The testing report is designed to describe all tests that have been done on the system and future tests to be done on the system.
+
 		\subsection{Purpose}
-		
-		The purpose of this document will be to list and describe all of the tests for the ReVA system, how they are carried out, what their purpose is and what use case they are related to. 
-	
+
+		The purpose of this document will be to list and describe all of the tests for the ReVA system, how they are carried out, what their purpose is and what use case they are related to.
+
+		\subsection{Structure of the document}
+
+		Each subsystem of ReVA will be addressed individually with the specific tests for each module (subsystem). The subsystems are:
+		\begin{itemize}
+			\item Real-Time Subsystem
+			\item Data Storage Subsystem
+			\item History/Statistics Subsystem
+			\item User Management Subsystem
+			\item Notification Subsystem
+			\item Advice Subsystem
+		\end{itemize}
 		\subsection{Definitions, Acronyms, and Abbreviations}
-			
-			
+
+
 			\subsubsection{Acronyms}
-			
+
 			\begin{itemize}
-				
+
 				\item \textbf{UI} \textbf{\textit{(User Interface)}} \\
 				\newline
 				The means by which the user and a computer system interact, in particular, the use of input devices and software.
-			
+
 			\end{itemize}
-		
+
 			\subsubsection{Definitions}
-		
+
 			\begin{itemize}
-				
+
 				\item \textbf{Unit Test}\\
 				\newline
 				Unit testing is a software development process in which the smallest testable parts of an application, called units, are individually and independently scrutinised for proper operation.\\
-				
+
 			\end{itemize}
-		
+
 		\subsection{Additional Information}
-		
-		The code being tested is written by different developers, thus this document serves as a way in order to review the functionality provided, and to provide information about future tests on current functionality.\\\\
-		
+
+		The code being tested is written by different developers, thus this document serves as a way in order to review the functionality and tests done, and to provide information about future tests on future or current functionality.\\\\
+
 
 	\pagebreak
 	\section{Functional requirements}
-        
-	\subsection UC1: A user can view real time data gathered from a patient. 
+	\subsection{UC1: A user can view real time data gathered from a patient. }
 	\subsubsection{Service Contract}
-	\textbf{Implementation status:} implemented
-	\textbf{Primary Actors:} All users
-	\textbf{Functionality:} View real time data on patient(s)
+	\textbf{Implementation status:} implemented \\
+	\textbf{Primary Actors:} All users \\
+	\textbf{Functionality:} View real time data on patient(s)\\
 	\subsubsection{Description of current tests}
-	The data streaming consists of servers streaming data and the application displaying those data streams. We do this using the Nodejs package Zetta (which is already been tested), and an application that someone created to recieve zetta streams. These have both been tested already, thus to create our own tests would be redundant. 
+	The data streaming consists of servers streaming data and the application displaying those data streams. We do this using the Nodejs package Zetta (which is already been tested), and an application that someone created to recieve zetta streams. These have both been tested already, thus to create our own tests would be redundant.
 	\subsubsection{Future tests:}
-	Future tests will include capacity testing, to show that the application is scalable and can stream to many devices. 
+	Future tests will include capacity testing of real time data, to show that the application is scalable and can stream to many devices, this would be testing of a non-functional requirement however.
 
-	\subsection UC2: A user can view historical data detailing a period of time.
+	\subsection{UC2: A user can view historical data detailing a period of time.}
 	\textbf{Implementation status:} unimplemented
-	
-	\subsection UC3: A user can view statistical data from over a period of time.
+
+	\subsection{UC3: A user can view statistical data from over a period of time.}
 	\textbf{Implementation status:} unimplemented
-	
-	\subsection UC4: A user can register to create an account and link to a particular patient.
+
+	\subsection{UC4: A user can register to create an account and link to a particular patient.}
 	\subsubsection{Service contract}
-	\textbf{Implementation status:} partly-implemented
-	\textbf{Primary Actors:} non-users
-	\textbf{Functionality} Type in details and register to become a new user. There is only local validation and forms currently implemented. Client-server communication for registration and user management is not yet implemented.
+	\textbf{Implementation status:} partly-implemented \\
+	\textbf{Primary Actors:} non-users \\
+	\textbf{Functionality} Type in details and register to become a new user. There is only local validation and forms currently implemented. Client-server communication for registration and user management is not yet implemented, however there are tests for CRUD even though client-server is not yet impemented.
 	\subsubsection{Description of current tests}
-	There are unit tests for each input that test the validation of those inputs. So there are tests for email, passwords, usernames etc. All to make sure that the validation is correct. 
+	There are unit tests for each input that test the validation of those inputs. So there are tests for email, passwords, usernames etc. All to make sure that the validation is correct.
 	\subsubsection{Future tests:}
-	Unit tests that verify client-server communication is happening correctly and that users are registered properly. 
+	Unit tests that verify client-server communication is happening correctly and that users are registered properly.
 
 
-	
-	\subsection UC5: A user can log in to his or her account.
+
+	\subsection{UC5: A user can log in to his or her account.}
 	\subsubsection{Service contract}
-	\textbf{Implementation status:} partly-implemented
-	\textbf{Primary Actors:} users
-	\textbf{Functionality} Type in details and login to use user features. There is only local validation and forms currently implemented. Client-server communication for login and user management is not yet implemented.
+	\textbf{Implementation status:} partly-implemented \\
+	\textbf{Primary Actors:} users \\
+	\textbf{Functionality} Type in details and login to use user features. There is only local validation and forms currently implemented. Client-server communication for login and user management is not yet implemented. \\
 	\subsubsection{Description of current tests}
-	There are unit tests for each input that test the validation of those inputs. So there are tests for email, passwords, usernames etc. All to make sure that the validation is correct. 
+	There are unit tests for each input that test the validation of those inputs. So there are tests for email, passwords, usernames etc. All to make sure that the validation is correct.
 	\subsubsection{Future tests:}
-	Unit tests that verify client-server communication is happening correctly and that users are logged in properly. 
-	
-	\subsection UC6: A user can log out of his or her account.
-	\textbf{Implementation status:} unimplemented
-	
-	\subsection UC7: A user can manage his or her account information.	
-	\textbf{Implementation status:} unimplemented	
+	Unit tests that verify client-server communication is happening correctly and that users are logged in properly.
 
-	\subsection UC8: An admin user can manage other users' access rights.
+	\subsection{UC6: A user can log out of his or her account.}
+	\textbf{Implementation status:} unimplemented \\
+
+	\subsection{UC7: A user can manage his or her account information.}
 	\textbf{Implementation status:} unimplemented
 
-
-	\subsection UC9: A user, caregiver, or doctor can get notifications if something is wrong according to the data.
+	\subsection{UC8: An admin user can manage other users' access rights.}
 	\textbf{Implementation status:} unimplemented
 
-	
-	\subsection UC10: A user can see all previous notifications.
+
+	\subsection{UC9: A user, caregiver, or doctor can get notifications if something is wrong according to the data.}
 	\textbf{Implementation status:} unimplemented
 
-	\subsection UC11: A user can view general advice on the App.
-	\textbf{Implementation status:} unimplemented
-	
-	\subsection UC12: A user can add or remove medical persons' contact details to the app.
+
+	\subsection{UC10: A user can see all previous notifications.}
 	\textbf{Implementation status:} unimplemented
 
-	\subsection UC13: A user can configure devices remotely.
+	\subsection{UC11: A user can view general advice on the App.}
 	\textbf{Implementation status:} unimplemented
 
-		
-	\subsection UC14: A researcher can view the data in the database anonymously.	
+	\subsection{UC12: A user can add or remove medical persons' contact details to the app.}
 	\textbf{Implementation status:} unimplemented
 
-	\subsection CRUD implementation related to database storage of user information and details. 
-	\textbf{Precondition:} The user manager is tested to ensure that arguments passed to the database manager are correctly formatted, i.e., that the json conforms to the database model. \\ \\ 
-	\\
+	\subsection{UC13: A user can configure devices remotely.}
+	\textbf{Implementation status:} unimplemented
+
+
+	\subsection{UC14: A researcher can view the data in the database anonymously.}
+	\textbf{Implementation status:} unimplemented
+
+	\subsection{CRUD implementation related to database storage of user information and details.}
+	\subsubsection{Service contract}
+	\textbf{Implementation status:} partly-implemented \\
+	\textbf{Primary Actors:} users, admin users \\
+	\textbf{Functionality} Create, Remove, Update or Delete items related to data storage, e.g., user accounts, general advice, account information, change access rights.  \\
+	\subsubsection{Description of current tests}
+	\textbf{Precondition:} The user manager is tested to ensure that arguments passed to the database manager are correctly formatted, i.e., that the json conforms to the database model. \\
+
 	\textbf{Postcondition:} Ensure that intended parameters are added to the database after successful query. \\
 
-	\textbf{Invariant:} Ensure that only intended parameters change within the related managers and database. 
+	\textbf{Invariant:} Ensure that only intended parameters change within the related managers and database.
 
     \section{Non-functional requirements}
     	\subsection{Usability test}
     	\subsection{Accessibility test}
 
     \section{Platform compatibility test}
-   
-			
+
+
 \end{document}
