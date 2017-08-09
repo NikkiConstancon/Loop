@@ -129,25 +129,15 @@
 	\textbf{Comment:} The user interface only displays data, and therefore it is easy to verify what is being displayed and that it is working as expected.
 
 	\section{Data Storage Subsystem}
-	\textbf{Implementation status:} partly-implemented
-	\subsubsection{Data Storage, interfaced with the Pub/Sub server}
-	\textbf{Implementation status:} partly-implemented \\
-	\textbf{Primary Actors:} users, admin users \\
-	\textbf{Functionality} Create, Remove, Update or Delete items related to data storage, e.g., timestamped human vital data. Current functionality is that the Data Storage module can recieve streams from the Pub/Sub server.  \\
-	\subsubsection{Description of current tests}
-	\textbf{Precondition:} The Pub/Sub server module is tested to ensure that arguments passed to the database manager are correctly formatted, i.e., that the json conforms to the database model. \\
-
-	\textbf{Postcondition:} Ensure that intended parameters are added to the database after successful query. \\
-
-	\textbf{Invariant:} Ensure that only intended parameters change within the related managers and database.
-
-
+	\textbf{Implementation status:} unimplemented
 
 	\section{History/Statistics subsystem}
 	\textbf{Implementation status:} unimplemented
 
 	\section{User Management Subsystem }
 	\textbf{Implementation status:} partly-implemented
+
+
 	\subsubsection{User Management}
 	\textbf{Implementation status:} partly-implemented \\
 	\textbf{Primary Actors:} users, admin users \\
@@ -155,13 +145,51 @@
 	\subsubsection{Description of current tests}
 	\textbf{Precondition:} The user manager is tested to ensure that arguments passed to the database manager are correctly formatted, i.e., that the json conforms to the database model. \\
 	\textbf{Postcondition:} Ensure that intended parameters are added to the database after successful query. \\
-	\textbf{Invariant:} Ensure that only intended parameters change within the related managers and database.
+	\textbf{Invariant:} Ensure that only intended parameters change within the related managers and database. \\
+	\textbf{Example of when the CRUD test passes}
+	\begin{center}
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=13cm]{usrCRUD/tests-pass.png.png}
+	\end{figure}
+	\end{center}
+	\textbf{User Manager CRUD fail example, due to Cassandra database being down. Note error reports on the console is also piped into a rotating file. Thus systems users will be able to track down errors after they occur.}
+	\begin{center}
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=13cm]{usrCRUD/tests-fail.png}
+	\end{figure}
+	\end{center}
+
+
+
 	\subsubsection{User Interface}
 	\textbf{Implementation status:} partly-implemented \\
 	\textbf{Primary Actors:} non-users \\
 	\textbf{Functionality} Type in details and register to become a new user. There is only local validation and forms currently implemented. Client-server communication for registration and user management is not yet implemented.
 	\subsubsection{Description of current tests}
-	There are unit tests for each input that test the validation of those inputs. So there are tests for email, passwords, usernames etc. All to make sure that the validation is correct.
+	There are unit tests for each input that test the validation of those inputs. So there are tests for email, passwords, usernames etc. All to make sure that the validation is correct. \\
+	\textbf{Following is the code for each unit test to show what is tested.}
+	\begin{center}
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=13cm]{usrUI/TestAge.JPG}
+	\end{figure}
+
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=13cm]{usrUI/TestLogin.JPG}
+	\end{figure}
+
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=13cm]{usrUI/TestLoginFunction.JPG}
+	\end{figure}
+
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=13cm]{usrUI/TestRegister.JPG}
+	\end{figure}
+
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=13cm]{usrUI/TestUsername.JPG}
+	\end{figure}
+	\end{center}
+
 	\subsubsection{Future tests:}
 	Unit tests that verify client-server communication is happening correctly.
 
