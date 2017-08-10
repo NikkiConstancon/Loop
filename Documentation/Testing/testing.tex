@@ -167,18 +167,22 @@
 	\textbf{Invariant:} Ensure that only intended parameters change within the related managers and database. \\
 	\textbf{Example of when the CRUD test passes}
 	\begin{center}
-	\begin{figure}[h]
-%		\includegraphics[width=15cm, height=13cm]{usrCRUD/tests-pass.png}
+	\begin{figure}[h!]
+		\includegraphics[width=\textwidth]{tests/usrCRUD/tests-pass.png}
+		\caption{Mocha output of successful \textit{User Manager} test}
 	\end{figure}
 	\end{center}
 	\textbf{User Manager CRUD fail example, due to Cassandra database being down. Note error reports on the console is also piped into a rotating file. Thus systems users will be able to track down errors after they occur.}
 	\begin{center}
-	\begin{figure}[h]
-%		\includegraphics[width=15cm, height=13cm]{usrCRUD/tests-fail.png}
+	\begin{figure}[h!]
+		\includegraphics[width=\textwidth]{tests/usrCRUD/tests-fail.png}
+		\caption{Mocha output of unsuccessful \textit{User Manager} test, due to database connection failure}
 	\end{figure}
 	\end{center}
 
-
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!BREAK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\pagebreak
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!BREAK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	\subsubsection{User Interface}
 	\textbf{Implementation status:} partly-implemented \\
