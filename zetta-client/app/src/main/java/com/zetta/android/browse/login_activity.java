@@ -7,35 +7,45 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.zetta.android.R;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Created by Hristian Vitrychenko on 06/06/2017.
+ * Edited by Gregory Austin 10/08/2017.
  */
 
 /**
- * Login class for starting the login process (possible first page)
+ * login activity class for starting the login process (possible first page)
  */
-public class Login extends AppCompatActivity {
+public class login_activity extends AppCompatActivity {
 
     private Button loginButton;
+    private Button registerButton;
 
     /**
-     * Overridden onCreate for starting with the Login class
+     * Overridden onCreate for starting with the login_activity class
      * @param savedInstanceState used to start a new instance
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.login_activity);
+
+
 
         loginButton = (Button) findViewById(R.id.btn_login);
+        registerButton = (Button) findViewById(R.id.btn_register);
+
+
 
         /* Setting an OnClickListener allows us to do something when this button is clicked. */
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -53,12 +63,38 @@ public class Login extends AppCompatActivity {
                  * wanted to demonstrate what parameter we were using "MainActivity.this" for as
                  * clear as possible.
                  */
-                Context context = Login.this;
-                Class destinationActivity = RealTime.class;
+                Context context = login_activity.this;
+                Class destinationActivity = DeviceListActivity.class;
 
                 Intent intent = new Intent(context, destinationActivity);
-                //startActivity(intent);
-                String message = "Button clicked!";
+                startActivity(intent);
+                String message = "Login clicked!";
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * The onClick method is triggered when this button (mDoSomethingCoolButton) is clicked.
+             *
+             * @param v The view that is clicked. In this case, it's mDoSomethingCoolButton.
+             */
+            @Override
+            public void onClick(View v) {
+                /*
+                 * Storing the Context in a variable in this case is redundant since we could have
+                 * just used "this" or "MainActivity.this" in the method call below. However, we
+                 * wanted to demonstrate what parameter we were using "MainActivity.this" for as
+                 * clear as possible.
+                 */
+                Context context = login_activity.this;
+                Class destinationActivity = DeviceListActivity.class;
+
+                Intent intent = new Intent(context, destinationActivity);
+                startActivity(intent);
+                String message = "Register clicked!";
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 
             }
@@ -115,7 +151,7 @@ public class Login extends AppCompatActivity {
             else
             {
                 //validation happens here
-                Intent toMain = new Intent(this, MainActivity.class);
+                Intent toMain = new Intent(this, DeviceList.class);
                 startActivityForResult(toMain,0);
             }
         }
@@ -127,7 +163,7 @@ public class Login extends AppCompatActivity {
      */
     public void toRegistration(Editable s)
     {
-        Intent toReg = new Intent(this, Registration.class);
-        startActivityForResult(toReg, 0);
+//        Intent toReg = new Intent(this, Registration.class);
+//        startActivityForResult(toReg, 0);
     }
 }

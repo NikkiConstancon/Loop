@@ -56,7 +56,7 @@ public class DeviceListActivity extends AppCompatActivity {
         setContentView(R.layout.device_list_activity);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
+        getSupportActionBar().setTitle("Reva");
 
         emptyLoadingWidget = (EmptyLoadingView) findViewById(R.id.device_list_empty_view);
         adapter = new DeviceListAdapter(new ImageLoader(), onDeviceClickListener);

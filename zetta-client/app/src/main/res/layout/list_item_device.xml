@@ -21,7 +21,7 @@
     android:paddingLeft="@dimen/spacing_double">
 
     <TextView
-        android:textColor="@color/textColorPrimary"
+        android:textColor="@color/colorPrimaryText"
       android:id="@+id/list_item_device_name"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
   <TextView
       android:gravity="right"
       android:textSize="24dp"
-      android:textColor="@color/textColorSecondary"
+      android:textColor="@color/colorPrimaryText"
       android:id="@+id/list_item_device_state"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
