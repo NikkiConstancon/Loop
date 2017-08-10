@@ -1,24 +1,69 @@
 \subsubsection{Actor-System Interaction Models}
-\noindent\textbf{UC: Reporting of Real-Time Data}
+\noindent\textbf{UC1: Reporting of Real-Time Data}
 				\begin{flushleft}
 					\begin{tabular}{ |p{7cm}|p{7cm}| }
    						\hline
   						\multicolumn{2}{|p{\textwidth}|}{\textbf{Precondition:} Caretaker must be registered and logged in. Mobile device must be connected to the internet} \\
  						\hline
-						\textbf {Actor: Caretaker} & \textbf{System: Mobile Application}\\
+						\textbf {Actor: Caretaker} & \textbf{System: Mobile App\textbackslash Server}\\
 						\hline
 						 & 0: TUCBW the system shows the start up page\\
 						\hline
- 						1: The user selects the patient whose data they wish to view & The system retrieves the current data of that patient\\
+ 						1: The user selects the patient whose data they wish to view & 2: The system retrieves the current data of that patient\\
 						\hline
 						3: TUCEW the user sees the patients data displayed on the screen. & \\
+  						\hline
+					\multicolumn{2}{|p{\textwidth}|}{\textbf{Postcondition:} Device must still be connected to the internet.} \\
+ 						\hline
+				\end{tabular}
+
+			\end{flushleft}
+
+			\pagebreak
+\noindent\textbf{UC2: A user can view historical data detailing a period of time.}			
+
+
+			\begin{flushleft}
+					\begin{tabular}{ |p{7cm}|p{7cm}| }
+   						\hline
+  						\multicolumn{2}{|p{\textwidth}|}{\textbf{Precondition:} Caretaker must be registered and logged in. Mobile device must be connected to the internet. Devices must be connected to the Raspberry Pi.} \\
+ 						\hline
+						\textbf {Actor: Caretaker} & \textbf{System: Mobile App\textbackslash Server}\\
+						\hline
+						 0: TUCBW the user selects the patient whose data they wish to view & 1: The system subscribes to that patients data\\
+						\hline
+						2: The user selects the device for which they wish to view the historical data & 3: The system retrieves the data for that particular device.\\
+						\hline
+						4: The user specifies the start time and end time & 5: The system extracts the relevant data and displays it on the mobile App\\
+						\hline
+						6: TUCEW the user sees the patients historical data displayed on the screen. & \\
+  						\hline
+  						\multicolumn{2}{|p{\textwidth}|}{\textbf{Postcondition:} Device must still be connected to the internet.} \\
   						\hline
 
 				\end{tabular}
 
 			\end{flushleft}
-			\begin{center}
-    			Table 1: Actor-System interaction model for reporting real-time data
-			\end{center}
+
+
 			
 			
+			
+\noindent\textbf{UC3: A user can view statistical data from over a period of time. }
+				\begin{flushleft}
+					\begin{tabular}{ |p{7cm}|p{7cm}| }
+   						\hline
+  						\multicolumn{2}{|p{\textwidth}|}{\textbf{Precondition:} Caretaker must be registered and logged in. Mobile device must be connected to the internet. Devices must be connected to the Raspberry Pi.} \\
+ 						\hline
+						\textbf {Actor: Caretaker} & \textbf{System: Mobile App\textbackslash Server}\\
+						\hline
+						  0: TUCBW the user selects the statistics tab at the top of the screen & 1: The system retrieves the statistical data from the database. It displays the data and draws graph points.\\
+						\hline
+						2: TUCEW the user sees the patient's statistical data displayed on the screen. This includes min, max, average and a graph depicting fluctuations. & \\
+  						\hline
+  						\multicolumn{2}{|p{\textwidth}|}{\textbf{Postcondition:} Device must still be connected to the internet.} \\
+  						\hline
+
+				\end{tabular}
+
+			\end{flushleft}
