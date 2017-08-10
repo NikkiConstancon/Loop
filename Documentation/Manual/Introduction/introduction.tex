@@ -1,3 +1,30 @@
 \subsection{System Overview}
+The ReVA homecare system is composed of two parts, namely the mobile application and the Raspberry Pi (see description). The mobile application is the App that is on the phone. This App is used for three purposes:
+\begin{itemize}
+	\item To register a patient, i.e. to put a patient's details in the system
+	\item To register a subscriber, i.e. to put a non-patient's details in the system and link to a specific patient
+	\item To view a patient's data
+\end{itemize}
+The Raspberry Pi connects to the medical devices. It needs to be set up before it can be used.
 \subsection{Definitions}
+\begin{itemize}
+	\item Raspberry Pi\\
+	The green, card-sized, electronic-looking thing that was provided. One can plug in wires to this box as well as see lights when it is on.
+	
+	\item Mobile Application\\
+	A program that runs on a phone. Specifically in this context, it will refer to the dowloaded ReVA Application.
+	
+	\item Subscriber\\
+	Any person who is not a patient.
+
+\end{itemize}
 \subsection{System Users}
+There are two intended users for this system. The first is the patient. The patient is the one who will be connected to the medical devices and whose vital information will be monitored.
+
+The other user is a subscriber. This includes:
+\begin{itemize}
+	\item The caretaker
+	\item A family member
+	\item A medical professional such as a doctor
+\end{itemize}
+The subscriber is the person who views the patient's vital information on the mobile application.
