@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +24,8 @@ import java.util.regex.Pattern;
  */
 public class Login extends AppCompatActivity {
 
+    private Button loginButton;
+
     /**
      * Overridden onCreate for starting with the Login class
      * @param savedInstanceState used to start a new instance
@@ -29,6 +34,35 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        loginButton = (Button) findViewById(R.id.btn_login);
+
+        /* Setting an OnClickListener allows us to do something when this button is clicked. */
+        loginButton.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * The onClick method is triggered when this button (mDoSomethingCoolButton) is clicked.
+             *
+             * @param v The view that is clicked. In this case, it's mDoSomethingCoolButton.
+             */
+            @Override
+            public void onClick(View v) {
+                /*
+                 * Storing the Context in a variable in this case is redundant since we could have
+                 * just used "this" or "MainActivity.this" in the method call below. However, we
+                 * wanted to demonstrate what parameter we were using "MainActivity.this" for as
+                 * clear as possible.
+                 */
+                Context context = Login.this;
+                Class destinationActivity = RealTime.class;
+
+                Intent intent = new Intent(context, destinationActivity);
+                //startActivity(intent);
+                String message = "Button clicked!";
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+
+            }
+        });
     }
 
     /**

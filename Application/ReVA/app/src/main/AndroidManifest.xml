@@ -24,11 +24,15 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme">
+
+
+        </activity>
         <activity
             android:name=".Registration"
             android:label="Registration"
             android:theme="@style/AppTheme"></activity>
+
     </application>
 
 </manifest>
