@@ -12,7 +12,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "node Zettar.js"
+    "test": "node mochaDriver.js --reporter spec"
   },
   "author": "",
   "license": "BSD-2-Clause"
