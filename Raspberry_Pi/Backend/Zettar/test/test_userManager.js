@@ -1,18 +1,18 @@
-﻿var chai = require("chai");
+var chai = require('chai');
 var expect = chai.expect;
 var assert = chai.assert;
 
 var dbMan = require('../databaseManager');
-var UserManager = require("../userManager");
+var UserManager = require('../userManager');
 
 
 
 
 
-describe("UserManager", function () {
-    describe("database CRUD", function () {
-        describe("#addUser", function () {
-            it("adds a user to the db", function () {
+describe('UserManager', function () {
+    describe('database CRUD', function () {
+        describe('#addUser', function () {
+            it('adds a user to the db', function () {
                 return UserManager
                     .addUser({ name: 'name-test', surname: 'surname-test', age: 100 })
                     .then((user) => {
