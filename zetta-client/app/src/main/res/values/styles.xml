@@ -14,6 +14,9 @@
     <item name="android:textColorTertiary">@color/textColorTertiary</item>
 
     <item name="android:windowBackground">@color/colorTextIcons</item>
+
+    <item name="colorButtonNormal">@color/colorPrimary</item>
+    <item name="colorControlHighlight">@color/colorAccent</item>
   </style>
 
   <style name="AppThemeDark"
@@ -74,6 +77,8 @@
       <item name="colorPrimary">@color/colorPrimary</item>
       <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
       <item name="colorAccent">@color/colorAccent</item>
+      <item name="colorButtonNormal">@color/colorPrimary</item>
+      <item name="colorControlHighlight">@color/colorAccent</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

@@ -35,7 +35,7 @@ public class SdkProperties {
 
     @NonNull
     public String getUrl() {
-        return "http://iomt.dedicated.co.za:3009";
+        return "http://192.168.43.125:1337";
     } // THE SERVER: http://iomt.dedicated.co.za:3009
 
     public boolean useMockResponses() {

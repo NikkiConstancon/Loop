@@ -41,9 +41,9 @@ public class login_activity extends AppCompatActivity {
         setContentView(R.layout.login_activity);
 
 
-
-        loginButton = (Button) findViewById(R.id.btn_login);
         registerButton = (Button) findViewById(R.id.btn_register);
+        loginButton = (Button) findViewById(R.id.btn_login);
+
 
 
 
