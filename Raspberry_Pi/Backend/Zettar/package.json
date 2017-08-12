@@ -8,7 +8,9 @@
     "zetta": "~1.5.0",
     "winston": "~2.3.1",
     "winston-daily-rotate-file": "~1.4.6",
-    "winston-cassandra": "~0.4.0"
+    "winston-cassandra": "~0.4.0",
+    "mocha": "~3.5.0",
+    "chai": "~4.1.1"
   },
   "devDependencies": {},
   "scripts": {

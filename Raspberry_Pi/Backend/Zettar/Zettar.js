@@ -3,9 +3,18 @@ var url = require('url');
 // var display = require('./display.js');
 var Hook = require('./lib/zettaHook')
 
+var dbManager1 = require("./userManager");
+var patientDataManager = require("./patientDataManager");
+
+
 //init zetta as usual, but dont call link yet
 //  the listen call is deferred to the hook
 var initializedZetta = zetta('peers').name('Zettar')
+
+var callback = function(info, data){
+    patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
+
+}
 
 //pass the initialized zetta var to a new hook
 var hook = new Hook(initializedZetta)
@@ -17,10 +26,7 @@ var hook = new Hook(initializedZetta)
     .registerStreamListener({
         topicName: 'value',
         where: { type: 'state_machine', name: 'heart_monitor' },
-        cb: function (info, data) {
-            console.log(info)
-            console.log(data)
-        },
+        cb: callback,
         errcb: function (e) {
             console.log(e)
         }
@@ -28,10 +34,7 @@ var hook = new Hook(initializedZetta)
     .registerStreamListener({
         topicName: 'value',
         where: { type: 'state_machine', name: 'temp_monitor' },
-        cb: function (info, data) {
-            console.log(info)
-            console.log(data)
-        },
+        cb: callback,
         errcb: function (e) {
             console.log(e)
         }
@@ -39,10 +42,7 @@ var hook = new Hook(initializedZetta)
     .registerStreamListener({
         topicName: 'concentration',
         where: { type: 'glucose-meter'},
-        cb: function (info, data) {
-            console.log(info)
-            console.log(data)
-        },
+        cb: callback,
         errcb: function (e) {
             console.log(e)
         }
@@ -50,10 +50,7 @@ var hook = new Hook(initializedZetta)
     .registerStreamListener({
         topicName: 'concentration',
         where: { type: 'insulin-pump'},
-        cb: function (info, data) {
-            console.log(info)
-            console.log(data)
-        },
+        cb: callback,
         errcb: function (e) {
             console.log(e)
         }
@@ -61,10 +58,7 @@ var hook = new Hook(initializedZetta)
     .registerStreamListener({
         topicName: 'temperature',
         where: { type: 'thermometer'},
-        cb: function (info, data) {
-            console.log(info)
-            console.log(data)
-        },
+        cb: callback,
         errcb: function (e) {
             console.log(e)
         }

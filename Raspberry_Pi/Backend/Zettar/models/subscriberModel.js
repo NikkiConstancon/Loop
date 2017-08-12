@@ -1,10 +1,9 @@
 module.exports = {
     fields:{
-    	Email : "text",		//email type?
-    		//name/surname?
-        Password    : "text",	//encryption? perhaps call it SubscriberPassword?
-        Relation : "text",
-        PatientList     : "int" //dataype?
+    	Email : "text",	
+        Password    : "text",	
+	Relation : "text",
+        PatientList     : "int" 
     },
-    key:["Email"]	//no username for Subscriber?
+    key:["Email"]
 }

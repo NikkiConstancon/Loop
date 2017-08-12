@@ -27,6 +27,6 @@
 #Zetta
 *.peers
 *.devices
-
+.DS_STORE
 node_modules
 
