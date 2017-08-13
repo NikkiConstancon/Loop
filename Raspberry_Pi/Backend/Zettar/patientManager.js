@@ -88,12 +88,14 @@ var patientManager = module.exports = {
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
                 dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
-                    if (err) {
+                    if (err || !found) {
+                        err = err || 'could not find ' + _patient.Username
                         logger.error(err)
                         reject(err)
+                    } else {
+                        logger.debug('Found patient: ' + found.Username)
+                        resolve(found)
                     }
-                    logger.debug('Found patient: ' + found.Username)
-                    resolve(found)
                 })
             }).catch((err) => {
                 reject(err)
