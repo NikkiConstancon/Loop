@@ -5,16 +5,11 @@ var util = require('util');
 var logger = require('./revaLog');
 
 
-var getNewInstance = function(type , _instance){
-    return new dbMan.models.instance.patientData(_instance);
-
-}
-
 var patientDataManager = module.exports = {
     addInstance: function (user){
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
-                var newUser = getNewInstance('patientData',user)
+                var newUser = new dbMan.models.instance.patientData(user)
                 newUser.save(function (err) {
                     if (err) {
                         logger.error(err)
