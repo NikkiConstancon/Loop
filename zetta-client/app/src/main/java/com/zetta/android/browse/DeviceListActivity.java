@@ -59,8 +59,7 @@ public class DeviceListActivity extends AppCompatActivity {
         setContentView(R.layout.device_list_activity);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Reva");
-
+        getSupportActionBar().setTitle("ReVA");
 
         emptyLoadingWidget = (EmptyLoadingView) findViewById(R.id.device_list_empty_view);
         adapter = new DeviceListAdapter(new ImageLoader(), onDeviceClickListener);
@@ -69,13 +68,13 @@ public class DeviceListActivity extends AppCompatActivity {
         deviceListWidget.setHasFixedSize(true);
         deviceListWidget.setLayoutManager(new LinearLayoutManager(this));
         quickActionsAdapter = new QuickActionsAdapter(onActionClickListener);
-        //RecyclerView deviceQuickActionsWidget = (RecyclerView) findViewById(R.id.device_list_bottom_sheet_quick_actions);
-        //deviceQuickActionsWidget.setAdapter(quickActionsAdapter);
-//        deviceQuickActionsWidget.setHasFixedSize(true);
-//        deviceQuickActionsWidget.setLayoutManager(new LinearLayoutManager(this));
-//        deviceListWidget.setItemAnimator(null);
+        RecyclerView deviceQuickActionsWidget = (RecyclerView) findViewById(R.id.device_list_bottom_sheet_quick_actions);
+        deviceQuickActionsWidget.setAdapter(quickActionsAdapter);
+        deviceQuickActionsWidget.setHasFixedSize(true);
+        deviceQuickActionsWidget.setLayoutManager(new LinearLayoutManager(this));
+        deviceListWidget.setItemAnimator(null);
 
-//        bottomSheetBehavior = BottomSheetBehavior.from(deviceQuickActionsWidget);
+        bottomSheetBehavior = BottomSheetBehavior.from(deviceQuickActionsWidget);
         pullRefreshWidget = (SwipeRefreshLayout) findViewById(R.id.pull_refresh);
         pullRefreshWidget.setOnRefreshListener(onPullRefreshListener);
 

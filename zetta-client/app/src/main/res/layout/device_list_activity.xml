@@ -27,12 +27,12 @@
 
   </android.support.v4.widget.SwipeRefreshLayout>
 
-<!--  <android.support.v7.widget.RecyclerView
+     <android.support.v7.widget.RecyclerView
     android:id="@+id/device_list_bottom_sheet_quick_actions"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#ffffff"
-    custom:layout_behavior="@string/bottom_sheet_behavior" /> -->
+    custom:layout_behavior="@string/bottom_sheet_behavior" />
 
 
   <com.zetta.android.browse.EmptyLoadingView

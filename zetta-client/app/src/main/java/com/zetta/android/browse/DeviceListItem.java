@@ -14,16 +14,24 @@ class DeviceListItem implements ListItem {
     @NonNull private final ZettaDeviceId deviceId;
     @NonNull private final String name;
     @NonNull private final String state;
+    @NonNull private final String unitOfMeasure;
     @NonNull private final ZettaStyle style;
 
     public DeviceListItem(@NonNull ZettaDeviceId zettaDeviceId,
                           @NonNull String name,
                           @NonNull String state,
-                          @NonNull ZettaStyle style) {
+                          @NonNull ZettaStyle style,
+                          @NonNull String unitOfMeasure) {
         deviceId = zettaDeviceId;
         this.name = name;
         this.state = state;
         this.style = style;
+        this.unitOfMeasure = unitOfMeasure;
+    }
+
+    @NonNull
+    public String getUnitOfMeasure() {
+        return unitOfMeasure;
     }
 
     @NonNull

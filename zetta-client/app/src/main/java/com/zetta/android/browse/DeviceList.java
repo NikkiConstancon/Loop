@@ -109,7 +109,15 @@ class DeviceList {
         public DeviceListItem createDeviceListItem(@NonNull ZIKServer server, @NonNull ZIKDevice device) {
             ZettaStyle style = zettaStyleParser.parseStyle(server, device);
             String state = getState(server, device);
-            return createDeviceListItem(style, device, state);
+
+            Map<String, Object> properties = device.getProperties();
+            String val = String.valueOf(properties.get("units"));
+            if (val != "null") {
+                return createDeviceListItem(style, device, state, val);
+            } else {
+                return createDeviceListItem(style, device, state, "N/A");
+            }
+
         }
 
         /**
@@ -171,16 +179,18 @@ class DeviceList {
         @NonNull
         private DeviceListItem createDeviceListItem(@NonNull ZettaStyle style,
                                                     @NonNull ZIKDevice device,
-                                                    @NonNull String state) {
+                                                    @NonNull String state,
+                                                    @NonNull String units) {
             return new DeviceListItem(
                 getDeviceId(device),
                 device.getName(),
                 state,
-                style
+                style,
+                    units
             );
         }
 
-        //TODO: somehow this _NEW_COPIED_FUNCTION_ in conjunction with other TODOs makes streaming possible
+
         private StreamListItem createStreamListItem(@NonNull ZettaStyle style,
                                                     @NonNull ZIKDevice device,
                                                     @NonNull ZIKStream zikStream) {

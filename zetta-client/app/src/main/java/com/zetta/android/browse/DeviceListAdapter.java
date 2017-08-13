@@ -130,6 +130,7 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         @NonNull private final ImageLoader imageLoader;
         @NonNull private final TextView nameLabelWidget;
+        @NonNull private final TextView unitsOfMeasure;
         @NonNull private final TextView stateLabelWidget;
         @NonNull private final ImageView stateImageWidget;
 
@@ -138,6 +139,7 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.imageLoader = imageLoader;
             nameLabelWidget = (TextView) itemView.findViewById(R.id.list_item_device_name);
             stateLabelWidget = (TextView) itemView.findViewById(R.id.list_item_device_state);
+            unitsOfMeasure = (TextView) itemView.findViewById(R.id.units_of_measure);
             stateImageWidget = (ImageView) itemView.findViewById(R.id.list_item_device_state_image);
         }
 
@@ -163,7 +165,9 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 // Performance Optimisation which makes an assumption
                 // when an item is updated via a stream only the state label & image is wanting to be updated
                 stateLabelWidget.setText(deviceListItem.getState());
-                imageLoader.load(deviceListItem.getStateImageUri(), stateImageWidget);
+
+                //This is taken out because don't have state images.
+                //imageLoader.load(deviceListItem.getStateImageUri(), stateImageWidget);
             } else {
                 itemView.setTag(deviceListItem.getDeviceId());
                 itemView.setBackground(deviceListItem.createBackground());
@@ -171,6 +175,7 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 nameLabelWidget.setTextColor(deviceListItem.getTextColor());
                 stateLabelWidget.setText(deviceListItem.getState());
                 stateLabelWidget.setTextColor(deviceListItem.getTextColor());
+                unitsOfMeasure.setText(deviceListItem.getUnitOfMeasure());
                 imageLoader.load(deviceListItem.getStateImageUri(), stateImageWidget);
                 stateImageWidget.setColorFilter(deviceListItem.getImageColorFilter());
             }

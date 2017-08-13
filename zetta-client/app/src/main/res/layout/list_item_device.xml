@@ -6,6 +6,7 @@
   android:gravity="center_vertical"
   android:orientation="horizontal"
   android:padding="@dimen/spacing_double"
+
     >
 
   <ImageView
@@ -26,7 +27,7 @@
       android:id="@+id/list_item_device_name"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-        android:textSize="20dp"
+        android:textSize="16dp"
       tools:text="Door" />
 
   </LinearLayout>
@@ -38,12 +39,24 @@
 
   <TextView
       android:gravity="right"
-      android:textSize="24dp"
+      android:textSize="28dp"
       android:textColor="@color/colorPrimaryText"
       android:id="@+id/list_item_device_state"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       tools:text="closed" />
+
+  <TextView
+      android:layout_gravity="bottom"
+      android:layout_marginLeft="5dp"
+      android:layout_marginBottom="5dp"
+      android:textSize="16dp"
+      android:id="@+id/units_of_measure"
+      android:textColor="@color/colorSecondaryText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="BPM"
+      tools:text="BPM"/>
 
 
 
