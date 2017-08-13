@@ -11,7 +11,13 @@
     "winston-cassandra": "~0.4.0",
     "mocha": "~3.5.0",
     "chai": "~4.1.1",
-    "crypto-js": "~3.1.9-1"
+    "crypto-js": "~3.1.9-1",
+    "uuid": "*",
+    "express": "*",
+    "parseurl": "*",
+    "express-session": "*",
+    "body-parser": "*",
+    "request": "*"
   },
   "devDependencies": {},
   "scripts": {
