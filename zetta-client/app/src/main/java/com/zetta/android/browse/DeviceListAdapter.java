@@ -137,6 +137,7 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public DeviceViewHolder(@NonNull View itemView, @NonNull ImageLoader imageLoader) {
             super(itemView);
             this.imageLoader = imageLoader;
+
             nameLabelWidget = (TextView) itemView.findViewById(R.id.list_item_device_name);
             stateLabelWidget = (TextView) itemView.findViewById(R.id.list_item_device_state);
             unitsOfMeasure = (TextView) itemView.findViewById(R.id.units_of_measure);
