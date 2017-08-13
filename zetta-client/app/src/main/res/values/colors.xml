@@ -11,4 +11,6 @@
   <color name="textColorPrimary">@color/colorPrimaryText</color>
   <color name="textColorSecondary">@color/colorSecondaryText</color>
   <color name="textColorTertiary">@color/colorSecondaryText</color>
+
+  <color name="white">#FFFFFF</color>
 </resources>

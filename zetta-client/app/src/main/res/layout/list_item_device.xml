@@ -5,7 +5,8 @@
   android:layout_height="wrap_content"
   android:gravity="center_vertical"
   android:orientation="horizontal"
-  android:padding="@dimen/spacing_double" >
+  android:padding="@dimen/spacing_double"
+    >
 
   <ImageView
     android:id="@+id/list_item_device_state_image"

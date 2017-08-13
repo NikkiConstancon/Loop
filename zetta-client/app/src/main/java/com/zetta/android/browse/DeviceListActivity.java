@@ -5,13 +5,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -58,6 +61,7 @@ public class DeviceListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Reva");
 
+
         emptyLoadingWidget = (EmptyLoadingView) findViewById(R.id.device_list_empty_view);
         adapter = new DeviceListAdapter(new ImageLoader(), onDeviceClickListener);
         deviceListWidget = (RecyclerView) findViewById(R.id.device_list);
@@ -65,15 +69,36 @@ public class DeviceListActivity extends AppCompatActivity {
         deviceListWidget.setHasFixedSize(true);
         deviceListWidget.setLayoutManager(new LinearLayoutManager(this));
         quickActionsAdapter = new QuickActionsAdapter(onActionClickListener);
-        RecyclerView deviceQuickActionsWidget = (RecyclerView) findViewById(R.id.device_list_bottom_sheet_quick_actions);
-        deviceQuickActionsWidget.setAdapter(quickActionsAdapter);
-        deviceQuickActionsWidget.setHasFixedSize(true);
-        deviceQuickActionsWidget.setLayoutManager(new LinearLayoutManager(this));
-        deviceListWidget.setItemAnimator(null);
+        //RecyclerView deviceQuickActionsWidget = (RecyclerView) findViewById(R.id.device_list_bottom_sheet_quick_actions);
+        //deviceQuickActionsWidget.setAdapter(quickActionsAdapter);
+//        deviceQuickActionsWidget.setHasFixedSize(true);
+//        deviceQuickActionsWidget.setLayoutManager(new LinearLayoutManager(this));
+//        deviceListWidget.setItemAnimator(null);
 
-        bottomSheetBehavior = BottomSheetBehavior.from(deviceQuickActionsWidget);
+//        bottomSheetBehavior = BottomSheetBehavior.from(deviceQuickActionsWidget);
         pullRefreshWidget = (SwipeRefreshLayout) findViewById(R.id.pull_refresh);
         pullRefreshWidget.setOnRefreshListener(onPullRefreshListener);
+
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_vitals:
+
+                            case R.id.action_advice:
+
+                            case R.id.action_settings:
+
+                        }
+                        return true;
+                    }
+                });
+
+
+
     }
 
     @NonNull private final DeviceListAdapter.OnDeviceClickListener onDeviceClickListener = new DeviceListAdapter.OnDeviceClickListener() {
