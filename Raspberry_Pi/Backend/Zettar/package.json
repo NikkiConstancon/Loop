@@ -17,7 +17,8 @@
     "parseurl": "*",
     "express-session": "*",
     "body-parser": "*",
-    "request": "*"
+    "request": "*",
+    "nodemailer":"*"
   },
   "devDependencies": {},
   "scripts": {
