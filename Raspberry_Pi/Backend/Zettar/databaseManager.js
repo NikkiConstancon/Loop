@@ -57,6 +57,33 @@ var self = module.exports = {
                 resolve(self)
             }
         })
+    },
+    dropTestKyespaceAndExit: function (exitParam) {
+        var exit = function () {
+            if (exitParam) {
+                process.exit(exitParam)
+            } else {
+                process.exit()
+            }
+        }
+        if (keyspace === 'test') {
+            const cassandra = require('cassandra-driver')
+            var client = new cassandra.Client({ contactPoints: dbHostAddress, keyspace: keyspace, socketOptions:{readTimeout: 10 } })
+            client.connect(function (err, result) {
+                if (err) {
+                    //logger.error(err)
+                    exit()
+                } else {
+                    client.execute('drop keyspace ' + keyspace).then(function () {
+                        //logger.debug('here')
+                        exit()
+                    }).catch(function (e) {
+                        //logger.error(e)
+                        exit()
+                    })
+                }
+            })
+        }
     }
 };
 
