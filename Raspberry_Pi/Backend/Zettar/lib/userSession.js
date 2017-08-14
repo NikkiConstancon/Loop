@@ -1,7 +1,8 @@
 ﻿
 var dbMan = require('../databaseManager');
 var PatientManager = require('../patientManager');
-
+var mailer = require('./mailer')
+var logger = require('../revaLog')
 
 
 var CryptoJS = require("crypto-js");
@@ -11,6 +12,8 @@ var accessKey = "4]),`~>{CKjv(E@'d:udH6N@/G4n(}4dn]Mi"
 var uuidv1 = require('uuid/v1')
 
 const HOSTNAME = require('os').hostname()
+
+
 
 
 module.exports = function (app) {
@@ -29,6 +32,11 @@ module.exports = function (app) {
     }));
 
     app.use(bootstrapSession)
+
+
+    app.get('/emial-confirmation', function(req, res, next) {
+        req.revaUser.emialConfirmation(req, res, next)
+    })
 
     app.get('/', function (req, res, next) {
         res.status(200).send('hi')
@@ -63,7 +71,8 @@ UserSession.createContext = function () {
     return { loggedOn: false, requestCount: 0 };
 }
 UserSession.prototype.isLoggedOn = function (req, res, next) {
-    if (!this.context.loggedOn && req.path !== '/login' && req.path !== '/registration') {
+  //TODO: fix this &&&&& with low auth path list
+    if (!this.context.loggedOn && req.path !== '/login' && req.path !== '/registration' && req.path !== '/emial-confirmation') {
         this.context.lastUrl = req.path
         res.status(401).send('login required')
         //res.redirect("/login");
@@ -73,11 +82,25 @@ UserSession.prototype.validateAuthorizatiron = function (req, res, next) {
 }
 
 UserSession.prototype.signup = function (req, res, next) {
-    req.body.PatientPassword = CryptoJS.AES.encrypt(req.body.PatientPassword, patientKey).toString()
-    req.body.AccessPassword = CryptoJS.AES.encrypt(uuidv1(), accessKey).toString()
 
-    PatientManager.addPatient(req.body).then(function () {
-        res.status(201).send('user created')
+    //TODO: Move to patiantManager
+    function deserialize(body) {
+        var test = require('../models/patientModel').fields
+        body.PatientPassword = CryptoJS.AES.encrypt(body.PatientPassword, patientKey).toString()
+        body.AccessPassword = CryptoJS.AES.encrypt(uuidv1(), accessKey).toString()
+        for (var key in test) {
+            switch (test[key].type) {
+                case 'int': { body[key] = parseInt(body[key]) } break
+                case 'float': { body[key] = parseFloat(body[key])}break
+            }
+        }
+    }
+    deserialize(req.body)
+
+    PatientManager.addPatient(req.body).then(function (pat) {
+        res.status(201).send('user created & email not sent')
+        mailer.mailEmialConfirmationUrl(pat, req.headers.host).catch(function (e) {
+        })
     }).catch(function (e) {
         res.status(412).send(e)
     })
@@ -102,6 +125,10 @@ UserSession.prototype.login = function (req, res, next) {
     }).catch(function (e) {
         res.status(401).send(e);
     })
+}
+
+UserSession.prototype.emialConfirmation = function (req, res, next) {
+    res.status(200).send('nice')
 }
 
 
