@@ -12,7 +12,7 @@ var logger = require('../revaLog');
 
 
 
-
+var lastLogLevel;
 
 describe('UserSession', function () {
     describe('server response', function () {
@@ -45,10 +45,10 @@ describe('UserSession', function () {
                 request.post({
                     url: 'http://localhost:3000/registration',
                     form: {
-                        Username: 'Username_test',
+                        Username: 'Server Session Test',
                         PatientPassword: 'PatientPassword',
                         SubscriberList: ['g@g.com'],
-                        PatientEmail: "testPatient@test.co.za",
+                        PatientEmail: 'COS332.Marthinus@gmail.com',
                         Address: '42 Dale Avenue Hempton 1765',
                         Age: 42,
                         Weight: 23,
@@ -66,7 +66,7 @@ describe('UserSession', function () {
                 request.post({
                     url: 'http://localhost:3000/login',
                     form: {
-                        Username: 'Username_test',
+                        Username: 'Server Session Test',
                         PatientPassword: uuidv1(),
                     }
                 }, function (err, res, body) {
@@ -90,7 +90,7 @@ describe('UserSession', function () {
                 request.post({
                     url: 'http://localhost:3000/login',
                     form: {
-                        Username: 'Username_test',
+                        Username: 'Server Session Test',
                         PatientPassword: 'PatientPassword',
                     }
                 }, function (err, res, body) {
