@@ -68,10 +68,10 @@ var patientManager = module.exports = {
                                 reject(err)
                             } else {
                                 logger.debug('Patient Added Successfully!')
-                                // resolve(newPatient)
+                                resolve(newPatient)
                             }
                         })
-                        resolve(found)
+                        //resolve(found)
 
                     }else{
                         //WARNING USER NAME IS TAKEN code goes here
