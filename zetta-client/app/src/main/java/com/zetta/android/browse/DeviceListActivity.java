@@ -1,5 +1,6 @@
 package com.zetta.android.browse;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,13 +8,14 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -78,26 +80,31 @@ public class DeviceListActivity extends AppCompatActivity {
         pullRefreshWidget = (SwipeRefreshLayout) findViewById(R.id.pull_refresh);
         pullRefreshWidget.setOnRefreshListener(onPullRefreshListener);
 
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
 
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.action_vitals:
-
-                            case R.id.action_advice:
-
-                            case R.id.action_settings:
-
-                        }
-                        return true;
-                    }
-                });
-
-
-
+//        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+//        bottomNavigationView.setOnNavigationItemSelectedListener(
+//                new BottomNavigationView.OnNavigationItemSelectedListener() {
+//                    @Override
+//                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//                        Intent in;
+//                        Context context = DeviceListActivity.this;
+//                        switch (item.getItemId()) {
+//                            case R.id.action_vitals:
+//                                in = new Intent(getBaseContext(),DeviceListActivity.class);
+//                                startActivity(in);
+//                                overridePendingTransition(0, 0);
+//                                return true;
+//                            case R.id.action_advice:
+//
+//                               // startActivity(in);
+//                               // overridePendingTransition(0, 0);
+//                                return true;
+//                            case R.id.action_settings:
+//                                return true;
+//                        }
+//                        return true;
+//                    }
+//                });
     }
 
     @NonNull private final DeviceListAdapter.OnDeviceClickListener onDeviceClickListener = new DeviceListAdapter.OnDeviceClickListener() {
@@ -140,6 +147,7 @@ public class DeviceListActivity extends AppCompatActivity {
         public void onRefresh() {
             Toast.makeText(DeviceListActivity.this, "Refreshing...", Toast.LENGTH_SHORT).show();
             deviceListService.getDeviceList(onDeviceListLoaded);
+            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
         }
     };
 
@@ -176,6 +184,7 @@ public class DeviceListActivity extends AppCompatActivity {
             adapter.replaceAll(listItems);
             pullRefreshWidget.setRefreshing(false);
             updateState();
+            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
         }
     };
 

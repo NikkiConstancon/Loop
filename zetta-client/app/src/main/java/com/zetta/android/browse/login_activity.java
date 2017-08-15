@@ -94,7 +94,7 @@ public class login_activity extends AppCompatActivity {
 
                 Intent intent = new Intent(context, destinationActivity);
                 startActivity(intent);
-                String message = "Register clicked!";
+                String message = "Going to the place!";
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 
             }

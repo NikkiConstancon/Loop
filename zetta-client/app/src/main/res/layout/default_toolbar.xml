@@ -18,6 +18,7 @@
     custom:titleTextAppearance="@style/Toolbar.TitleText"
       custom:titleTextColor="@color/white"/>
 
+
   <TextView
       android:id="@+id/toolbar_title"
       android:layout_width="wrap_content"
