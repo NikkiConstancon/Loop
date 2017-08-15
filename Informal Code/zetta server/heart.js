@@ -46,7 +46,7 @@ Heart.prototype._startMockData = function(cb) {
   this._timeOut = setInterval(function() {
     self.vitals = 60 + (Math.sin(degToRad(self._counter)) + 1.0) * 10;
     self._counter += self._increment;
-  }, 100);
+  }, 1000);
 }
 
 Heart.prototype._stopMockData = function(cb) {
