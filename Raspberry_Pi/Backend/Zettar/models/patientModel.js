@@ -1,3 +1,8 @@
+var uuidv1 = require('uuid/v1')
+var mailer = require('../lib/mailer')
+var keys = require('../lib/keys')
+var logger = require('../revaLog')
+
 module.exports = {
     fields:{
     	Username: "text",			
@@ -61,7 +66,26 @@ module.exports = {
                 },
             	message: 'Reason is not included in the set of reasons.'
         	}
-    	}	
+        },
+        RegistrationObject: {
+            type: 'map',
+            typeDef: '<text, text>',
+            default: function () {
+                const dbMan = require('../databaseManager')
+                var name = this.Username;
+                var context = { c: 'sending', k1: keys.userEmailEncrypt(name), k2:uuidv1() }
+                mailer.mailEmialConfirmationUrl(this.PatientEmail, context.k1, context.k2).then(function () {
+                    context.c = 'awaiting'
+                    dbMan.models.instance.patient.update({ Username: name }, { RegistrationObject: context });
+                }).catch(function (e) {
+                    logger.error(e)
+                    context.c = 'failed'
+                    dbMan.models.instance.patient.update({ Username: name }, { RegistrationObject: context });
+                })
+                return context
+            }
+        }
     },
     key:["Username"]		
 }
+

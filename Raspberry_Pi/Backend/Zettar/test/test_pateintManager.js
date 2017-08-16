@@ -5,6 +5,8 @@ var assert = chai.assert;
 var dbMan = require('../databaseManager');
 var PatientManager = require('../patientManager');
 
+var mailer = require('../lib/mailer')
+
 //ENCRYPTION:
 var CryptoJS = require("crypto-js");
 
@@ -94,5 +96,25 @@ describe('PatientManager', function () {
         //             })
         //     })
         // })
+    })
+    describe('Email validation', function () {
+        var poll = function () {
+            return PatientManager.getPatient({ Username: 'Username_test' }).then(function (pat) {
+                if (pat.RegistrationObject.c !== 'sending') {
+                    return PatientManager.validateEmail(pat.RegistrationObject.k1, pat.RegistrationObject.k2).then(function (pat) {
+                        return PatientManager.getPatient({ Username: 'Username_test' }).then(function (pat) {
+                            expect(pat.RegistrationObject.c).to.equal('registered')
+                            expect(pat.RegistrationObject.k1).to.equal(undefined)
+                            expect(pat.RegistrationObject.k2).to.equal(undefined)
+                        })
+                    })
+                } else {
+                    return new Promise(function (res, rej) {
+                        setTimeout(function () { res() },1000)
+                    }).then(poll);
+                }
+            })
+        }
+        it('test transition from <sending> to <awaiting> lastly <registered>', poll)
     })
 })

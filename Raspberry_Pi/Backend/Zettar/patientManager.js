@@ -13,7 +13,8 @@ var CryptoJS = require("crypto-js");
 
 var patientKey = "xP{}Lk.x#3V2S?F2p'q{kqd[Qu{7/S-d*bzt"
 var accessKey = "4]),`~>{CKjv(E@'d:udH6N@/G4n(}4dn]Mi"
- 
+
+var keys = require('./lib/keys')
 
 /*EXAMPLE USE
 // Encrypt 
@@ -76,7 +77,7 @@ var patientManager = module.exports = {
                     }else{
                         //WARNING USER NAME IS TAKEN code goes here
                         logger.debug('ERROR: ' + found.Username + " already exists")
-                        resolve(found)
+                        reject( found.Username + ' already exists')
                     }
                 });
             }).catch((err)=>{
@@ -186,6 +187,29 @@ var patientManager = module.exports = {
                         else console.log('Yuppiie!');
                     });
                     resolve(found)
+                })
+            }).catch((err) => {
+                reject(err)
+            })
+        })
+    },
+    validateEmail: function (key1, key2) {
+        return new Promise((resolve, reject) => {
+            dbMan.try().then(function () {
+                //Find 
+                
+                var who = { Username: keys.userEmailDecrypt(key1) }
+                dbMan.models.instance.patient.findOne(who, function (err, found) {
+                    if (err || !found) {
+                        logger.error(err || who)
+                        reject(err)
+                    } else if (found.RegistrationObject.k1 === key1 && found.RegistrationObject.k2 === key2) {
+                        dbMan.models.instance.patient.update(who, { RegistrationObject: { c: 'registered' } }, function (err) {
+                            if (err) { console.log(err); reject(err) } else { resolve(found)}
+                        })
+                    } else {
+                        reject('mismatched keys')
+                    }
                 })
             }).catch((err) => {
                 reject(err)
