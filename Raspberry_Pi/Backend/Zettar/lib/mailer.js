@@ -1,10 +1,14 @@
-﻿
+﻿const querystring = require('querystring')
+
 var uuid1 = require('uuid/v1')
 var nodemailer = require('nodemailer')
 var logger = require('../revaLog')
 
-var server = require('./revaServer')
+var server = require('../webServer')
 
+
+
+var pendingSends = 0
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -16,21 +20,19 @@ var transporter = nodemailer.createTransport({
 
 
 var Mailer = module.exports = {
-    mailEmialConfirmationUrl: function (user, hostUrl) {
+    mailEmialConfirmationUrlPath: '/email-confirmation',
+    mailEmialConfirmationUrl: function (to, keyA, keyB) {
+        pendingSends++
         return new Promise(function (resolve, reject) {
-            if (!hostUrl) {
-                reject('hostUrl is undifined')
-            }
-            var key1 = uuid1()
-            var key2 = uuid1()
             var mailOptions = {
                 from: 'noreply.mailEmialConfirmationUrl@gmail.com',
-                to: user.PatientEmail,
-                subject: 'Sending Email using Node.js',
-                text: hostUrl + '/emial-confirmation?a=' + key1 + '&b=' + key2
+                to: to,
+                subject: 'Test activation',
+                text: server.whoAmI(Mailer.mailEmialConfirmationUrlPath + '?a=' + querystring.escape(keyA) + '&b=' + querystring.escape(keyB))
             }
 
             transporter.sendMail(mailOptions, function (error, info) {
+                pendingSends--
                 if (error) {
                     logger.error(error);
                     reject()
@@ -40,6 +42,9 @@ var Mailer = module.exports = {
                 }
             })
         })
+    },
+    get pendingSends() {
+        return pendingSends
     }
 }
 
