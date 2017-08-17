@@ -28,14 +28,14 @@ var UserManager = module.exports = {
     getUser: function (name) {
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
-                dbMan.models.instance.users.findOne({ name: name }, function (err, found) {
+                dbMan.models.instance.users.findOne({ Username: name }, function (err, found) {
                     if (err) {
                         logger.error(err)
                         reject(err)
                     }
                     //Note that returned variable john here is an instance of your model,
                     //so you can also do john.delete(), john.save() type operations on the instance.
-                    logger.debug('Found user: ' + found.name)
+                    logger.debug('Found user: ' + found.Username)
                     resolve(found)
                 })
             }).catch((err) => {

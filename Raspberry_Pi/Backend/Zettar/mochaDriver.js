@@ -13,7 +13,7 @@ var Mocha = require('mocha'),
 
 // Instantiate a Mocha instance.
 var mocha = new Mocha();
-mocha.timeout(15000)
+mocha.timeout(12000)
 var testDir = './test'
 
 // Add each .js file to the mocha instance

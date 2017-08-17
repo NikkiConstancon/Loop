@@ -37,15 +37,15 @@ describe('UserSession', function () {
                     form: {
                     }
                 }, function (err, res, body) {
-                    expect(res.statusCode).to.equal(412)
+                    expect(res.statusCode).to.equal(422)
                     done()
                 })
             })
             form = {
                 Username: 'Server Session Test',
-                PatientPassword: 'PatientPassword',
+                Password: 'Password',
                 SubscriberList: ['g@g.com'],
-                PatientEmail: 'COS332.Marthinus@gmail.com',
+                Email: 'COS332.Marthinus@gmail.com',
                 Address: '42 Dale Avenue Hempton 1765',
                 Age: 42,
                 Weight: 23,
@@ -66,7 +66,7 @@ describe('UserSession', function () {
                     url: server.whoAmI('/registration'),
                     form: form
                 }, function (err, res, body) {
-                    expect(res.statusCode).to.equal(412)
+                    expect(res.statusCode).to.equal(422)
                     done()
                 })
             })
@@ -77,7 +77,7 @@ describe('UserSession', function () {
                     url: server.whoAmI('/login'),
                     form: {
                         Username: 'Server Session Test',
-                        PatientPassword: uuidv1(),
+                        Password: uuidv1(),
                     }
                 }, function (err, res, body) {
                     expect(res.statusCode).to.equal(401)
@@ -89,7 +89,7 @@ describe('UserSession', function () {
                     url: server.whoAmI('/login'),
                     form: {
                         Username: uuidv1(),
-                        PatientPassword: uuidv1(),
+                        Password: uuidv1(),
                     }
                 }, function (err, res, body) {
                     expect(res.statusCode).to.equal(401)
@@ -101,7 +101,7 @@ describe('UserSession', function () {
                     url: server.whoAmI('/login'),
                     form: {
                         Username: 'Server Session Test',
-                        PatientPassword: 'PatientPassword',
+                        Password: 'Password',
                     }
                 }, function (err, res, body) {
                     expect(res.statusCode).to.equal(200)

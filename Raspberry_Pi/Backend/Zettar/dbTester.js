@@ -13,10 +13,10 @@ setTimeout(function() {
     PatientManager
                     .removeFromSubscriberList({ 
                         Username: 'Username_test',
-                        PatientPassword: CryptoJS.AES.encrypt('PatientPassword', 'secret key 123').toString(),
+                        Password: CryptoJS.AES.encrypt('Password', 'secret key 123').toString(),
                         AccessPassword: CryptoJS.AES.encrypt('AccessPassword', 'secret key 123').toString(),
                         SubscriberList : [],
-                        PatientEmail : "testPatient@test.co.za", 
+                        Email : "testPatient@test.co.za", 
                         Address : '42 Dale Avenue Hempton 1765',
                         Age : 42, 
                         Weight : 23,

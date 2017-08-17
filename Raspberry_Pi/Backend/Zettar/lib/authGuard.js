@@ -5,14 +5,6 @@ var mailer = require('./mailer')
 var logger = require('../revaLog')
 
 
-var CryptoJS = require("crypto-js");
-var patientKey = "xP{}Lk.x#3V2S?F2p'q{kqd[Qu{7/S-d*bzt"
-var accessKey = "4]),`~>{CKjv(E@'d:udH6N@/G4n(}4dn]Mi"
-
-var uuidv1 = require('uuid/v1')
-
-const HOSTNAME = require('os').hostname()
-
 
 var authClassMap = {}
 var pathAuthMap = {}
@@ -57,7 +49,7 @@ var authGuard = module.exports = {
             var authObj = pathAuthMap[req.path]
             //must explisitly define lower level at path to pass
             if (!authObj) {
-                res.status(401).send('login required')
+                res.status(401).send('')
                 reject()
             } else {
                 var level = webClass.lowest
@@ -163,8 +155,8 @@ UserSession.prototype.signup = function (req, res, next) {
     //TODO: Move to patiantManager
     function deserialize(body) {
         var test = require('../models/patientModel').fields
-        body.PatientPassword = CryptoJS.AES.encrypt(body.PatientPassword, patientKey).toString()
-        body.AccessPassword = CryptoJS.AES.encrypt(uuidv1(), accessKey).toString()
+       // body.Password = CryptoJS.AES.encrypt(body.Password, patientKey).toString()
+       // body.AccessPassword = CryptoJS.AES.encrypt(uuidv1(), accessKey).toString()
         for (var key in test) {
             switch (test[key].type) {
                 case 'int': { body[key] = parseInt(body[key]) } break
@@ -177,25 +169,19 @@ UserSession.prototype.signup = function (req, res, next) {
     PatientManager.addPatient(req.body).then(function (pat) {
         res.status(201).send('user created')
     }).catch(function (e) {
-        res.status(412).send(e)
+        res.status(422).send(e)
     })
 }
 UserSession.prototype.login = function (req, res, next) {
     var self = this;
     PatientManager.getPatient({ Username: req.body.Username }).then(function (pat) {
-        var truePass = CryptoJS.AES.decrypt(pat.PatientPassword.toString(), patientKey).toString(CryptoJS.enc.Utf8)
-
-
-
-        if (truePass !== req.body.PatientPassword) {
-            res.status(401).send('incorrect user or pass');
-            //NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB
-            res.end()
-            //NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB--NB
-        } else {
+        if (pat.verifyPassword(req.body.Password)) {
             self.context.webAuthLevel = webClass.authenticated;
             res.status(200).send('login successful');
             next()
+        } else {
+            res.status(401).send('incorrect user or pass');
+            res.end()
         }
     }).catch(function (e) {
         res.status(401).send(e);

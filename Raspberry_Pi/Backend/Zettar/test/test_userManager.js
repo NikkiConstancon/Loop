@@ -14,11 +14,12 @@ describe('UserManager', function () {
         describe('#addUser', function () {
             it('adds a user to the db', function () {
                 return UserManager
-                    .addUser({ name: 'name-test', surname: 'surname-test', age: 100 })
+                    .addUser({ Username: 'name-test', Surname: 'surname-test', Password:'paas', Age: 100 })
                     .then((user) => {
-                        expect(user.name).to.equal('name-test');
-                        expect(user.surname).to.equal('surname-test');
-                        expect(user.age).to.equal(100);
+                        var test = user.getName()
+                        expect(user.Username).to.equal('name-test');
+                        expect(user.Surname).to.equal('surname-test');
+                        expect(user.Age).to.equal(100);
                     })
             })
         })
@@ -28,9 +29,9 @@ describe('UserManager', function () {
                 return UserManager
                     .getUser('name-test')
                     .then((user) => {
-                        expect(user.name).to.equal('name-test');
-                        expect(user.surname).to.equal('surname-test');
-                        expect(user.age).to.equal(100);
+                        expect(user.Username).to.equal('name-test');
+                        expect(user.Surname).to.equal('surname-test');
+                        expect(user.Age).to.equal(100);
                     })
             })
         })
