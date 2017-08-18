@@ -90,9 +90,9 @@ public class MainActivity extends AppCompatActivity
     private void setupViewPager(ViewPager viewPager)
     {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(new DeviceListActivity(), "Real Time");
+        adapter.addFragment(new DeviceListActivity(), "Vitals");
         adapter.addFragment(new statHistFragment(), "Stats");
-        adapter.addFragment(new notifications(), "Notification");
+        adapter.addFragment(new notifications(), "Alerts");
         viewPager.setAdapter(adapter);
     }
 }

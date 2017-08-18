@@ -3,6 +3,7 @@ package com.zetta.android.browse;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,10 +12,13 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.zetta.android.R;
+import com.zetta.android.ServerComms;
 
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,7 +48,8 @@ public class login_activity extends AppCompatActivity {
         registerButton = (Button) findViewById(R.id.btn_register);
         loginButton = (Button) findViewById(R.id.btn_login);
 
-
+        final EditText user = (EditText) findViewById(R.id.input_emailLogin);
+        final EditText passw = (EditText) findViewById(R.id.input_passwordLogin);
 
 
         /* Setting an OnClickListener allows us to do something when this button is clicked. */
@@ -67,9 +72,18 @@ public class login_activity extends AppCompatActivity {
                 Class destinationActivity = MainActivity.class;
 
                 Intent intent = new Intent(context, destinationActivity);
-                startActivity(intent);
-                String message = "Login clicked!";
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+
+
+//
+                ServerComms server = new ServerComms();
+
+                Boolean youShallPass = server.makeRequest("Username", user.getText().toString(), "PatientPassword", passw.getText().toString());
+                if (youShallPass) {
+                    startActivity(intent);
+                } else {
+                    String message = "Incorrect username/password";
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                }
 
             }
         });

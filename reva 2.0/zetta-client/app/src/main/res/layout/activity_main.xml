@@ -35,9 +35,11 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="392dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_below="@+id/appbar"
+        android:layout_marginBottom="96dp"
+
 
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
@@ -56,8 +58,8 @@
         android:layout_height="wrap_content"
 
         android:layout_gravity="bottom"
-        android:background="@color/colorPrimary"
         app:background="@color/white"
+        android:background="@color/colorPrimary"
         app:elevation="8dp"
 
         app:itemBackground="@color/colorPrimary"

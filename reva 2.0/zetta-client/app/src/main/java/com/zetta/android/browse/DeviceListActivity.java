@@ -68,10 +68,6 @@ public class DeviceListActivity extends Fragment {
         deviceListService = new DeviceListService(sdkProperties, sdkService);
 
 
-        /*Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("ReVA");*/
-
         emptyLoadingWidget = (EmptyLoadingView) view.findViewById(R.id.device_list_empty_view);
         adapter = new DeviceListAdapter(new ImageLoader(), onDeviceClickListener);
         deviceListWidget = (RecyclerView) view.findViewById(R.id.device_list);
@@ -139,6 +135,7 @@ public class DeviceListActivity extends Fragment {
         public void onRefresh() {
             Toast.makeText(getActivity(), "Refreshing...", Toast.LENGTH_SHORT).show();
             deviceListService.getDeviceList(onDeviceListLoaded);
+            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
         }
     };
 
@@ -175,6 +172,7 @@ public class DeviceListActivity extends Fragment {
             adapter.replaceAll(listItems);
             pullRefreshWidget.setRefreshing(false);
             updateState();
+            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
         }
     };
 
