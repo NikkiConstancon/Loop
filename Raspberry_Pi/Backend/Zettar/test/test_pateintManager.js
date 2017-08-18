@@ -97,7 +97,7 @@ describe('PatientManager', function () {
         //     })
         // })
     })
-    xdescribe('Email validation', function () {
+    describe('Email validation', function () {
         var poll = function () {
             return PatientManager.getPatient({ Username: 'Username_test' }).then(function (pat) {
                 if (pat.RegistrationObject.c !== 'sending') {
