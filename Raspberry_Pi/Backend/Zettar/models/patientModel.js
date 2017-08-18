@@ -118,6 +118,11 @@ class PatientModel extends userModel.class {
         }
     }
 }
+var thing = new userModel.class()
+var obj = {}
 
+for (var k in thing) {
+    obj[k] = thing[k]
+}
+module.exports = obj
 module.exports.class = PatientModel
-module.exports = new PatientModel()

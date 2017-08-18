@@ -24,7 +24,11 @@ class UserModel extends Model {
     }
 }
 
+var thing = new UserModel()
+var obj = {}
 
-
-module.exports = new UserModel()
+for (var k in thing) {
+    obj[k] = thing[k]
+}
+module.exports = obj
 module.exports.class = UserModel
