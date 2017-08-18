@@ -1,8 +1,6 @@
 var Model = require('../lib/modelClass')
 
-class UserModel extends Model {
-    constructor() {
-        super();
+function UserModel() {
         this.fields = {
             Username: 'text',
             Firstname: 'text',
@@ -21,9 +19,9 @@ class UserModel extends Model {
                 return this.Firstname + " " + this.Surname;
             }
         }
-    }
+    
 }
-
+UserModel.prototype = Model
 var thing = new UserModel()
 var obj = {}
 

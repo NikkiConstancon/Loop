@@ -17,9 +17,7 @@ var keys = require('../lib/keys')
 var logger = require('../revaLog')
 
 const userModel = require('./usersModel')
-class PatientModel extends userModel.class {
-    constructor() {
-        super()
+function PatientModel(){
 //-------------------------------begin fields---------------------------------//
         this.fields = {
             AccessPassword: {
@@ -116,8 +114,9 @@ class PatientModel extends userModel.class {
                     } else { next() }
                 });
         }
-    }
+   
 }
+PatientModel.prototype = userModel.class 
 var thing = new userModel.class()
 var obj = {}
 

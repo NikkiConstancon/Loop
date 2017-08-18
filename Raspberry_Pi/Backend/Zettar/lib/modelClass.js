@@ -9,8 +9,7 @@
 var fieldsKey = 'fieldsKey'//Symbol();
 var keyKey = 'keyKey'//Symbol();
 var methodsKey = 'methodsKey'
-class Model {
-    constructor() {
+function Model (){
         this[fieldsKey] = {}
         this[keyKey] = []
         this[methodsKey] = {}
@@ -30,13 +29,6 @@ class Model {
             get: function() { return this[methodsKey] },
             set: function(obj) { Object.assign(this[methodsKey], obj) }
         })
-    }
-
-    get key() { return this[keyKey] }
-    set key(arr) { myArryConcat(this[keyKey], arr) }
-
-    get methods() { return this[methodsKey] }
-    set methods(obj) { Object.assign(this[methodsKey], obj) }
 }
 
 module.exports = Model
