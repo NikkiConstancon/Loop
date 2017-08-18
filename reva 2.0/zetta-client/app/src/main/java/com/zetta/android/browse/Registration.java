@@ -39,9 +39,9 @@ public class Registration extends AppCompatActivity
         setContentView(R.layout.activity_register);
 
         Button btnCont = (Button) findViewById(R.id.btn_register);
-        /*
-        Button btnRegPat = (Button) findViewById(R.id.btn_patRegDone);
-        Button btnRegSub = (Button) findViewById(R.id.btn_subRegDone);*/
+
+
+
 
         btnCont.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v)  {
@@ -64,28 +64,6 @@ public class Registration extends AppCompatActivity
         text = (EditText) findViewById(R.id.txt_patientCheck);
         text.setEnabled(false);
 
-        btnCont.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v)  {
-                contReg();
-            }
-        });
-
-
-        /*
-
-        btnRegPat.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v)
-            {
-                registerPatient();
-            }
-        });
-
-        btnRegSub.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v)
-            {
-                registerSub();
-            }
-        });*/
 
         checkedRad = false;
 
@@ -118,37 +96,13 @@ public class Registration extends AppCompatActivity
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-                Context context = Registration.this;
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
-                builder1.setMessage("Please double check your details");
-                builder1.setCancelable(true);
-
-                builder1.setPositiveButton(
-                        "OK",
-                        new DialogInterface.OnClickListener() {
-                            /**
-                             * On click method for warning dialogue box
-                             * @param dialog the dialog to be displayed
-                             * @param id the id of the message
-                             */
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
                 checkedRad = false;
                 // find which radio button is selected
                 if(checkedId == R.id.rad_patYes) {
-                    builder1.setMessage("Patient Yes");
-                    AlertDialog alertWarning = builder1.create();
-                    alertWarning.show();
                     checkedRad = true;
                     patient = true;
 
                 } else if(checkedId == R.id.rad_patientNo) {
-                    builder1.setMessage("Patient No");
-                    AlertDialog alertWarning = builder1.create();
-                    alertWarning.show();
                     checkedRad = true;
                     patient = false;
                 }
@@ -177,18 +131,9 @@ public class Registration extends AppCompatActivity
         text = (EditText) findViewById(R.id.input_confirmPassReg);
         confPass = text.getText().toString();
 
-        /*Button btnContPat1 = (Button) findViewById(R.id.btn_patRegCont);
-
-        btnContPat1.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v)
-            {
-                contPatReg();
-            }
-        });*/
-
         Context context = this;
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
-        builder1.setMessage("Please double check your details");
+        builder1.setMessage("Please double check kiss your details");
         builder1.setCancelable(true);
 
         builder1.setPositiveButton(
@@ -212,7 +157,7 @@ public class Registration extends AppCompatActivity
 
         if(regEmail.length() < 1 || regPass.length() < 1 || confPass.length() < 1 || !checkedRad)
         {
-            builder1.setMessage("Please fill in all details." + regEmail.length() + regPass.length() + confPass.length() + checkedRad);
+            builder1.setMessage("Please fill in all details.");
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
         }
@@ -236,14 +181,56 @@ public class Registration extends AppCompatActivity
         }
         else if(patient)
         {
-            builder1.setMessage("Continuing registration.");
-            AlertDialog alertWarning = builder1.create();
-            alertWarning.show();
             setContentView(R.layout.activity_register_continue);
+            Button btnRegPat = (Button) findViewById(R.id.btn_patRegCont);
+
+            text = (EditText) findViewById(R.id.txt_addr);
+            text.setEnabled(false);
+
+            text = (EditText) findViewById(R.id.txt_userName);
+            text.setEnabled(false);
+
+            text = (EditText) findViewById(R.id.txt_subpass);
+            text.setEnabled(false);
+
+            text = (EditText) findViewById(R.id.txt_confirmSubPass);
+            text.setEnabled(false);
+
+            btnRegPat.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v)
+                {
+                    contPatReg();
+                }
+            });
         }
         else
         {
-            //setContentView(R.layout.activity_register_continue_subscriber);
+            setContentView(R.layout.activity_register_continue_subscriber);
+
+            EditText textHold = (EditText) findViewById(R.id.txt_Title);
+            textHold.setEnabled(false);
+            textHold = (EditText) findViewById(R.id.txt_whoSub);
+            textHold.setEnabled(false);
+            textHold = (EditText) findViewById(R.id.txt_subscribePass);
+            textHold.setEnabled(false);
+
+            checkedRad = false;
+
+            rg5 = (RadioGroup) findViewById(R.id.radioGroupReg4);
+            rg4 = (RadioGroup) findViewById(R.id.radioGroupReg5);
+            rg4.clearCheck();
+            rg5.clearCheck();
+            rg4.setOnCheckedChangeListener(listener3);
+            rg5.setOnCheckedChangeListener(listener4);
+
+
+            Button btnRegSub = (Button) findViewById(R.id.btn_subRegDone);
+            btnRegSub.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v)
+                {
+                    registerSub();
+                }
+            });
         }
     }
 
@@ -260,18 +247,6 @@ public class Registration extends AppCompatActivity
         subPass = text.getText().toString();
         text = (EditText) findViewById(R.id.input_confSubPass);
         confSubPass = text.getText().toString();
-
-        text = (EditText) findViewById(R.id.txt_addr);
-        text.setEnabled(false);
-
-        text = (EditText) findViewById(R.id.txt_userName);
-        text.setEnabled(false);
-
-        text = (EditText) findViewById(R.id.txt_subpass);
-        text.setEnabled(false);
-
-        text = (EditText) findViewById(R.id.txt_confirmSubPass);
-        text.setEnabled(false);
 
         Context context = this;
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
@@ -299,7 +274,7 @@ public class Registration extends AppCompatActivity
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
         }
-        else if(m2.find())
+        else if(!m2.find())
         {
             builder1.setMessage("Password incorrect. Passwords must be at least 6 characters long, with at least one capital letter and number.");
             AlertDialog alertWarning = builder1.create();
@@ -313,7 +288,34 @@ public class Registration extends AppCompatActivity
         }
         else
         {
-            //setContentView(R.layout.activity_register_continue_patient);
+            setContentView(R.layout.activity_register_continue_patient);
+
+            EditText textHold = (EditText) findViewById(R.id.txt_age);
+            textHold.setEnabled(false);
+            textHold = (EditText) findViewById(R.id.txt_height);
+            textHold.setEnabled(false);
+            textHold = (EditText) findViewById(R.id.txt_weight);
+            textHold.setEnabled(false);
+            textHold = (EditText) findViewById(R.id.txt_reason);
+            textHold.setEnabled(false);
+
+            checkedRad = false;
+
+            rg2 = (RadioGroup) findViewById(R.id.radioGroupReg2);
+            rg3 = (RadioGroup) findViewById(R.id.radioGroupReg3);
+            rg2.clearCheck();
+            rg3.clearCheck();
+            rg2.setOnCheckedChangeListener(listener1);
+            rg3.setOnCheckedChangeListener(listener2);
+
+
+            Button btnContPat2 = (Button) findViewById(R.id.btn_patRegDone);
+            btnContPat2.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v)
+                {
+                    registerPatient();
+                }
+            });
         }
     }
 
@@ -323,19 +325,19 @@ public class Registration extends AppCompatActivity
     /**
      * Private radio group listener that simulates larger radio group
      */
-    //private RadioGroup.OnCheckedChangeListener listener1 = new RadioGroup.OnCheckedChangeListener() {
+    private RadioGroup.OnCheckedChangeListener listener1 = new RadioGroup.OnCheckedChangeListener() {
 
         /**
          * Overridden on checked changed method that keeps track of radio group changes and changes other radio group to not allow multiple radio inputs
          * @param group the radio group
          * @param checkedId the view id that was checked
          */
-        /*@Override
+        @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             if (checkedId != -1) {
-                rg2.setOnCheckedChangeListener(null);
-                rg2.clearCheck();
-                rg2.setOnCheckedChangeListener(listener2);
+                rg3.setOnCheckedChangeListener(null);
+                rg3.clearCheck();
+                rg3.setOnCheckedChangeListener(listener2);
 
                 if(checkedId == R.id.rad_age) {
                     checkedRad = true;
@@ -353,25 +355,25 @@ public class Registration extends AppCompatActivity
                 }
             }
         }
-    };*/
+    };
 
 
     /**
      * Private radio group listener that simulates larger radio group
      */
-    //private RadioGroup.OnCheckedChangeListener listener2 = new RadioGroup.OnCheckedChangeListener() {
+    private RadioGroup.OnCheckedChangeListener listener2 = new RadioGroup.OnCheckedChangeListener() {
 
         /**
          * Overridden on checked changed method that keeps track of radio group changes and changes other radio group to not allow multiple radio inputs
          * @param group the radio group
          * @param checkedId the view id that was checked
          */
-       /* @Override
+        @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             if (checkedId != -1) {
-                rg3.setOnCheckedChangeListener(null);
-                rg3.clearCheck();
-                rg3.setOnCheckedChangeListener(listener1);
+                rg2.setOnCheckedChangeListener(null);
+                rg2.clearCheck();
+                rg2.setOnCheckedChangeListener(listener1);
 
                 if(checkedId == R.id.rad_accident) {
                     checkedRad = true;
@@ -389,20 +391,19 @@ public class Registration extends AppCompatActivity
                 }
             }
         }
-    };*/
+    };
 
 
     /**
      * Final method for registering patient (actual registration occurs here)
      */
-   // public void registerPatient()
-    //{
-        /*
+   public void registerPatient()
+   {
+
         int ageVal = 0;
         double weight = 0, height = 0;
-        boolean age, illness, accident, disability; */
 
-       /* Context context = this;
+        final Context context = this;
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please fill in all details.");
         builder1.setCancelable(true);
@@ -433,16 +434,6 @@ public class Registration extends AppCompatActivity
             return;
         }
 
-        checkedRad = false;
-
-        rg2 = (RadioGroup) findViewById(R.id.radioGroupReg2);
-        rg3 = (RadioGroup) findViewById(R.id.radioGroupReg3);
-        rg2.clearCheck();
-        rg3.clearCheck();
-        rg2.setOnCheckedChangeListener(listener1);
-        rg3.setOnCheckedChangeListener(listener2);
-
-
         if(ageVal == 0 || weight == 0 || height == 0 || checkedRad == false)
         {
             builder1.setMessage("Please fill in all details.");
@@ -469,31 +460,40 @@ public class Registration extends AppCompatActivity
         }
         else
         {
-            //register patient in database
-            Intent toReg = new Intent(this, Login.class);
-            startActivityForResult(toReg, 0);
+            builder1.setPositiveButton(
+                    "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                            Intent toReg = new Intent(context, login_activity.class);
+                            startActivityForResult(toReg, 0);
+                        }
+                    });
+            builder1.setMessage("You have been registered!");
+            AlertDialog alertWarning = builder1.create();
+            alertWarning.show();
         }
     }
 
     RadioGroup rg4;
-    RadioGroup rg5;*/
+    RadioGroup rg5;
 
     /**
      * Private radio group listener that simulates larger radio group (for subscribers)
      */
-   // private RadioGroup.OnCheckedChangeListener listener3 = new RadioGroup.OnCheckedChangeListener() {
+    private RadioGroup.OnCheckedChangeListener listener3 = new RadioGroup.OnCheckedChangeListener() {
 
         /**
          * Overridden on checked changed method that keeps track of radio group changes and changes other radio group to not allow multiple radio inputs
          * @param group the radio group
          * @param checkedId the view id that was checked
          */
-       /* @Override
+       @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             if (checkedId != -1) {
-                rg2.setOnCheckedChangeListener(null);
-                rg2.clearCheck();
-                rg2.setOnCheckedChangeListener(listener4);
+                rg5.setOnCheckedChangeListener(null);
+                rg5.clearCheck();
+                rg5.setOnCheckedChangeListener(listener4);
 
                 if(checkedId == R.id.rad_family) {
                     checkedRad = true;
@@ -511,40 +511,42 @@ public class Registration extends AppCompatActivity
                 }
             }
         }
-    };*/
+    };
 
     /**
      * Private radio group listener that simulates larger radio group (for subscribers)
      */
-    //private RadioGroup.OnCheckedChangeListener listener4 = new RadioGroup.OnCheckedChangeListener() {
+    private RadioGroup.OnCheckedChangeListener listener4 = new RadioGroup.OnCheckedChangeListener() {
 
         /**
          * Overridden on checked changed method that keeps track of radio group changes and changes other radio group to not allow multiple radio inputs
          * @param group the radio group
          * @param checkedId the view id that was checked
          */
-        /*@Override
+        @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             if (checkedId != -1) {
-                rg3.setOnCheckedChangeListener(null);
-                rg3.clearCheck();
-                rg3.setOnCheckedChangeListener(listener3);
+                rg4.setOnCheckedChangeListener(null);
+                rg4.clearCheck();
+                rg4.setOnCheckedChangeListener(listener3);
 
                 if(checkedId == R.id.rad_researcher) {
+                    checkedRad = true;
                     family = false;
                     caretaker = false;
                     researcher = true;
                     doctor = false;
 
                 } else if(checkedId == R.id.rad_doctor) {
+                    checkedRad = true;
                     family = false;
                     caretaker = false;
                     researcher = false;
                     doctor = true;
                 }
             }
-        }*/
-    //};
+        }
+    };
 
     boolean family = false, caretaker = false, researcher = false, doctor = false;
     String toWho = "", toWhoPass = "";
@@ -552,14 +554,14 @@ public class Registration extends AppCompatActivity
     /**
      * Method for subscriber registration (actual subscriber registration occurs here)
      */
-   /* public void registerSub()
+    public void registerSub()
     {
         EditText text = (EditText) findViewById(R.id.input_whoSub);
         toWho = text.getText().toString();
         text = (EditText) findViewById(R.id.input_subToPatientPass);
         toWhoPass = text.getText().toString();
 
-        Context context = this;
+        final Context context = this;
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please fill in all details.");
         builder1.setCancelable(true);
@@ -572,26 +574,30 @@ public class Registration extends AppCompatActivity
                     }
                 });
 
-        checkedRad = false;
-
-        rg4 = (RadioGroup) findViewById(R.id.radioGroupReg4);
-        rg5 = (RadioGroup) findViewById(R.id.radioGroupReg5);
-        rg4.clearCheck();
-        rg5.clearCheck();
-        rg4.setOnCheckedChangeListener(listener1);
-        rg5.setOnCheckedChangeListener(listener2);
 
         if(toWho.length() < 1 || toWhoPass.length() < 1 || checkedRad == false)
         {
+            builder1.setMessage("Please fill in all details.");
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
         }
         else
         {
+            builder1.setPositiveButton(
+                    "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                            Intent toReg = new Intent(context, login_activity.class);
+                            startActivityForResult(toReg, 0);
+                        }
+                    });
+            builder1.setMessage("You have been registered!");
+            AlertDialog alertWarning = builder1.create();
+            alertWarning.show();
             //register subscriber in database
-            Intent toReg = new Intent(this, Login.class);
-            startActivityForResult(toReg, 0);
+
         }
         //Database validation needed for this section in terms of existing users and subscriber passwords
-    }*/
+    }
 }

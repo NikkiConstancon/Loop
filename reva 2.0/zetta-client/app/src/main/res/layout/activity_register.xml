@@ -53,6 +53,7 @@
         android:layout_marginRight="8dp"
         android:ems="10"
         android:hint="************"
+        android:textColorHint="@color/textColorTertiary"
         android:inputType="textPassword"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -80,29 +81,35 @@
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/input_emailReg" />
+        app:layout_constraintBottom_toTopOf="@+id/input_emailReg"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/txt_register"
         style="@style/Widget.AppCompat.Button.Colored"
-        android:background="@android:color/holo_blue_dark"
         android:layout_width="384dp"
-        android:layout_height="46dp"
-        android:layout_marginBottom="19dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginTop="1dp"
+        android:background="@android:color/holo_blue_dark"
         android:ems="10"
+        android:gravity="center"
         android:inputType="none"
         android:labelFor="@id/txt_userMailReg"
         android:maxLines="1"
         android:text="Registration"
-        android:gravity="center"
         android:textIsSelectable="false"
         app:layout_constraintBottom_toTopOf="@+id/txt_userMailReg"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        tools:text="Registration"
-        tools:ignore="HardcodedText,LabelFor" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="HardcodedText,LabelFor"
+        tools:text="Registration" />
 
     <EditText
         android:id="@+id/input_emailReg"
@@ -112,12 +119,13 @@
         android:layout_marginRight="8dp"
         android:ems="10"
         android:hint="johndoe@gmail.com"
+        android:textColorHint="@color/textColorTertiary"
         android:inputType="textWebEmailAddress"
         android:selectAllOnFocus="false"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         tools:ignore="HardcodedText"
-        android:layout_marginBottom="0dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/txt_PassReg" />
 
     <EditText
@@ -147,11 +155,12 @@
         android:id="@+id/input_passwordReg"
         android:layout_width="262dp"
         android:layout_height="42dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="17dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:ems="10"
         android:hint="************"
+        android:textColorHint="@color/textColorTertiary"
         android:inputType="textPassword"
         app:layout_constraintBottom_toTopOf="@+id/txt_confPass"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -175,26 +184,27 @@
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="25dp" />
 
     <RadioGroup
         android:id="@+id/radioGroupReg1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_register"
         android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.209">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/btn_register"
+        app:layout_constraintHorizontal_bias="0.209"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
 
         <RadioButton
             android:id="@+id/rad_patYes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Yes"
+            android:textColor="@color/textColorPrimary"
             tools:ignore="HardcodedText"
             tools:text="Yes" />
 
@@ -205,6 +215,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:text="No"
+            android:textColor="@color/textColorPrimary"
 
             tools:ignore="HardcodedText,RtlHardcoded" />
     </RadioGroup>
