@@ -42,7 +42,7 @@ describe('AuthGuard', function () {
                 })
             })
             form = {
-                Username: 'Server Session Test',
+                Username: 'authGuard ' + uuidv1(),
                 Password: 'Password',
                 SubscriberList: ['g@g.com'],
                 Email: 'COS332.Marthinus@gmail.com',

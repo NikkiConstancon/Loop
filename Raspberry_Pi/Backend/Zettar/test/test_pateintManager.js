@@ -2,6 +2,8 @@ var chai = require('chai');
 var expect = chai.expect;
 var assert = chai.assert;
 
+var uuidv1 = require('uuid/v1')
+
 var dbMan = require('../databaseManager');
 var PatientManager = require('../patientManager');
 
@@ -51,6 +53,7 @@ module.exports = {
 }
 */
 
+var userName = 'Patient ' + uuidv1()
 
 describe('PatientManager', function () {
     describe('database CRUD', function () {
@@ -58,7 +61,7 @@ describe('PatientManager', function () {
             it('adds a patient to the db', function () {
                 return PatientManager
                     .addPatient({ 
-                        Username: 'Username_test',
+                        Username: userName,
                         Password: CryptoJS.AES.encrypt('Password', patientKey).toString(),
                         AccessPassword: CryptoJS.AES.encrypt('AccessPassword', accessKey).toString(),
                         SubscriberList : ['g@g.com'],
@@ -70,7 +73,7 @@ describe('PatientManager', function () {
                         Reason : 'Disability'})
                     .then((_patient) => {
                         if(_patient != null){
-                            expect(_patient.Username).to.equal('Username_test');
+                            expect(_patient.Username).to.equal(userName);
                             expect(typeof _patient.Password).to.equal('string');
                             expect(typeof _patient.AccessPassword).to.equal('string');
                             expect(typeof _patient.SubscriberList).to.equal('object');
@@ -99,12 +102,12 @@ describe('PatientManager', function () {
     })
     describe('Email validation', function () {
         var poll = function () {
-            return PatientManager.getPatient({ Username: 'Username_test' }).then(function (pat) {
+            return PatientManager.getPatient({ Username: userName }).then(function (pat) {
                 if (pat) {
                     if (pat.RegistrationObject.c !== 'sending') {
                         var check = (pat.RegistrationObject.c !== 'registered')
                         return PatientManager.validateEmail(pat.RegistrationObject.k1, pat.RegistrationObject.k2).then(function (pat) {
-                            return PatientManager.getPatient({ Username: 'Username_test' }).then(function (pat) {
+                            return PatientManager.getPatient({ Username: userName }).then(function (pat) {
                                 if (check) {
                                     expect(pat.RegistrationObject.c).to.equal('registered')
                                     expect(pat.RegistrationObject.k1).to.equal(undefined)

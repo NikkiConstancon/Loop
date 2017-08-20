@@ -62,8 +62,11 @@ dbMan.try().then(function () {
                     } else {
                         process.exit()
                     }
+                } else {
+                    console.log('..server is still running..')
                 }
                 clearInterval(exitInterval)
+                console.log('..DONE..')
             } else {
                 console.log('...')
             }
