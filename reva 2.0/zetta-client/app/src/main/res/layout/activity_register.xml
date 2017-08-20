@@ -162,6 +162,7 @@
             android:layout_height="52dp"
             android:id="@+id/btn_register"
             android:text="CONTINUE"
+            android:textColor="@color/white"
 
 
             android:layout_marginLeft="16dp"

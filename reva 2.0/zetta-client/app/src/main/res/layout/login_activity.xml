@@ -78,46 +78,45 @@
 
 
             <Button
-                android:id="@+id/btn_login"
-                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
-
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="32dp"
-                android:background="@color/colorPrimary"
-
+                android:layout_height="52dp"
+                android:id="@+id/btn_login"
                 android:text="LOGIN"
+                android:textColor="@color/white"
+
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/input_passwordLogin"
-                tools:ignore="HardcodedText" />
+
+                tools:ignore="HardcodedText"
+                app:layout_constraintTop_toBottomOf="@+id/input_passwordLogin"/>
 
             <Button
-                android:id="@+id/btn_register"
-                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="52dp"
+                android:id="@+id/btn_register"
+                android:text="REGISTER NOW"
+                android:textColor="@color/white"
 
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@color/colorPrimary"
-
-                android:text="REGISTER"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
 
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/txtview_login"
-                tools:ignore="HardcodedText" />
+
+                tools:ignore="HardcodedText"
+                app:layout_constraintTop_toBottomOf="@+id/txtview_login"/>
             <TextView
                 android:id="@+id/txtview_login"
-                android:layout_width="368dp"
+                android:layout_width="0dp"
                 android:layout_height="30dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginLeft="8dp"
