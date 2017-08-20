@@ -1,6 +1,13 @@
 package com.zetta.android;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.zetta.android.browse.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,17 +22,39 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class ServerComms  {
-    private String result = null;
+import static com.zetta.android.R.layout.login_activity;
 
+public class ServerComms extends AsyncTask<String, Void, Boolean> {
+    private String result = null;
+    private ProgressDialog progressDialog;
+    private boolean pass = false;
+    private Context context;
+
+    public boolean getPass() { return pass; }
     public String getResult() {
         return result;
     }
 
-    public Boolean makeRequest(String... params) {
+    public ServerComms(Context context) {
+        this.context = context.getApplicationContext();
+        progressDialog =  new ProgressDialog(context);
+    }
+
+    @Override
+    protected void onPreExecute() {
+        try {
+            progressDialog = ProgressDialog.show(context, "Signing in...", "This should take a few seconds.", true);
+        } catch (final Throwable th) {
+            //TODO
+        }
+    }
+
+    @Override
+    protected Boolean doInBackground(String... params) {
         HttpURLConnection urlConnection;
-        String url;
-        String uri = "127.0.0.1:3009";
+
+
+        String uri = "http://192.168.1.103:8080/login"; // 192.168.1.103
         JSONObject obj = new JSONObject();
         for (int i = 0; i < params.length-1; i=i+2) {
             try {
@@ -34,15 +63,20 @@ public class ServerComms  {
                 e.printStackTrace();
             }
         }
+        Log.d("obj", obj.toString());
 
         try {
             //Connect
+            Log.d("try", "Trying to connect");
             urlConnection = (HttpURLConnection) ((new URL(uri).openConnection()));
             urlConnection.setDoOutput(true);
+//            urlConnection.setRequestProperty("Content-Type", "application/json");
+//            urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Accept", "application/json");
+
             urlConnection.setRequestMethod("POST");
-            urlConnection.connect();
+
 
             //Write
             OutputStream outputStream = urlConnection.getOutputStream();
@@ -51,18 +85,27 @@ public class ServerComms  {
             writer.close();
             outputStream.close();
 
-            //Read
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"));
+            urlConnection.connect();
 
-            String line = null;
-            StringBuilder sb = new StringBuilder();
+            int statusCode = urlConnection.getResponseCode();
+            String responseMsg = urlConnection.getResponseMessage();
+            if (statusCode == 200) {
+                //Read
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"));
 
-            while ((line = bufferedReader.readLine()) != null) {
-                sb.append(line);
+                String line = null;
+                StringBuilder sb = new StringBuilder();
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+                bufferedReader.close();
+                result = sb.toString();
+                return true;
+            } else {
+                return false;
             }
-
-            bufferedReader.close();
-            result = sb.toString();
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -70,5 +113,21 @@ public class ServerComms  {
             e.printStackTrace();
         }
         return false;
+
+    }
+
+
+    @Override
+    protected void onPostExecute(Boolean result) {
+        progressDialog.dismiss();
+        if (result) {
+            Intent intent =  new Intent(context, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } else {
+            String message = "Incorrect user credentials";
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        }
+
     }
 }

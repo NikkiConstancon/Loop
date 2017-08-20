@@ -1,5 +1,6 @@
 package com.zetta.android.browse;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,6 +36,8 @@ public class login_activity extends AppCompatActivity {
 
     private Button loginButton;
     private Button registerButton;
+    //private ProgressDialog pd; TODO add progress dialog
+
 
     /**
      * Overridden onCreate for starting with the login_activity class
@@ -69,22 +73,12 @@ public class login_activity extends AppCompatActivity {
                  * clear as possible.
                  */
                 Context context = login_activity.this;
-                Class destinationActivity = MainActivity.class;
 
-                Intent intent = new Intent(context, destinationActivity);
+                //pd = ProgressDialog.show(context.getApplicationContext(), "Signing in", "Please wait while we are signing you in..");
 
+                ServerComms server = new ServerComms(context);
 
-//
-                ServerComms server = new ServerComms();
-
-                Boolean youShallPass = server.makeRequest("Username", user.getText().toString(), "PatientPassword", passw.getText().toString());
-                if (youShallPass) {
-                    startActivity(intent);
-                } else {
-                    String message = "Incorrect username/password";
-                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                }
-
+                server.execute("Username", user.getText().toString(), "Password", passw.getText().toString());
             }
         });
 

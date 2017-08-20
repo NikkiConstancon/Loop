@@ -1,6 +1,6 @@
 {
     "Username": "Username_test",
-    "PatientPassword": "PatientPassword",
+    "Password": "PatientPassword",
     "SubscriberList": ["g@g.com"],
     "PatientEmail": "testPatient@test.co.za",
     "Address": "42 Dale Avenue Hempton 1765",
