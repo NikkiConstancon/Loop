@@ -104,24 +104,31 @@ wss.on('connection', function connection(ws) {
         })
 
         for (var key in connecttors) {
-            connecttors[key](user, function (msg, errcb) {
-                var errcb = errcb
-                msgObj = { [key]: msg }
-                msg = JSON.stringify(msgObj)
-                if (errcb) {
-                    ws.send(msg, errcb)
-                } else {
-                    ws.send(msg, function (err) {
-                        logger.error('@WebSockMessenger#connection', err)
-                    })
+            (function(key) {
+                connecttors[key].publisher = function (msg, errcb) {
+                    var errcb = errcb
+                    msgObj = { [key]: msg }
+                    msg = JSON.stringify(msgObj)
+                    logger.debug('on-publish', key, msg)
+                    if (errcb) {
+                        ws.send(msg, errcb)
+                    } else {
+                        ws.send(msg, function (err) {
+                            logger.error('@WebSockMessenger#connection', err)
+                        })
+                    }
                 }
-            })
+                connecttors[key](user, connecttors[key].publisher)
+            })(key)
         }
         ws.on('message', function (message) {
             try {
                 var json = JSON.parse(message)
                 for (var k in json) {
-                    subscribers[k] && subscribers[k](user, json[k])
+                    if (subscribers[k]) {
+                        logger.debug('on-message', k, json[k])
+                        subscribers[k](user,  json[k])
+                    }
                 }
             } catch (e) {
                 var errMsg = JSON.stringify({
@@ -162,20 +169,20 @@ wss.on('connection', function connection(ws) {
 
 
 
-/*
 
-webSockMessenger.attach('Alert', {
+var echoPubFunctionMap = {}
+webSockMessenger.attach('echo', {
     connect: function (user, send) {
-        var ival = setInterval(function () {
-            send('pushing to you', function (err) {
+        echoPubFunctionMap[user.Username] = send
+            send('connected to service', function (err) {
                 err && clearInterval(ival)
             });
-        }, 1000)
     },
     close: function (user) {
     },
     sub: function (user, obj) {
+        var send = echoPubFunctionMap[user.Username]
+        send(obj)
     }
 })
 
-*/

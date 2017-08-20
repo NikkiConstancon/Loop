@@ -55,6 +55,7 @@ dbMan.try().then(function () {
         var max = 10;
         var exitInterval = setInterval(function () {
             if (mailer.pendingSends == 0 || max-- < 0) {
+                logger.level = 'silly'
                 if (!keepAlive) {
                     if (willDrop) {
                         logger.warn('now dropping keyspace')
