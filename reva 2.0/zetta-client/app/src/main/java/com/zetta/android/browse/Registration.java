@@ -40,28 +40,13 @@ public class Registration extends AppCompatActivity
 
         Button btnCont = (Button) findViewById(R.id.btn_register);
 
-
-
-
         btnCont.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v)  {
                 contReg();
             }
         });
 
-        //TextView txtReg = (TextView) findViewById(R.id.txt_register);
-        //txtReg.setEnabled(false);
-
-        EditText text = (EditText) findViewById(R.id.txt_userMailReg);
-        text.setEnabled(false);
-
-        text = (EditText) findViewById(R.id.txt_PassReg);
-        text.setEnabled(false);
-
-        text = (EditText) findViewById(R.id.txt_confPass);
-        text.setEnabled(false);
-
-        text = (EditText) findViewById(R.id.txt_patientCheck);
+        EditText text = (EditText) findViewById(R.id.txt_patientCheck);
         text.setEnabled(false);
 
 

@@ -152,7 +152,7 @@
         android:layout_height="45dp"
         android:ems="10"
         android:inputType="none"
-        android:labelFor="@id/txt_userMailReg"
+
         android:maxLines="1"
         android:text="Registration"
         android:gravity="center"

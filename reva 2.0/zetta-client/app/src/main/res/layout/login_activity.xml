@@ -45,13 +45,12 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="31dp"
+                android:layout_marginTop="16dp"
                 android:hint="Email address"
 
                 android:inputType="textWebEmailAddress"
                 android:selectAllOnFocus="false"
 
-                tools:text="words"
                 android:textColor="@color/colorPrimaryText"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -67,7 +66,6 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginStart="16dp"
-                android:ems="10"
 
                 android:hint="Password"
                 android:inputType="textPassword"
