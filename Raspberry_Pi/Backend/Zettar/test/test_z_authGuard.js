@@ -14,7 +14,7 @@ var server = require('../webServer.js')
 
 
 var lastLogLevel;
-
+var username = 'authGuard ' + uuidv1()
 describe('AuthGuard', function () {
     describe('server response', function () {
         before(function () {
@@ -42,7 +42,7 @@ describe('AuthGuard', function () {
                 })
             })
             form = {
-                Username: 'authGuard ' + uuidv1(),
+                Username: username,
                 Password: 'Password',
                 SubscriberList: ['g@g.com'],
                 Email: 'COS332.Marthinus@gmail.com',
@@ -76,7 +76,7 @@ describe('AuthGuard', function () {
                 request.post({
                     url: server.whoAmI('/login'),
                     form: {
-                        Username: 'Server Session Test',
+                        Username: username,
                         Password: uuidv1(),
                     }
                 }, function (err, res, body) {
@@ -100,7 +100,7 @@ describe('AuthGuard', function () {
                 request.post({
                     url: server.whoAmI('/login'),
                     form: {
-                        Username: 'Server Session Test',
+                        Username: username,
                         Password: 'Password',
                     }
                 }, function (err, res, body) {
