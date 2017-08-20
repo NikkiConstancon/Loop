@@ -1,6 +1,7 @@
 // var dbManager = require("./databaseManager");
 // var dbManager1 = require("./dataManager");
 var PatientManager = require("./patientManager");
+var subscriberManager = require("./subscriberManager")
 
 var CryptoJS = require("crypto-js");
 
@@ -10,8 +11,8 @@ setTimeout(function() {
      // dbManager2.addInstance({patientName: 'Nikki2', device: 'Con', time: 21});
     // patientDataManager.addInstance({PatientUsername : "name", DeviceID : "data[0].topic", TimeStamp : 0, Value : parseFloat(10.99)  });
    
-    PatientManager
-                    .removeFromSubscriberList({ 
+    /*subscriberManager
+                    .addPatient({ 
                         Username: 'Username_test',
                         Password: CryptoJS.AES.encrypt('Password', 'secret key 123').toString(),
                         AccessPassword: CryptoJS.AES.encrypt('AccessPassword', 'secret key 123').toString(),
@@ -21,7 +22,13 @@ setTimeout(function() {
                         Age : 42, 
                         Weight : 23,
                         Height : 32, 
-                        Reason : 'Disability'},"test1@test.com");
+                        Reason : 'Disability'});*/
+    subscriberManager.addSubscriber({
+        Email: "nikkiconstancon@gmail.com",
+        Password: CryptoJS.AES.encrypt('Password', 'secret key 123').toString(),
+        Relation: "doctor",
+        PatientList: {Username: "Username_test", AccessPassword: "AccessPassword"}
+    })
 
     // PatientManager.getPatient();
   }, 0);
