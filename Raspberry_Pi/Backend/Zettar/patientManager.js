@@ -90,7 +90,7 @@ var patientManager = module.exports = {
             dbMan.try().then(function () {
                 dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
                     if (err || !found) {
-                        err = err || 'could not find ' + _patient.Username
+                        err = err || 'invalid username'
                         logger.error(err)
                         reject(err)
                     } else {
@@ -199,9 +199,13 @@ var patientManager = module.exports = {
                 //Find 
                 
                 var who = { Username: keys.userEmailDecrypt(key1) }
+                if (!who.Username) {
+                    reject('expired or invalid key1')
+                    return
+                }
                 dbMan.models.instance.patient.findOne(who, function (err, found) {
                     if (err || !found) {
-                        logger.error(err || who)
+                        logger.error('email registration failed could not find: ' + who.Username)
                         reject(err)
                     } else if (found.RegistrationObject.k1 === key1 && found.RegistrationObject.k2 === key2) {
                         dbMan.models.instance.patient.update(who, { RegistrationObject: { c: 'registered' } }, function (err) {
@@ -215,5 +219,8 @@ var patientManager = module.exports = {
                 reject(err)
             })
         })
+    },
+    getModelInfo: function () {
+        return 'keyspace ' + dbMan.getKeyspcaeName() + ', tabel patient';
     }
 }

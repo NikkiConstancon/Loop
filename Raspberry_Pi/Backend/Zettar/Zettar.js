@@ -12,7 +12,7 @@ var patientDataManager = require("./patientDataManager");
 var initializedZetta = zetta('peers').name('Zettar')
 
 var callback = function(info, data){
-    patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
+   // patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
 
 }
 
@@ -23,6 +23,15 @@ var hook = new Hook(initializedZetta)
         console.log('Zettar is running : 3009');
     })
     //here you hook the streams
+    .registerStreamListener({
+        connect: function (peer) {
+            console.log(peer)
+            //peer.ws.close()
+        },
+        disconnect: function (peer) {
+            console.log(peer)
+        }
+    })
     .registerStreamListener({
         topicName: 'value',
         where: { type: 'state_machine', name: 'heart_monitor' },

@@ -15,11 +15,11 @@ var server = require('../webServer.js')
 
 var lastLogLevel;
 
-describe('UserSession', function () {
+describe('AuthGuard', function () {
     describe('server response', function () {
         before(function () {
             lastLogLevel = logger.level
-            logger.level = -1;
+            logger.level = -1 //'silly';
         });
         it('with unauthenticated connection', function (done) {
             request.post({
@@ -117,7 +117,6 @@ describe('UserSession', function () {
         })
         after(function () {
             logger.level = lastLogLevel
-            server.close();
         });
     })
 });

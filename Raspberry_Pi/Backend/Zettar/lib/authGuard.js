@@ -45,11 +45,10 @@ var authGuard = module.exports = {
         app.post('/registration', function (req, res, next) {
             req.revaUser.signup(req, res, next)
         })
-        authGuard.bindAuthResolver('web', function (resolve, reject, req, res) {
+        authGuard.bindAuthResolver('web', function (resolve, reject, req, authRes) {
             var authObj = pathAuthMap[req.path]
             //must explisitly define lower level at path to pass
             if (!authObj) {
-                res.status(401).send('')
                 reject()
             } else {
                 var level = webClass.lowest
@@ -57,7 +56,7 @@ var authGuard = module.exports = {
                     level = req.revaUser.context.webAuthLevel
                 }
                 if (authObj.web && authObj.web < level) {
-                    res.status(401).send('login required')
+                    authRes.content = { status: 401, send: 'login required' }
                     reject()
                 } else {
                     resolve()
@@ -126,7 +125,7 @@ function bootstrapSession(req, res, next) {
     req.revaUser = new UserSession(req)
     req.revaUser.context.lastUrl = req.path
 
-    var arr = [];
+    /*var arr = [];
     for (var c in authClassMap) {
         arr.push(c)
     }
@@ -138,6 +137,42 @@ function bootstrapSession(req, res, next) {
             }).then(function () {
                 next()
             }).catch(function () { loop(i + 1)})
+        }
+    }
+    loop(0)*/
+    var arr = [];
+    for (var c in authClassMap) {
+        arr.push(c)
+    }
+
+    function authResponse() {
+        var storeKey = Symbol()
+        this[storeKey] = { contentSet: false, content: { status: 401, send: 'access denied' }}
+        Object.defineProperty(this, 'content', {
+            get: function () { return this[storeKey].content },
+            set: function (value) {
+                if (!this[storeKey].contentSet) {
+                    this[storeKey].contentSet = true
+                    this[storeKey].content = value
+                }
+            }
+        })
+    }
+
+    var obj = new authResponse()
+    const loop = function (i) {
+        if (i >= arr.length) {
+            res.status(obj.content.status).send(obj.content.send)
+            res.end()
+        } else if (pathAuthMap[req.path]) {
+            return new Promise(function (resolve, reject) {
+                return authClassMap[c](resolve, reject, req, obj)
+            }).then(function () {
+                next()
+            }).catch(function () { loop(i + 1) })
+        } else {
+            res.status(obj.content.status).send(obj.content.send)
+            res.end()
         }
     }
     loop(0)

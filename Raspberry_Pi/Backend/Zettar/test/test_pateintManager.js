@@ -100,21 +100,30 @@ describe('PatientManager', function () {
     describe('Email validation', function () {
         var poll = function () {
             return PatientManager.getPatient({ Username: 'Username_test' }).then(function (pat) {
-                if (pat.RegistrationObject.c !== 'sending') {
-                    return PatientManager.validateEmail(pat.RegistrationObject.k1, pat.RegistrationObject.k2).then(function (pat) {
-                        return PatientManager.getPatient({ Username: 'Username_test' }).then(function (pat) {
-                            expect(pat.RegistrationObject.c).to.equal('registered')
-                            expect(pat.RegistrationObject.k1).to.equal(undefined)
-                            expect(pat.RegistrationObject.k2).to.equal(undefined)
+                if (pat) {
+                    if (pat.RegistrationObject.c !== 'sending') {
+                        var check = (pat.RegistrationObject.c !== 'registered')
+                        return PatientManager.validateEmail(pat.RegistrationObject.k1, pat.RegistrationObject.k2).then(function (pat) {
+                            return PatientManager.getPatient({ Username: 'Username_test' }).then(function (pat) {
+                                if (check) {
+                                    expect(pat.RegistrationObject.c).to.equal('registered')
+                                    expect(pat.RegistrationObject.k1).to.equal(undefined)
+                                    expect(pat.RegistrationObject.k2).to.equal(undefined)
+                                } else {
+                                    assert(false, 'ALREADY REGISTERED')
+                                }
+                            })
                         })
-                    })
+                    } else {
+                        return new Promise(function (res, rej) {
+                            setTimeout(function () { res() }, 1000)
+                        }).then(poll);
+                    }
                 } else {
-                    return new Promise(function (res, rej) {
-                        setTimeout(function () { res() },1000)
-                    }).then(poll);
+                    assert(false, 'could not get patient to send email')
                 }
             })
         }
-        it('test transition from <sending> to <awaiting> lastly <registered>', poll)
+        it('test transition from <sending> to <awaiting> lastly <registered>', poll).timeout(12000)
     })
 })

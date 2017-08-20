@@ -33,6 +33,11 @@ class PatientModel extends userModel.class {
                 type: "list",
                 typeDef: "<text>"
             },
+            ZettaletUuid: {
+                type: 'list',
+                typeDef: '<uuid>',
+                default: []
+            },
             Email: {
                 type: "text",
                 rule: {

@@ -66,10 +66,15 @@ var dataHandelerMap = {
             var params = this.streamListenerArr[i]
             params.server = this.server
             params.from = obj.peer.name
-            listenZettaUpdates(params)
+            params.connect && params.connect(obj.peer)
+            params.cb && listenZettaUpdates(params)
         }
     },
     '_peer/disconnect': function (obj) {
+        for (var i in this.streamListenerArr) {
+            var params = this.streamListenerArr[i]
+            params.disconnect && params.disconnect(obj.peer)
+        }
         //console.log('disconnect')
         //console.log(obj)
     }

@@ -58,6 +58,9 @@ var self = module.exports = {
             }
         })
     },
+    getKeyspcaeName: function () {
+        return keyspace
+    },
     dropTestKyespaceAndExit: function (exitParam) {
         var exit = function () {
             if (exitParam) {

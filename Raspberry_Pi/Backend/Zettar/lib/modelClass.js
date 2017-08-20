@@ -30,6 +30,14 @@ class Model {
             get: function() { return this[methodsKey] },
             set: function(obj) { Object.assign(this[methodsKey], obj) }
         })
+        this.methods = {
+            printFields: function () {
+                var obj = JSON.parse(JSON.stringify(this))
+                for (var i in obj) {
+                    console.log(i, ':', obj[i])
+                }
+            }
+        }
     }
 }
 

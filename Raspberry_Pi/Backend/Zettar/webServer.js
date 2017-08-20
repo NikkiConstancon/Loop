@@ -1,9 +1,14 @@
-﻿var express = require('express')
+﻿
+
+const url = require('url');
+
+var express = require('express')
 var parseurl = require('parseurl')
 var authGuard = require('./lib/authGuard')
 
 
 var app = express()
+
 authGuard.initApp(app)
 authGuard.get('/email-confirmation', { web: authGuard.webClass.lowest }, function (req, res, next) {
     var PatientManager = require('./patientManager');
@@ -20,13 +25,32 @@ authGuard.get('/email-confirmation', { web: authGuard.webClass.lowest }, functio
 
 var transport = 'http'
 server = module.exports = require(transport).createServer(app);
-server.listen(80,'127.0.0.1', function (err) {
-    err && console.log(err)
+const WebSocket = require('ws');
+const wss = module.exports.wss = new WebSocket.Server({ server });
+var wssRoot
+wss.whoAmI = function (options) {
+    var authorization = ''
+    if (options) {
+        if (options.user) {
+            authorization = options.user + ':' + options.pass + '@'
+        }
+    }
+    return 'ws://' + authorization + wssRoot 
+}
 
+server.listen(8080, '127.0.0.1', function (err) {
+    err && console.log(err)
+    wssRoot = server.address().address + (server.address().port !== 80 ? ':' + server.address().port : '')
 
     server.whoAmI = function (path) {
         return transport + '://' + server.address().address + (server.address().port !== 80 ? ':' + server.address().port : '') + (path ? path : '')
     }
     console.log('\tserver started ', server.address())
 })
+
+
+
+
+
+
 
