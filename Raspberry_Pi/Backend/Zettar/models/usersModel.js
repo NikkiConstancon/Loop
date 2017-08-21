@@ -1,10 +1,26 @@
 var Model = require('../lib/modelClass')
 
+const badWords = require('bad-words')
+const filter = new badWords()
+
+//NOTE call:  ! usernameAcceptor()  for the validator
+function usernameAcceptor(val) {
+    if (filter.isProfane(val)) { return JSON.stringify({ Username: 'profane names are not allowed' }) }
+    if (val.length < 3) { return JSON.stringify({ Username: 'must be longer than two characters' }) }
+    return false
+}
+
 class UserModel extends Model {
     constructor() {
         super();
         this.fields = {
-            Username: 'text',
+            Username: {
+                type: 'text',
+                rule: {
+                    validator: function (value) { return !usernameAcceptor(value) },
+                    message: function (value) { return usernameAcceptor(value) }
+                }
+            },
             Firstname: 'text',
             Surname: 'text',
             Age: 'int',

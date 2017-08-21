@@ -1,4 +1,5 @@
 ﻿//NOTE: module.exports is at end of file
+var sharedKeys = require('../../Shared/sharedKeys')
 var logger = require('../revaLog')
 
 //====================BEGIN CLASS Hook====================
@@ -62,6 +63,7 @@ var dataHandelerMap = {
     '_peer/connect': function (obj) {
         //console.log(obj)
         //console.log('connect')
+
         for (var i in this.streamListenerArr) {
             var params = this.streamListenerArr[i]
             params.server = this.server
@@ -114,7 +116,7 @@ var listenZettaUpdates = function (args) {
         server.observe([server.from(from).where(where)], function (thing) {
             try {
                 //capture info
-                var info = { from: from, topicName: topicName, where: where }
+                var info = { from: sharedKeys.decrypt(from), topicName: topicName, where: where }
                 var key = buildObserveKeyForHook(thing, topicName)
                 logger.debug('#listenZettaStream: key:', key)
                 hookObserveEmiter(thing, key, function () {

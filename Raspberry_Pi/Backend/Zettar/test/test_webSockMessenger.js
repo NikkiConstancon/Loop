@@ -132,28 +132,27 @@ describe('@zettaletEventsDispatcher', function (done) {
                 done()
             })
         })
-        xdescribe('testing publish and subscribeing', function () {
+        describe('testing publish and subscribeing', function () {
             this.timeout(8000)
-            before(function (done) {
+            var doneToCall = true;
+            before(function () {
                 ws = new WebSocket(server.wss.whoAmI({ user: query.Username, pass: query.Password }))
                 ws.on('open', function () {
-                    done()
                     var numSend = 0
                     var ival = setInterval(function () {
                         ws.send(JSON.stringify({ TEST: "pub" }))
-                        if (numSend++ == 2) {
+                        if (numSend++ == 5) {
                             clearInterval(ival)
                             ws.close()
                         }
-                    }, 500)
+                    }, 100)
                 })
             })
+            var foundOne = false
             it('test #connect, #close, and #sub', function (done) {
-                var count = 0
                 var subTrue = false
                 webSockMessenger.attach('TEST', {
                     connect: function (user, send) {
-                        ++count == 3 && done()
                         var ival = setInterval(function () {
                             send('sub', function (err) {
                                 err && clearInterval(ival)
@@ -161,18 +160,18 @@ describe('@zettaletEventsDispatcher', function (done) {
                         }, 1000)
                     },
                     close: function (user) {
-                        ++count == 3 && done()
+                        if (foundOne){
+                            done()
+                        } else {
+                            assert(false,'did not find the sub message')
+                        }
                     },
                     sub: function (user, obj) {
-                        if (!subTrue && obj === 'pub') {
-                            subTrue = true
-                            ++count
-                        }
-                        count === 3 && done()
+                        foundOne = true
                     }
                 })
             })
-            it('message arrival', function (done) {
+            xit('message arrival', function (done) {
                 ws.on('open', function open() {
                 })
                 ws.on('message', function incoming(data) {

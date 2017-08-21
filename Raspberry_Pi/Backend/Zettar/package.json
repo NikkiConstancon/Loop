@@ -18,7 +18,8 @@
     "express-session": "*",
     "body-parser": "*",
     "request": "*",
-    "nodemailer":"*"
+    "nodemailer": "*",
+    "bad-words": "*"
   },
   "devDependencies": {},
   "scripts": {

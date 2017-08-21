@@ -15,6 +15,7 @@ var patientKey = "xP{}Lk.x#3V2S?F2p'q{kqd[Qu{7/S-d*bzt"
 var accessKey = "4]),`~>{CKjv(E@'d:udH6N@/G4n(}4dn]Mi"
 
 var keys = require('./lib/keys')
+var sharedKeys = require('../Shared/sharedKeys')
 
 /*EXAMPLE USE
 // Encrypt 
@@ -191,6 +192,23 @@ var patientManager = module.exports = {
             }).catch((err) => {
                 reject(err)
             })
+        })
+    },
+    bindZettalet: function (key, apiUri) {
+        return new Promise(function (res, rej) {
+            var who = { Username: sharedKeys.decrypt(key) }
+            patientManager.getPatient(who)
+                .then(function (pat) {
+                    dbMan.models.instance.patient.update(who, { ZettaletUuid: apiUri}, function (err) {
+                        if (err) {
+                            rej(err)
+                        } else {
+                            res(pat)
+                        }
+                    })
+                }).catch(function (e) {
+                    rej(e)
+                })
         })
     },
     validateEmail: function (key1, key2) {

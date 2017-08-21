@@ -5,6 +5,8 @@ const url = require('url');
 var express = require('express')
 var parseurl = require('parseurl')
 var authGuard = require('./lib/authGuard')
+var sharedKeys = require('../Shared/sharedKeys')
+
 
 
 var app = express()
@@ -19,6 +21,20 @@ authGuard.get('/email-confirmation', { web: authGuard.webClass.lowest }, functio
         res.status(400).send(e)
     })
 })
+authGuard.get('/patient-info', { web: authGuard.webClass.authenticated }, function (req, res, next) {
+    var patientManager = require("./patientManager");
+    try {
+        patientManager.getPatient({ Username: req.revaUser.context.username })
+            .then(function (pat) {
+                res.status(200).send(JSON.stringify({ zettaletHash: pat.ZettaletUuid }))
+            }).catch(function (e) {
+                
+            })
+    } catch (e) {
+        res.status(500).send(e)
+    }
+})
+
 
 
 

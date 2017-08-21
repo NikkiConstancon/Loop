@@ -31,13 +31,49 @@ describe('AuthGuard', function () {
             })
         });
         describe('test user registration', function () {
-            it('with invalid username', function (done) {
+            it('with unset username in headder', function (done) {
+                request.post({
+                    url: server.whoAmI('/registration'),
+                    form: {                    }
+                }, function (err, res, body) {
+                    expect(res.statusCode).to.equal(422)
+                    expect(res.body).to.equal('{"error_head":"Username"}')
+                    done()
+                })
+            })
+            it('with unset password in headder', function (done) {
+                request.post({
+                    url: server.whoAmI('/registration'),
+                    form: { Username:'hello' }
+                }, function (err, res, body) {
+                    expect(res.statusCode).to.equal(422)
+                    expect(res.body).to.equal('{"error_head":"Password"}')
+                    done()
+                })
+            })
+            it('with invalid usernamer', function (done) {
                 request.post({
                     url: server.whoAmI('/registration'),
                     form: {
+                        Username: 'ab',
+                        Password: 'set'
                     }
                 }, function (err, res, body) {
                     expect(res.statusCode).to.equal(422)
+                    expect(res.body).to.equal('{"Username":"must be longer than two characters"}')
+                    done()
+                })
+            })
+            it('with invalid profane name', function (done) {
+                request.post({
+                    url: server.whoAmI('/registration'),
+                    form: {
+                        Username: 'shit face',
+                        Password: 'set'
+                    }
+                }, function (err, res, body) {
+                    expect(res.statusCode).to.equal(422)
+                    expect(res.body).to.equal('{"Username":"profane names are not allowed"}')
                     done()
                 })
             })
@@ -100,8 +136,8 @@ describe('AuthGuard', function () {
                 request.post({
                     url: server.whoAmI('/login'),
                     form: {
-                        Username: username,
-                        Password: 'Password',
+                        Username: 'reva user',
+                        Password: 'password',
                     }
                 }, function (err, res, body) {
                     expect(res.statusCode).to.equal(200)
@@ -113,7 +149,14 @@ describe('AuthGuard', function () {
                     expect(res.statusCode).to.equal(200)
                     done()
                 })
-            });
+            })
+            it('at path /patient-info', function (done) {
+                request.get(server.whoAmI('/patient-info'), function (err, res, body) {
+                    //expect(res.statusCode).to.equal(200)
+                    //expect(JSON.parse(res.body)).to.deep.include({ zettaletHash: 'U2FsdGVkX19VHQRYZNi4vKkc8FC9JuYR7hh25NwCAek=U2FsdGVkX19VHQRYZNi4vKkc8FC9JuYR7hh25NwCAek=' })
+                    done()
+                })
+            })
         })
         after(function () {
             logger.level = lastLogLevel

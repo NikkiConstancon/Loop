@@ -1,9 +1,16 @@
+
 var zetta = require('zetta');
 var url = require('url');
 // var display = require('./display.js');
+
+require('./webServer')
+var sharedKeys = require('../Shared/sharedKeys')
 var Hook = require('./lib/zettaHook')
 
+var logger = require('./revaLog')
+
 var dbManager1 = require("./userManager");
+var patientManager = require("./patientManager");
 var patientDataManager = require("./patientDataManager");
 
 
@@ -25,11 +32,25 @@ var hook = new Hook(initializedZetta)
     //here you hook the streams
     .registerStreamListener({
         connect: function (peer) {
-            console.log(peer)
-            //peer.ws.close()
+            patientManager.bindZettalet(peer.name, encodeURI(peer.name))
+                .then(function (pat) {
+                    //do it this way, else field is out of date
+                    patientManager.getPatient(pat).then(function (pat) {
+                        logger.info('user [' + pat.Username + "]'s device connected with api uri: " + pat.ZettaletUuid)
+                    })
+                }).catch(function (err) {
+                    logger.warn('no user bound for device with uuid ' + peer.name)
+                    //peer.ws.close()
+                })
         },
         disconnect: function (peer) {
-            console.log(peer)
+            patientManager.bindZettalet(peer.name, '-')
+                .then(function (pat) {
+                    //do it this way, else field is out of date
+                    patientManager.getPatient(pat).then(function (pat) {
+                        logger.info('user [' + pat.Username + "]'s device disconnected and api uri set to: " + pat.ZettaletUuid)
+                    })
+                })
         }
     })
     .registerStreamListener({

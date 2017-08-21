@@ -183,10 +183,21 @@ function UserSession(req) {
     this.context.requestCount++;
 }
 UserSession.createContext = function () {
-    return { webAuthLevel: webClass.lowest, requestCount: 0 };
+    return {
+        webAuthLevel: webClass.lowest,
+        requestCount: 0,
+        username: undefined
+    };
 }
 UserSession.prototype.signup = function (req, res, next) {
-
+    if (!req.body.Username) {
+        res.status(422).send(JSON.stringify({ error_head: 'Username' }))
+        return
+    }
+    if (!req.body.Password) {
+        res.status(422).send(JSON.stringify({ error_head: 'Password' }))
+        return
+    }
     //TODO: Move to patiantManager
     function deserialize(body) {
         var test = require('../models/patientModel').fields
@@ -200,18 +211,25 @@ UserSession.prototype.signup = function (req, res, next) {
         }
     }
     deserialize(req.body)
-
-    PatientManager.addPatient(req.body).then(function (pat) {
-        res.status(201).send('user created')
-    }).catch(function (e) {
-        res.status(422).send(e)
-    })
+    PatientManager.getPatient(req.body)
+        .then(function () {
+            res.status(422).send(JSON.stringify({ error: req.body.Username + ' is already taken' }))
+        }).catch(function () {
+            return PatientManager.addPatient(req.body).then(function (pat) {
+                res.status(201).send(JSON.stringify({ success:'user created'}))
+            }).catch(function (e) {
+                res.status(422).send(e.message || e)
+            })
+        }).catch(function (e) {
+            res.status(500)
+        })
 }
 UserSession.prototype.login = function (req, res, next) {
     var self = this;
     PatientManager.getPatient({ Username: req.body.Username }).then(function (pat) {
         if (pat.verifyPassword(req.body.Password)) {
             self.context.webAuthLevel = webClass.authenticated;
+            self.context.username = req.body.Username
             res.status(200).send('login successful');
             next()
         } else {
