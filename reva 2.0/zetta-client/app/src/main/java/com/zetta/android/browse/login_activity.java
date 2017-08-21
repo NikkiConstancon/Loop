@@ -36,8 +36,6 @@ public class login_activity extends AppCompatActivity {
 
     private Button loginButton;
     private Button registerButton;
-    //private ProgressDialog pd; TODO add progress dialog
-
 
     /**
      * Overridden onCreate for starting with the login_activity class
@@ -77,8 +75,8 @@ public class login_activity extends AppCompatActivity {
                 //pd = ProgressDialog.show(context.getApplicationContext(), "Signing in", "Please wait while we are signing you in..");
 
                 ServerComms server = new ServerComms(context);
-
-                server.execute("Username", user.getText().toString(), "Password", passw.getText().toString());
+                String serverURI = "http://" + getString(R.string.serverURL) + ":8080/login";
+                server.execute(serverURI, "Username", user.getText().toString(), "Password", passw.getText().toString());
             }
         });
 

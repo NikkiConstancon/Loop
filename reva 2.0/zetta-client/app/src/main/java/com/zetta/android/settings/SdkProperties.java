@@ -12,20 +12,23 @@ public class SdkProperties {
     @NonNull private final SharedPreferences sharedPreferences;
     @NonNull private final String apiUrlKey;
     @NonNull private final String mockResponsesKey;
+    private String serverURL;
 
     @NonNull
     public static SdkProperties newInstance(@NonNull Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String apiUrlKey = context.getString(R.string.key_api_url_with_history);
+        String serverURL = context.getString(R.string.serverURL);
         String mockResponsesKey = context.getString(R.string.key_mock_responses);
-        return new SdkProperties(sharedPreferences, apiUrlKey, mockResponsesKey);
+        return new SdkProperties(sharedPreferences, apiUrlKey, mockResponsesKey, serverURL);
     }
 
     SdkProperties(@NonNull SharedPreferences sharedPreferences,
                   @NonNull String apiUrlKey,
-                  @NonNull String mockResponsesKey) {
+                  @NonNull String mockResponsesKey, @NonNull String serverURL) {
         this.sharedPreferences = sharedPreferences;
         this.apiUrlKey = apiUrlKey;
+        this.serverURL = serverURL;
         this.mockResponsesKey = mockResponsesKey;
     }
 
@@ -35,7 +38,7 @@ public class SdkProperties {
 
     @NonNull
     public String getUrl() {
-        return "http://192.168.1.103:1337";
+        return "http://" + serverURL + ":1337";
     } // THE SERVER: http://iomt.dedicated.co.za:3009
 
     public boolean useMockResponses() {

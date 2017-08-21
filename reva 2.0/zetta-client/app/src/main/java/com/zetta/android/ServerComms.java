@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,18 +20,25 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.CookieManager;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import static com.zetta.android.R.layout.login_activity;
 
 public class ServerComms extends AsyncTask<String, Void, Boolean> {
     private String result = null;
     private ProgressDialog progressDialog;
-    private boolean pass = false;
-    private Context context;
 
-    public boolean getPass() { return pass; }
+    private Context context;
+    static final String COOKIES_HEADER = "Set-Cookie";
+    static final String COOKIE = "Cookie";
+
+    static CookieManager msCookieManager = new CookieManager();
+
     public String getResult() {
         return result;
     }
@@ -45,7 +53,7 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
         try {
             progressDialog = ProgressDialog.show(context, "Signing in...", "This should take a few seconds.", true);
         } catch (final Throwable th) {
-            //TODO
+
         }
     }
 
@@ -54,9 +62,11 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
         HttpURLConnection urlConnection;
 
 
-        String uri = "http://192.168.1.103:8080/login"; // 192.168.1.103
+
+        String uri = params[0]; // 192.168.1.103
+        Log.d("uri", uri);
         JSONObject obj = new JSONObject();
-        for (int i = 0; i < params.length-1; i=i+2) {
+        for (int i = 1; i < params.length-1; i=i+2) {
             try {
                 obj.put(params[i], params[i+1]);
             } catch (JSONException e) {
@@ -68,15 +78,18 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
         try {
             //Connect
             Log.d("try", "Trying to connect");
+
             urlConnection = (HttpURLConnection) ((new URL(uri).openConnection()));
             urlConnection.setDoOutput(true);
-//            urlConnection.setRequestProperty("Content-Type", "application/json");
-//            urlConnection.setRequestProperty("Accept", "application/json");
+
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Accept", "application/json");
+            if (msCookieManager.getCookieStore().getCookies().size() > 0) {
+                urlConnection.setRequestProperty(COOKIE, TextUtils.join(";", msCookieManager.getCookieStore().getCookies()));
+
+            }
 
             urlConnection.setRequestMethod("POST");
-
 
             //Write
             OutputStream outputStream = urlConnection.getOutputStream();
@@ -86,6 +99,16 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
             outputStream.close();
 
             urlConnection.connect();
+
+            Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
+            List<String> cookiesHeader = headerFields.get(COOKIES_HEADER);
+
+            if (cookiesHeader != null) {
+                for (String cookie : cookiesHeader) {
+                    Log.d("Cookie", HttpCookie.parse(cookie).get(0).toString());
+                    msCookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
+                }
+            }
 
             int statusCode = urlConnection.getResponseCode();
             String responseMsg = urlConnection.getResponseMessage();
