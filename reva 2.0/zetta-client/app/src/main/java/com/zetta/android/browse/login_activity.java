@@ -21,6 +21,7 @@ import com.zetta.android.R;
 import com.zetta.android.ServerComms;
 
 import java.util.concurrent.ExecutionException;
+import android.os.Handler;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,10 +33,33 @@ import java.util.regex.Pattern;
 /**
  * login activity class for starting the login process (possible first page)
  */
+
+
 public class login_activity extends AppCompatActivity {
 
     private Button loginButton;
     private Button registerButton;
+    private boolean exit = false;
+
+    @Override
+    public void onBackPressed()
+    {
+        if(exit)
+        {
+            finish();
+        }
+        else {
+            Toast.makeText(this, "Press back again to exit ReVA", Toast.LENGTH_SHORT).show();
+            exit = true;
+            new Handler().postDelayed(new Runnable() {
+               @Override
+                public void run()
+               {
+                   exit = false;
+               }
+            }, 3*1000);
+        }
+    }
 
     /**
      * Overridden onCreate for starting with the login_activity class
