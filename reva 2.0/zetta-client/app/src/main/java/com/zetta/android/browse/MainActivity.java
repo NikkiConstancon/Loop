@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity
     {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
         adapter.addFragment(new DeviceListActivity(), "Vitals");
-        adapter.addFragment(new statHistFragment(), "Stats");
+        adapter.addFragment(new StatFragment(), "Stats");
         adapter.addFragment(new notifications(), "Alerts");
         viewPager.setAdapter(adapter);
     }

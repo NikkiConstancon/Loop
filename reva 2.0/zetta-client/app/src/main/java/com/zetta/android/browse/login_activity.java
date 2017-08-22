@@ -112,7 +112,9 @@ public class login_activity extends AppCompatActivity {
                 ServerComms server = new ServerComms(context);
                 String serverURI = "http://" + getString(R.string.serverURL) + ":8080/login";
                 //if (attemptLogin()) TODO: do this thing
-                    server.execute(serverURI, "Username", user.getText().toString(), "Password", passw.getText().toString());
+                    //server.execute(serverURI, "Username", user.getText().toString(), "Password", passw.getText().toString());
+                Intent intent =  new Intent(context, MainActivity.class);
+                startActivity(intent);
 
             }
         });
@@ -202,15 +204,5 @@ public class login_activity extends AppCompatActivity {
             }
         }
         return false;
-    }
-
-    /**
-     * on click method for first time registration
-     * @param s not needed and not used
-     */
-    public void toRegistration(Editable s)
-    {
-//        Intent toReg = new Intent(this, Registration.class);
-//        startActivityForResult(toReg, 0);
     }
 }
