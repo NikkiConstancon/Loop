@@ -3,9 +3,28 @@
   <style name="AppThemeLight"
     parent="Theme.AppCompat.Light.NoActionBar">
 
+  <item name="colorPrimary">@color/colorPrimary</item>
+  <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+  <item name="colorAccent">@color/colorAccent</item>
+
+  <item name="buttonStyle">@style/ZettaButton</item>
+
+  <item name="android:textColorPrimary">@color/textColorPrimary</item>
+  <item name="android:textColorSecondary">@color/textColorSecondary</item>
+  <item name="android:textColorTertiary">@color/textColorTertiary</item>
+
+  <item name="android:windowBackground">@color/colorTextIcons</item>
+
+  <item name="colorButtonNormal">@color/colorPrimary</item>
+  <item name="colorControlHighlight">@color/colorAccent</item>
+</style>
+
+  <style name="Form"
+      parent="Theme.AppCompat.Light.NoActionBar">
+
     <item name="colorPrimary">@color/colorPrimary</item>
     <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-    <item name="colorAccent">@color/colorAccent</item>
+    <item name="colorAccent">@color/colorPrimaryDark</item>
 
     <item name="buttonStyle">@style/ZettaButton</item>
 
@@ -16,7 +35,7 @@
     <item name="android:windowBackground">@color/colorTextIcons</item>
 
     <item name="colorButtonNormal">@color/colorPrimary</item>
-    <item name="colorControlHighlight">@color/colorAccent</item>
+    <item name="colorControlHighlight">@color/textColorPrimary</item>
   </style>
 
   <style name="AppThemeDark"

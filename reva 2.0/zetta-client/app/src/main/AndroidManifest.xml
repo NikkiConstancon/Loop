@@ -18,9 +18,11 @@
             android:name=".device.events.EventsActivity"
             android:parentActivityName=".device.DeviceDetailsActivity" />
         <activity
+            android:theme="@style/Form"
             android:name=".browse.login_activity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,9 +31,10 @@
         </activity>
         <activity android:name=".advice_page"></activity>
         <activity android:name=".browse.Registration"
+
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeLight"></activity>
+            android:theme="@style/Form"></activity>
     </application>
 
 </manifest>

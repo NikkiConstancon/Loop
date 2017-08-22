@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -46,12 +47,22 @@ public class login_activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
 
-
         registerButton = (Button) findViewById(R.id.btn_register);
         loginButton = (Button) findViewById(R.id.btn_login);
 
         final EditText user = (EditText) findViewById(R.id.input_emailLogin);
         final EditText passw = (EditText) findViewById(R.id.input_passwordLogin);
+
+        user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    user.setHint("johndoe@example.com");
+                } else {
+                    user.setHint("");
+                }
+            }
+        });
 
 
         /* Setting an OnClickListener allows us to do something when this button is clicked. */
@@ -72,11 +83,13 @@ public class login_activity extends AppCompatActivity {
                  */
                 Context context = login_activity.this;
 
-                //pd = ProgressDialog.show(context.getApplicationContext(), "Signing in", "Please wait while we are signing you in..");
+
 
                 ServerComms server = new ServerComms(context);
                 String serverURI = "http://" + getString(R.string.serverURL) + ":8080/login";
-                server.execute(serverURI, "Username", user.getText().toString(), "Password", passw.getText().toString());
+                //if (attemptLogin()) TODO: do this thing
+                    server.execute(serverURI, "Username", user.getText().toString(), "Password", passw.getText().toString());
+
             }
         });
 
@@ -109,14 +122,15 @@ public class login_activity extends AppCompatActivity {
 
     /**
      * Validation of login details and attempt to continue to main
-     * @param s not needed and not used
      */
-    public void attemptLogin(Editable s)
+    public Boolean attemptLogin()
     {
         Context context = this;
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please fill in all details.");
         builder1.setCancelable(true);
+
+
 
         builder1.setPositiveButton(
                 "OK",
@@ -131,8 +145,9 @@ public class login_activity extends AppCompatActivity {
 
         if(email.length() < 1 || pass.length() < 1)
         {
-            AlertDialog alertWarning = builder1.create();
-            alertWarning.show();
+            TextInputLayout til = (TextInputLayout)    findViewById(R.id.login_email_label);
+            til.setErrorEnabled(true);
+            til.setError("You need to enter a name");
         }
         else
         {
@@ -142,25 +157,27 @@ public class login_activity extends AppCompatActivity {
             Pattern p2 = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$");
             Matcher m2 = p2.matcher(pass);
 
+            TextInputLayout til;
             if (!m.find())
             {
-                builder1.setMessage("Email incorrect. Please double check your email.");
-                AlertDialog alertWarning = builder1.create();
-                alertWarning.show();
+                til = (TextInputLayout)    findViewById(R.id.login_email_label);
+                til.setErrorEnabled(true);
+                til.setError("Type in your email address");
             }
-            else if(!m2.find())
+            if(!m2.find())
             {
-                builder1.setMessage("Password incorrect. Passwords must be at least 6 characters long, with at least one capital letter and number.");
-                AlertDialog alertWarning = builder1.create();
-                alertWarning.show();
+                til = (TextInputLayout)    findViewById(R.id.login_pass_label);
+                til.setErrorEnabled(true);
+                til.setError("Type in your password");
             }
-            else
+            if (m2.find() && m.find())
             {
                 //validation happens here
-                Intent toMain = new Intent(this, DeviceList.class);
-                startActivityForResult(toMain,0);
+                return true;
+
             }
         }
+        return false;
     }
 
     /**

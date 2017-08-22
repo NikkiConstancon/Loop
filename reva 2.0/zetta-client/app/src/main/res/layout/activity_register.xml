@@ -45,50 +45,58 @@
         android:layout_height="match_parent"
 
         tools:context="com.zetta.android.browse.activity_register">
-    <EditText
-        android:id="@+id/input_emailReg"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
 
-        android:hint="Email address"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/reg_email_txt"
+            android:hint="Email address"
+            android:layout_width="0dp"
+            android:layout_height="58dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
 
-        android:inputType="textWebEmailAddress"
-        android:selectAllOnFocus="false"
-
-        android:textColor="@color/colorPrimaryText"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
-
-    <EditText
-        android:id="@+id/input_passwordReg"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-
-        android:hint="Password"
-        android:inputType="textPassword"
-        app:layout_constraintLeft_toLeftOf="parent"
-
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_emailReg"
-        tools:ignore="HardcodedText,RtlHardcoded"
-        tools:layout_constraintTop_creator="1" />
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText"
+            >
 
         <EditText
-            android:id="@+id/input_confirmPassReg"
+            android:id="@+id/input_emailReg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/reg_pass_txt"
             android:layout_width="0dp"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+
+            android:hint="Password"
+            android:inputType="textPassword"
+            app:layout_constraintLeft_toLeftOf="parent"
+
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/reg_email_txt"
+            tools:ignore="HardcodedText,RtlHardcoded"
+            tools:layout_constraintTop_creator="1" >
+            <EditText
+                android:id="@+id/input_passwordReg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </android.support.design.widget.TextInputLayout>
+
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/confirmPassReg_txt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
@@ -99,14 +107,20 @@
             app:layout_constraintLeft_toLeftOf="parent"
 
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/input_passwordReg"
+            app:layout_constraintTop_toBottomOf="@+id/reg_pass_txt"
             tools:ignore="HardcodedText,RtlHardcoded"
-            tools:layout_constraintTop_creator="1" />
+            tools:layout_constraintTop_creator="1" >
+            <EditText
+                android:id="@+id/input_confirmPassReg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </android.support.design.widget.TextInputLayout>
 
         <EditText
             android:id="@+id/txt_patientCheck"
             android:layout_width="0dp"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginEnd="16dp"
@@ -120,7 +134,7 @@
             tools:ignore="HardcodedText,LabelFor,RtlHardcoded"
             tools:text="Are You a Patient?"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/input_confirmPassReg" />
+            app:layout_constraintTop_toBottomOf="@+id/confirmPassReg_txt" />
 
         <RadioGroup
             android:id="@+id/radioGroupReg1"
@@ -161,7 +175,7 @@
     <!-- btn_register -->
         <Button
             android:layout_width="0dp"
-            android:layout_height="52dp"
+            android:layout_height="58dp"
             android:id="@+id/btn_register"
             android:text="CONTINUE"
             android:textColor="@color/white"
