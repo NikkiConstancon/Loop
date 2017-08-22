@@ -58,7 +58,7 @@ class DeviceList {
             List<ListItem> items = new ArrayList<>();
             for (ZIKServer server : servers) {
                 ZettaStyle serverStyle = zettaStyleParser.parseStyle(server);
-                items.add(createServerListItem(serverStyle, server));
+                //items.add(createServerListItem(serverStyle, server)); DOESNT SHOW SERVER INFO ANYMORE
 
                 List<ZIKDevice> zikDevices = server.getDevices();
 
@@ -66,10 +66,7 @@ class DeviceList {
                     items.add(createEmptyServerListItem(serverStyle));
                 } else {
                     for (ZIKDevice device : zikDevices) {
-
-
                         items.add(createDeviceListItem(server, device));
-
                     }
                 }
             }

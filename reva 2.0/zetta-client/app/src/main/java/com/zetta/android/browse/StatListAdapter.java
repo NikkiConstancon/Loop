@@ -113,7 +113,7 @@ public class StatListAdapter extends RecyclerView.Adapter<StatListAdapter.Number
         public NumberViewHolder(View itemView) {
             super(itemView);
 
-            listItemNumberView = (TextView) itemView.findViewById(R.id.tv_item_number);
+            listItemNumberView = (TextView) itemView.findViewById(R.id.card_info);
         }
 
         /**
