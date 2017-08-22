@@ -34,8 +34,9 @@
 
             android:configChanges="orientation"
             android:screenOrientation="portrait"
+            android:theme="@style/Form"></activity>
 
-            android:theme="@style/AppThemeLight"></activity>
+
         <activity android:name=".browse.Registration_Cont"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
@@ -48,6 +49,7 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeLight"></activity>
+
     </application>
 
 </manifest>
