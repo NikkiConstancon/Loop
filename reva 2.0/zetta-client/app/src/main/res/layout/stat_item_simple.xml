@@ -10,19 +10,84 @@
         android:id="@+id/stat_card"
         android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="80dp"
         card_view:cardCornerRadius="2dp"
         card_view:cardElevation="2dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="4dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="4dp"
-        android:padding="16dp">
 
-
-        <TextView
-            android:id="@+id/card_info"
+        >
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp"
+
+            >
+            <ImageView
+
+                android:id="@+id/list_item_device_state_image"
+                android:layout_width="50dip"
+                android:layout_height="50dip"
+                android:importantForAccessibility="no"
+                tools:src="@drawable/ic_heart"
+                android:src="@drawable/ic_heart" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical">
+                <TextView
+                    android:textColor="@color/colorPrimaryText"
+                    android:id="@+id/stat_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Heart-rate"
+                    android:text="Heart-rate"
+                    android:textSize="14sp"/>
+                <TextView
+                    android:textColor="@color/colorSecondaryText"
+                    android:id="@+id/stat_subtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Average for the last week"
+                    android:text="Average for the last week"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:gravity="right"
+                android:textSize="28dp"
+                android:textColor="@color/colorPrimaryText"
+                android:id="@+id/stat_simple"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="35.23" />
+
+            <TextView
+                android:layout_gravity="bottom"
+                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="16dp"
+                android:id="@+id/units_simple_stat"
+                android:textColor="@color/colorSecondaryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BPM"
+                tools:text="BPM"/>
+
+        </LinearLayout>
+
+
+
     </android.support.v7.widget.CardView>
 </LinearLayout>
