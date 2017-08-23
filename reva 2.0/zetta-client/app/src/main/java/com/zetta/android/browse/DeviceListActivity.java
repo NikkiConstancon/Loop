@@ -58,9 +58,6 @@ public class DeviceListActivity extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-
-
         View view = inflater.inflate(R.layout.device_list_activity, container, false);
         super.onCreate(savedInstanceState);
         SdkProperties sdkProperties = SdkProperties.newInstance(getActivity());
@@ -98,9 +95,10 @@ public class DeviceListActivity extends Fragment {
     @NonNull private final DeviceListAdapter.OnDeviceClickListener onDeviceClickListener = new DeviceListAdapter.OnDeviceClickListener() {
         @Override
         public void onDeviceClick(@NonNull ZettaDeviceId deviceId) {
-            Intent intent = new Intent(getActivity(), DeviceDetailsActivity.class);
-            intent.putExtra(DeviceDetailsActivity.KEY_DEVICE_ID, deviceId);
-            startActivity(intent);
+//            Intent intent = new Intent(getActivity(), DeviceDetailsActivity.class);
+//            intent.putExtra(DeviceDetailsActivity.KEY_DEVICE_ID, deviceId);
+//            startActivity(intent);
+            Log.d("Clicked", "Clicked the device");
         }
 
         @Override

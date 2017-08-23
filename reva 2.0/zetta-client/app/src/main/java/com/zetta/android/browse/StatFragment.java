@@ -37,7 +37,7 @@ public class StatFragment extends android.support.v4.app.Fragment
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         statList.setLayoutManager(layoutManager);
-        // this is for performance
+
         statList.setHasFixedSize(true);
         statListAdapter = new StatListAdapter(NUM_LIST_ITEMS);
 

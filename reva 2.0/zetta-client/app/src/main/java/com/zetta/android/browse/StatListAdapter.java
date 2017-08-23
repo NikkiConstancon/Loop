@@ -56,7 +56,6 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-
         return position % 2 * 2;
     }
 
