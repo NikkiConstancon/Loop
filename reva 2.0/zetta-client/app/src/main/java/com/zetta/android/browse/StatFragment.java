@@ -10,15 +10,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.zetta.android.GraphEntry;
 import com.zetta.android.R;
+import com.zetta.android.StatItem;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Hristian Vitrychenko on 11/08/2017.
  * Made to do something 22/08/2017
  */
-
-
-
 
 public class StatFragment extends android.support.v4.app.Fragment
 {
@@ -26,6 +30,7 @@ public class StatFragment extends android.support.v4.app.Fragment
     public static final String Tag = "StatFragment";
     private RecyclerView statList;
     private StatListAdapter statListAdapter;
+    private List<StatItem> cards = new ArrayList<>();
 
     @Nullable
     @Override
@@ -33,13 +38,30 @@ public class StatFragment extends android.support.v4.app.Fragment
         View view = inflater.inflate(R.layout.stat_hist_fragment, container, false);
         super.onCreate(savedInstanceState);
 
+        // MOCK DATA STARTS HERE
+        String timeStamp = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date());
+        cards.add(new SimpleStatItem("Temperature", "http://i.imgur.com/R9xBixo.png", "average", timeStamp, timeStamp, "C", 37.34 ));
+        LinkedList<GraphEntry> entries = new LinkedList<GraphEntry>();
+        entries.add(new GraphEntry(1.0, 56.3));
+        entries.add(new GraphEntry(2.0, 78.3));
+        entries.add(new GraphEntry(3.0, 43.16));
+        entries.add(new GraphEntry(4.0, 88.3));
+        entries.add(new GraphEntry(5.0, 100.3));
+        entries.add(new GraphEntry(6.0, 67.3));
+        entries.add(new GraphEntry(7.0, 43.3));
+        entries.add(new GraphEntry(8.0, 104.3));
+        entries.add(new GraphEntry(9.0, 55.3));
+        entries.add(new GraphEntry(10.0, 67.3));
+        cards.add(new GraphStatItem("Heart-rate", "", "line-graph", new java.util.Date().toString(), new java.util.Date().toString(), "BPM", entries ));
+        // MOCK DATA ENDS HERE
+
         statList = (RecyclerView) view.findViewById(R.id.stats_list);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         statList.setLayoutManager(layoutManager);
 
         statList.setHasFixedSize(true);
-        statListAdapter = new StatListAdapter(NUM_LIST_ITEMS);
+        statListAdapter = new StatListAdapter(cards);
 
         statList.setAdapter(statListAdapter);
         return view;

@@ -166,9 +166,6 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 // Performance Optimisation which makes an assumption
                 // when an item is updated via a stream only the state label & image is wanting to be updated
                 stateLabelWidget.setText(deviceListItem.getState());
-
-                //This is taken out because don't have state images.
-                //imageLoader.load(deviceListItem.getStateImageUri(), stateImageWidget);
             } else {
                 itemView.setTag(deviceListItem.getDeviceId());
                 itemView.setBackground(deviceListItem.createBackground());

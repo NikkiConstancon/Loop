@@ -16,6 +16,7 @@
 package com.zetta.android.browse;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,7 +32,9 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.zetta.android.ImageLoader;
 import com.zetta.android.R;
+import com.zetta.android.StatItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,20 +46,20 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private static final String TAG = StatListAdapter.class.getSimpleName();
 
-    private int mNumberItems;
+    private List<StatItem> cards;
     /**
      * Constructor for StatListAdapter that accepts a number of items to display and the specification
      * for the ListItemClickListener.
      *
-     * @param numberOfItems Number of items to display in list
+     * @param cards, the cards to display in a list.
      */
-    public StatListAdapter(int numberOfItems) {
-        mNumberItems = numberOfItems;
+    public StatListAdapter(List<StatItem> cards) {
+        this.cards = cards;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position % 2 * 2;
+        return cards.get(position).getType();
     }
 
     /**
@@ -79,16 +82,18 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         boolean shouldAttachToParentImmediately = false;
         LayoutInflater inflater = LayoutInflater.from(context);
         switch(viewType) {
-            case 0:
+            case StatItem.TYPE_LINE_GRAPH:
                 layoutIdForListItem = R.layout.stat_item_graph;
 
                 view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
                 return new GraphViewHolder(view);
-            default:
+            case StatItem.TYPE_SIMPLE_STAT:
                 layoutIdForListItem = R.layout.stat_item_simple;
 
                 view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
                 return new NumberViewHolder(view);
+            default:
+                throw new IllegalStateException("Attempted to create view holder for a type you haven't coded for: " + viewType);
         }
     }
 
@@ -106,12 +111,14 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         Log.d(TAG, "#" + position);
         switch(holder.getItemViewType()) {
-            case 0:
-                ((GraphViewHolder) holder).bind(position);
+            case StatItem.TYPE_LINE_GRAPH:
+                ((GraphViewHolder) holder).bind((GraphStatItem) cards.get(position));
+                break;
+            case StatItem.TYPE_SIMPLE_STAT:
+                ((NumberViewHolder) holder).bind((SimpleStatItem) cards.get(position));
                 break;
             default:
-                ((NumberViewHolder) holder).bind(position);
-                break;
+                throw new IllegalStateException("Attempted to bind a type you haven't coded for: " + holder.getItemViewType());
         }
 
     }
@@ -124,7 +131,7 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     @Override
     public int getItemCount() {
-        return mNumberItems;
+        return cards.size();
     }
 
     /**
@@ -132,8 +139,12 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     class NumberViewHolder extends RecyclerView.ViewHolder {
 
-        // Will display the position in the list, ie 0 through getItemCount() - 1
-        TextView listItemNumberView;
+        //private final
+        ImageLoader imageLoader;
+        @NonNull private final TextView stat_simple;
+        @NonNull private final TextView units_simple_stat;
+        @NonNull private final TextView stat_title;
+        @NonNull private final TextView stat_subtitle;
 
         /**
          * Constructor for our ViewHolder. Within this constructor, we get a reference to our
@@ -145,16 +156,22 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public NumberViewHolder(View itemView) {
             super(itemView);
 
-            listItemNumberView = (TextView) itemView.findViewById(R.id.stat_simple);
+            stat_simple = (TextView) itemView.findViewById(R.id.stat_simple);
+            units_simple_stat = (TextView) itemView.findViewById(R.id.units_simple_stat);
+            stat_title = (TextView) itemView.findViewById(R.id.stat_title);
+            stat_subtitle = (TextView) itemView.findViewById(R.id.stat_subtitle);
         }
 
         /**
          * A method we wrote for convenience. This method will take an integer as input and
          * use that integer to display the appropriate text within a list item.
-         * @param listIndex Position of the item in the list
+         * @param item The simplestatitem that needs to be displayed
          */
-        void bind(int listIndex) {
-            listItemNumberView.setText(String.valueOf(listIndex));
+        void bind(SimpleStatItem item) {
+            stat_simple.setText("" + item.getStatistic());
+            units_simple_stat.setText("" + item.getUnits());
+            stat_title.setText("" + item.deviceName + " " + item.getStatName());
+            stat_subtitle.setText("Start: " + item.getStart() +"\nEnd:   " + item.getEnd());
         }
     }
 
@@ -175,7 +192,7 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             chart = (LineChart) itemView.findViewById(R.id.line_chart);
         }
 
-        void bind(int listIndex) {
+        void bind(GraphStatItem item) {
             List<Entry> entries = new ArrayList<Entry>();
             for (int i = 0; i < 20; i++) {
                 entries.add(new Entry(i ,i));
