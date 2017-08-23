@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -179,6 +180,9 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * Cache of the children views for the graphs
      */
     class GraphViewHolder extends RecyclerView.ViewHolder {
+        TextView stat_title;
+        TextView stat_subtitle;
+        ImageLoader imageLoader;
 
         LineChart chart;
 
@@ -190,14 +194,18 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public GraphViewHolder(View itemView) {
             super(itemView);
             chart = (LineChart) itemView.findViewById(R.id.line_chart);
+            stat_subtitle = (TextView) itemView.findViewById(R.id.stat_subtitle);
+            stat_title = (TextView) itemView.findViewById(R.id.stat_title);
         }
 
         void bind(GraphStatItem item) {
-            List<Entry> entries = new ArrayList<Entry>();
-            for (int i = 0; i < 20; i++) {
-                entries.add(new Entry(i ,i));
-            }
 
+            stat_title.setText(item.getDeviceName() + " " + item.getStatName());
+            stat_subtitle.setText("Start: " + item.getStart() +"\nEnd:   " + item.getEnd());
+            List<Entry> entries = new ArrayList<Entry>();
+            for (int i = 0; i < item.getEntries().size(); i++) {
+                entries.add(new Entry(item.getEntries().get(i).x(), item.getEntries().get(i).y()));
+            }
 
             // ALL THAT FOLLOWS IS STYLING FOR THE GRAPH
             LineDataSet dataSet = new LineDataSet(entries, "First Graph");
@@ -211,7 +219,7 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             LineData lineData = new LineData(dataSet);
             XAxis xAxis = chart.getXAxis();
             xAxis.setDrawGridLines(false);
-            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM_INSIDE);
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis.setTextColor(R.color.colorSecondaryText);
             xAxis.setDrawAxisLine(false);
 
@@ -219,7 +227,7 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             leftAxis.setTextColor(R.color.colorSecondaryText);
             leftAxis.setDrawAxisLine(false);
             leftAxis.setGranularityEnabled(true);
-            leftAxis.setGranularity(5f); //TODO set this properly
+            //leftAxis.setGranularity(5f); //TODO set this properly
 
             //Removing thedescription
             Description description = new Description();

@@ -7,15 +7,15 @@ package com.zetta.android;
 
 public class GraphEntry
 {
-    private final Double x;
-    private final Double y;
+    private final Float x;
+    private final Float y;
 
     /**
      *
      * @param aKey x value
      * @param aValue y value
      */
-    public GraphEntry(Double aKey, Double aValue)
+    public GraphEntry(Float aKey, Float aValue)
     {
         x   = aKey;
         y = aValue;
@@ -25,11 +25,11 @@ public class GraphEntry
      *
      * @return x value
      */
-    public Double x()   { return x; }
+    public Float x()   { return x; }
 
     /**
      *
      * @return y value
      */
-    public Double y() { return y; }
+    public Float y() { return y; }
 }

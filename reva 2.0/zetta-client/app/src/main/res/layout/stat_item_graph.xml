@@ -55,8 +55,7 @@
                         android:id="@+id/stat_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Heart-rate"
-                        android:text="Heart-rate line graph"
+                        tools:text="Heart-rate line graph"
                         android:textSize="14sp"/>
                     <TextView
                         android:textColor="@color/colorSecondaryText"

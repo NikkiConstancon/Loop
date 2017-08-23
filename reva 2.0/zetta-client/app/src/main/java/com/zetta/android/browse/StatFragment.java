@@ -42,17 +42,17 @@ public class StatFragment extends android.support.v4.app.Fragment
         String timeStamp = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date());
         cards.add(new SimpleStatItem("Temperature", "http://i.imgur.com/R9xBixo.png", "average", timeStamp, timeStamp, "C", 37.34 ));
         LinkedList<GraphEntry> entries = new LinkedList<GraphEntry>();
-        entries.add(new GraphEntry(1.0, 56.3));
-        entries.add(new GraphEntry(2.0, 78.3));
-        entries.add(new GraphEntry(3.0, 43.16));
-        entries.add(new GraphEntry(4.0, 88.3));
-        entries.add(new GraphEntry(5.0, 100.3));
-        entries.add(new GraphEntry(6.0, 67.3));
-        entries.add(new GraphEntry(7.0, 43.3));
-        entries.add(new GraphEntry(8.0, 104.3));
-        entries.add(new GraphEntry(9.0, 55.3));
-        entries.add(new GraphEntry(10.0, 67.3));
-        cards.add(new GraphStatItem("Heart-rate", "", "line-graph", new java.util.Date().toString(), new java.util.Date().toString(), "BPM", entries ));
+        entries.add(new GraphEntry(1.0f, 56.3f));
+        entries.add(new GraphEntry(2.0f, 78.3f));
+        entries.add(new GraphEntry(3.0f, 43.16f));
+        entries.add(new GraphEntry(4.0f, 88.3f));
+        entries.add(new GraphEntry(5.0f, 100.3f));
+        entries.add(new GraphEntry(6.0f, 67.3f));
+        entries.add(new GraphEntry(7.0f, 43.3f));
+        entries.add(new GraphEntry(8.0f, 104.3f));
+        entries.add(new GraphEntry(9.0f, 55.3f));
+        entries.add(new GraphEntry(10.0f, 67.3f));
+        cards.add(new GraphStatItem("Heart-rate", "", "line-graph", timeStamp, timeStamp, "BPM", entries ));
         // MOCK DATA ENDS HERE
 
         statList = (RecyclerView) view.findViewById(R.id.stats_list);
