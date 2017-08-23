@@ -9,6 +9,7 @@
   <color name="colorSecondaryText">#757575</color>
   <color name="colorDivider">#BDBDBD</color>
   <color name="lightGray">#d3d3d3</color>
+  <color name="lightBlue">#F1F8FB</color>
   <color name="textColorPrimary">@color/colorPrimaryText</color>
   <color name="textColorSecondary">@color/colorSecondaryText</color>
   <color name="textColorTertiary">@color/colorSecondaryText</color>

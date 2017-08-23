@@ -46,16 +46,16 @@
                     android:id="@+id/stat_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:text="Heart-rate"
-                    android:text="Heart-rate"
+                    tools:text="Heart-rate average "
+                    android:text="Heart-rate average "
                     android:textSize="14sp"/>
                 <TextView
                     android:textColor="@color/colorSecondaryText"
                     android:id="@+id/stat_subtitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:text="Average for the last week"
-                    android:text="Average for the last week"
+                    tools:text="Last week"
+                    android:text="Last week"
                     android:textSize="14sp"/>
             </LinearLayout>
 
