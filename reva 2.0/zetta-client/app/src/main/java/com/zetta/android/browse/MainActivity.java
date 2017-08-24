@@ -38,12 +38,16 @@ public class MainActivity extends AppCompatActivity
 
     private ViewPager mViewPager;
 
+    private String zettaUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: Starting.");
+
+        zettaUser = getIntent().getStringExtra("Username");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarMain);
         setSupportActionBar(toolbar);
@@ -85,6 +89,10 @@ public class MainActivity extends AppCompatActivity
                 });
 
 
+    }
+
+    public String getUser() {
+        return zettaUser;
     }
 
     private void setupViewPager(ViewPager viewPager)

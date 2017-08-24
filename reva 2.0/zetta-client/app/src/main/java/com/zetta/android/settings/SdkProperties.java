@@ -38,7 +38,7 @@ public class SdkProperties {
 
     @NonNull
     public String getUrl() {
-        return "http://" + serverURL + ":1337";
+        return "http://" + serverURL + "";
     } // THE SERVER: http://iomt.dedicated.co.za:3009
 
     public void setUrl(String URL) {

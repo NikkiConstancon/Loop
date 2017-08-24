@@ -1,5 +1,6 @@
 package com.zetta.android.browse;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -33,7 +34,9 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
     private String result = null;
     private ProgressDialog progressDialog;
 
+    private Activity activity;
     private Context context;
+    private JSONObject obj;
     static final String COOKIES_HEADER = "Set-Cookie";
     static final String COOKIE = "Cookie";
 
@@ -43,7 +46,8 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
         return result;
     }
 
-    public ServerComms(Context context) {
+    public ServerComms(Activity context) {
+        this.activity = context;
         this.context = context.getApplicationContext();
         progressDialog =  new ProgressDialog(context);
     }
@@ -64,7 +68,7 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
         String uri = params[0]; // 192.168.1.103
         Log.d("uri", uri);
 
-        JSONObject obj = new JSONObject();
+        obj = new JSONObject();
         if (params.length != 1) {
             for (int i = 1; i < params.length-1; i=i+2) {
                 try {
@@ -76,6 +80,11 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
         }
 
         Log.d("obj", obj.toString());
+        try {
+            Log.d("Username", obj.get("Username").toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         try {
             //Connect
@@ -114,6 +123,7 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
             }
 
             int statusCode = urlConnection.getResponseCode();
+            Log.d("code", "" + statusCode);
             String responseMsg = urlConnection.getResponseMessage();
             if (statusCode == 200) {
                 //Read
@@ -124,6 +134,7 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
 
                 while ((line = bufferedReader.readLine()) != null) {
                     sb.append(line);
+
                 }
 
                 bufferedReader.close();
@@ -146,16 +157,25 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean result) {
         progressDialog.dismiss();
-        if (context instanceof login_activity) {
+        Log.d("cont", context.toString());
+        if (activity instanceof login_activity) {
             if (result) {
                 Intent intent =  new Intent(context, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                try {
+                    intent.putExtra("Username", obj.get("Username").toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 context.startActivity(intent);
             } else {
                 String message = "Incorrect user credentials";
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         } else {
+            Log.d("result", this.result);
+            DeviceListActivity.onBackgroundTaskDataObtained(this.result);
             //TODO: handle the result here
         }
 

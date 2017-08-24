@@ -10,7 +10,9 @@
         android:label="ReVA"
         android:supportsRtl="false"
         android:theme="@style/AppThemeLight">
-        <activity android:name=".browse.MainActivity" />
+        <activity android:name=".browse.MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".device.DeviceDetailsActivity"
             android:parentActivityName=".browse.MainActivity" />

@@ -183,22 +183,21 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public static class ServerViewHolder extends RecyclerView.ViewHolder {
 
-        @NonNull private final View swatchColorWidget;
+       // @NonNull private final View swatchColorWidget;
         @NonNull private final TextView nameLabelWidget;
 
         public ServerViewHolder(@NonNull View itemView) {
             super(itemView);
-            swatchColorWidget = itemView.findViewById(R.id.list_item_server_swatch);
+            //swatchColorWidget = itemView.findViewById(R.id.list_item_server_swatch);
             nameLabelWidget = (TextView) itemView.findViewById(R.id.list_item_server_name);
         }
 
         public void bind(@NonNull ServerListItem serverListItem) {
-            swatchColorWidget.setBackgroundColor(serverListItem.getSwatchColor());
+           // swatchColorWidget.setBackgroundColor(serverListItem.getSwatchColor());
             nameLabelWidget.setText(serverListItem.getName());
             nameLabelWidget.setTextColor(serverListItem.getTextColor());
             itemView.setBackground(serverListItem.createBackground());
         }
-
     }
 
     public static class EmptyViewHolder extends RecyclerView.ViewHolder {

@@ -2,7 +2,7 @@ var zetta = require('zetta');
 var scout = require('./scout.js');
 
 zetta()
-  .name('Stream Device Server')
+  .name('Dummy Patient')
   //.use(style)
   .use(scout)
   .listen(1337, function(){

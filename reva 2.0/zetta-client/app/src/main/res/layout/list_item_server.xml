@@ -3,22 +3,25 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
-  android:gravity="center_vertical"
-  android:orientation="horizontal"
-  android:padding="@dimen/spacing_single">
+  android:orientation="vertical"
 
-  <ImageView
-    android:id="@+id/list_item_server_swatch"
-    android:layout_width="30dip"
-    android:layout_height="30dip"
-    android:importantForAccessibility="no"
-    tools:src="@color/colorAccent" />
+  android:padding="@dimen/spacing_single">
 
   <TextView
     android:id="@+id/list_item_server_name"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+      android:textSize="20dp"
+      android:gravity="center"
     android:paddingLeft="@dimen/spacing_single"
+
     tools:text="bangalore" />
+  <TextView
+      android:layout_marginTop="8dp"
+      android:layout_width="match_parent"
+      android:layout_marginLeft="16dp"
+      android:layout_marginRight="16dp"
+      android:layout_height="1dp"
+      android:background="@color/lightGray"/>
 
 </LinearLayout>

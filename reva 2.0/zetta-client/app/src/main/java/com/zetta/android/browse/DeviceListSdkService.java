@@ -19,8 +19,10 @@ class DeviceListSdkService {
 
     @NonNull private final ZettaSdkApi zettaSdkApi;
     @NonNull private final DeviceList.Parser deviceListParser;
+    private String serverName; // this is a hotfix
 
-    public DeviceListSdkService() {
+    public DeviceListSdkService(String serverName) {
+        this.serverName = serverName; // this is a hotfix
         zettaSdkApi = ZettaSdkApi.INSTANCE;
         deviceListParser = new DeviceList.Parser(new ZettaStyle.Parser(), new ActionListItemParser());
     }
@@ -29,7 +31,7 @@ class DeviceListSdkService {
     public List<ListItem> getListItems(@NonNull String url) {
         zettaSdkApi.registerRoot(url);
         List<ZIKServer> zikServers = zettaSdkApi.getServers();
-        return deviceListParser.createListItems(zikServers);
+        return deviceListParser.createListItems(zikServers, serverName); // this is a hotfix
     }
 
     @NonNull

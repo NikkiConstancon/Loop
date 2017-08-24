@@ -92,8 +92,7 @@
                 android:paddingBottom="16dp"
                 android:paddingTop="16dp"
 
-
-                android:inputType="textWebEmailAddress"
+                android:inputType="textPassword"
                 android:textColor="@color/colorPrimaryText"
                  />
             </android.support.design.widget.TextInputLayout>

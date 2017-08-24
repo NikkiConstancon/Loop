@@ -15,6 +15,9 @@ import android.widget.Toast;
 import com.zetta.android.R;
 
 import android.os.Handler;
+
+import org.json.JSONException;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,15 +100,15 @@ public class login_activity extends AppCompatActivity {
                  * wanted to demonstrate what parameter we were using "MainActivity.this" for as
                  * clear as possible.
                  */
-                Context context = login_activity.this;
 
-
-
-                ServerComms server = new ServerComms(context);
+                ServerComms server = new ServerComms(login_activity.this);
                 String serverURI = "http://" + getString(R.string.serverURL) + ":8080/login";
                 //if (attemptLogin()) {
-                    Intent intent =  new Intent(context, MainActivity.class);
+                        //HOTFIX FROM HERE
+                    Intent intent =  new Intent(login_activity.this, MainActivity.class);
+                    intent.putExtra("Username", user.getText().toString());
                     startActivity(intent);
+                        //HOTFIX FROM HERE
                 //}
 
                 //TODO: do this thing
@@ -179,19 +182,19 @@ public class login_activity extends AppCompatActivity {
             Matcher m2 = p2.matcher(pass);
 
             TextInputLayout til;
-            if (!m.find())
+            /*if (!m.find())
             {
                 til = (TextInputLayout)    findViewById(R.id.login_email_label);
                 til.setErrorEnabled(true);
                 til.setError("Type in your email address");
-            }
+            }*/
             if(!m2.find())
             {
                 til = (TextInputLayout)    findViewById(R.id.login_pass_label);
                 til.setErrorEnabled(true);
                 til.setError("Type in your password");
             }
-            if (m2.find() && m.find())
+            if (m2.find() )//&& m.find() hotfix
             {
                 //validation happens here
                 return true;

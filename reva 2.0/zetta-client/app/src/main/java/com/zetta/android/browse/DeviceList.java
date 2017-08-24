@@ -54,21 +54,28 @@ class DeviceList {
          * @return returns a list of all servers and devices with styling
          */
         @NonNull
-        public List<ListItem> createListItems(@NonNull List<ZIKServer> servers) {
+        public List<ListItem> createListItems(@NonNull List<ZIKServer> servers, String name) {
             List<ListItem> items = new ArrayList<>();
+            boolean hasServer = false; //hotfix
             for (ZIKServer server : servers) {
-                ZettaStyle serverStyle = zettaStyleParser.parseStyle(server);
-                //items.add(createServerListItem(serverStyle, server)); DOESNT SHOW SERVER INFO ANYMORE
+                if (server.getName().equals(name)) { //hotfix
+                    ZettaStyle serverStyle = zettaStyleParser.parseStyle(server);
+                    items.add(createServerListItem(serverStyle, server)); //DOESNT SHOW SERVER INFO ANYMORE
 
-                List<ZIKDevice> zikDevices = server.getDevices();
+                    List<ZIKDevice> zikDevices = server.getDevices();
 
-                if (zikDevices.isEmpty()) {
-                    items.add(createEmptyServerListItem(serverStyle));
-                } else {
-                    for (ZIKDevice device : zikDevices) {
-                        items.add(createDeviceListItem(server, device));
+                    if (zikDevices.isEmpty()) {
+                        items.add(createEmptyServerListItem(serverStyle));
+                    } else {
+                        for (ZIKDevice device : zikDevices) {
+                            items.add(createDeviceListItem(server, device));
+                        }
                     }
+                    //hasServer = true;
                 }
+            }
+            if (!hasServer) {// hotfix
+                // Don't know what to do here
             }
 
             return items;

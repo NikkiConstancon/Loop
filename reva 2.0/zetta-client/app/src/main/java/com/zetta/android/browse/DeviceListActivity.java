@@ -1,5 +1,7 @@
 package com.zetta.android.browse;
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +23,7 @@ import com.zetta.android.ImageLoader;
 import com.zetta.android.ListItem;
 import com.zetta.android.R;
 import com.zetta.android.ZettaDeviceId;
+import com.zetta.android.device.DeviceDetailsActivity;
 import com.zetta.android.device.actions.OnActionClickListener;
 import com.zetta.android.settings.SdkProperties;
 
@@ -38,6 +41,9 @@ public class DeviceListActivity extends Fragment {
     static {
         Log.setShowLogs(BuildConfig.DEBUG);
     }
+    public static void onBackgroundTaskDataObtained(String URL) {
+
+    }
 
     private DeviceListService deviceListService;
     private DeviceListAdapter adapter;
@@ -46,22 +52,30 @@ public class DeviceListActivity extends Fragment {
     private BottomSheetBehavior<? extends View> bottomSheetBehavior;
     private QuickActionsAdapter quickActionsAdapter;
     private SwipeRefreshLayout pullRefreshWidget;
+    private static SdkProperties sdkProperties;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.device_list_activity, container, false);
         super.onCreate(savedInstanceState);
-        SdkProperties sdkProperties = SdkProperties.newInstance(getActivity());
+        sdkProperties = SdkProperties.newInstance(getActivity());
 
-        String serverURI = "http://" + getString(R.string.serverURL) + ":8080/patient-info";
-        ServerComms server = new ServerComms(DeviceListActivity.this.getContext());
-        server.execute(serverURI);
+        MainActivity activity = (MainActivity) getActivity();
+        String myDataFromActivity = activity.getUser();
 
-        DeviceListSdkService sdkService = new DeviceListSdkService();
+        String serverURI = getString(R.string.serverURL) + ":1337";
+        sdkProperties.setUrl(serverURI);
+        Log.d("data", myDataFromActivity);
+        DeviceListSdkService sdkService = new DeviceListSdkService(myDataFromActivity); // this is a hotfix
+
+
+
+        //ServerComms server = new ServerComms(DeviceListActivity.this.getActivity());
+        //server.execute(serverURI);
+
+        //while (server.getStatus() != AsyncTask.Status.FINISHED){} // Spin while getting server URL
         deviceListService = new DeviceListService(sdkProperties, sdkService);
-
-
         emptyLoadingWidget = (EmptyLoadingView) view.findViewById(R.id.device_list_empty_view);
         adapter = new DeviceListAdapter(new ImageLoader(), onDeviceClickListener);
         deviceListWidget = (RecyclerView) view.findViewById(R.id.device_list);
@@ -92,9 +106,9 @@ public class DeviceListActivity extends Fragment {
     @NonNull private final DeviceListAdapter.OnDeviceClickListener onDeviceClickListener = new DeviceListAdapter.OnDeviceClickListener() {
         @Override
         public void onDeviceClick(@NonNull ZettaDeviceId deviceId) {
-//            Intent intent = new Intent(getActivity(), DeviceDetailsActivity.class);
-//            intent.putExtra(DeviceDetailsActivity.KEY_DEVICE_ID, deviceId);
-//            startActivity(intent);
+            Intent intent = new Intent(getActivity(), DeviceDetailsActivity.class);
+            intent.putExtra(DeviceDetailsActivity.KEY_DEVICE_ID, deviceId);
+            startActivity(intent);
             Log.d("Clicked", "Clicked the device");
         }
 
