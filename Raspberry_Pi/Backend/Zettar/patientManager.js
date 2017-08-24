@@ -225,12 +225,18 @@ var patientManager = module.exports = {
                     if (err || !found) {
                         logger.error('email registration failed could not find: ' + who.Username)
                         reject(err)
-                    } else if (found.RegistrationObject.k1 === key1 && found.RegistrationObject.k2 === key2) {
-                        dbMan.models.instance.patient.update(who, { RegistrationObject: { c: 'registered' } }, function (err) {
-                            if (err) { console.log(err); reject(err) } else { resolve(found)}
-                        })
                     } else {
-                        reject('mismatched keys')
+                        if (found.RegistrationObject.k2 === key2) {
+                            dbMan.models.instance.patient.update(who, { RegistrationObject: { c: 'registered' } }, function (err) {
+                                if (err) { console.log(err); reject(err) } else { resolve('sucsess') }
+                            })
+                        } else if (found.RegistrationObject.k3 === key2){
+                            dbMan.models.instance.patient.update(who, { RegistrationObject: { c: 'declined' } }, function (err) {
+                                if (err) { console.log(err); reject(err) } else { resolve('declined') }
+                            })
+                        } else {
+                            reject('mismatched keys')
+                        }
                     }
                 })
             }).catch((err) => {

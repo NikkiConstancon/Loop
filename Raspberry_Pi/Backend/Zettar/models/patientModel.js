@@ -88,8 +88,8 @@ class PatientModel extends userModel.class {
                 default: function () {
                     const dbMan = require('../databaseManager')
                     var name = this.Username;
-                    var context = { c: 'sending', k1: keys.userEmailEncrypt(name), k2: uuidv1() }
-                    mailer.mailEmialConfirmationUrl(this.Email, context.k1, context.k2).then(function () {
+                    var context = { c: 'sending', k1: keys.userEmailEncrypt(name), k2: uuidv1(), k3: uuidv1() }
+                    mailer.mailEmialConfirmationUrl(this.Email, context.k1, context.k2, context.k3, name).then(function () {
                         context.c = 'awaiting'
                         dbMan.models.instance.patient.update({ Username: name }, { RegistrationObject: context });
                     }).catch(function (e) {

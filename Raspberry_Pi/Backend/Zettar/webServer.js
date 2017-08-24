@@ -15,8 +15,12 @@ authGuard.initApp(app)
 authGuard.get('/email-confirmation', { web: authGuard.webClass.lowest }, function (req, res, next) {
     var PatientManager = require('./patientManager');
     const querystring = require('querystring')
-    PatientManager.validateEmail(querystring.unescape(req.query.a), querystring.unescape(req.query.b)).then(function () {
-        res.status(200).send('hi there')
+    PatientManager.validateEmail(querystring.unescape(req.query.a), querystring.unescape(req.query.b)).then(function (got) {
+        if (got === 'declined') {
+            res.status(200).send('declined')
+        } else if (got === 'sucsess'){
+            res.status(200).send('sucsessfully registered')
+        }
     }).catch(function (e) {
         res.status(400).send(e)
     })
@@ -54,7 +58,16 @@ wss.whoAmI = function (options) {
     return 'ws://' + authorization + wssRoot 
 }
 
-server.listen(8080, '127.0.0.1', function (err) {
+
+var port = 8080
+var listenAddress = '197.242.150.255'
+if (process.argv.indexOf('--test') >= 0) {
+    listenAddress = '127.0.0.1'
+    console.log('webServer initialized in testing mode, using link address [' + listenAddress + ']')
+}
+
+
+server.listen(8080, listenAddress, function (err) {
     err && console.log(err)
     wssRoot = server.address().address + (server.address().port !== 80 ? ':' + server.address().port : '')
 
