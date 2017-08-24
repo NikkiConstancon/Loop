@@ -1,4 +1,4 @@
-package com.zetta.android;
+package com.zetta.android.browse;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -61,18 +61,20 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
     protected Boolean doInBackground(String... params) {
         HttpURLConnection urlConnection;
 
-
-
         String uri = params[0]; // 192.168.1.103
         Log.d("uri", uri);
+
         JSONObject obj = new JSONObject();
-        for (int i = 1; i < params.length-1; i=i+2) {
-            try {
-                obj.put(params[i], params[i+1]);
-            } catch (JSONException e) {
-                e.printStackTrace();
+        if (params.length != 1) {
+            for (int i = 1; i < params.length-1; i=i+2) {
+                try {
+                    obj.put(params[i], params[i+1]);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
+
         Log.d("obj", obj.toString());
 
         try {
@@ -86,17 +88,18 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
             urlConnection.setRequestProperty("Accept", "application/json");
             if (msCookieManager.getCookieStore().getCookies().size() > 0) {
                 urlConnection.setRequestProperty(COOKIE, TextUtils.join(";", msCookieManager.getCookieStore().getCookies()));
-
             }
 
             urlConnection.setRequestMethod("POST");
 
             //Write
-            OutputStream outputStream = urlConnection.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-            writer.write(obj.toString());
-            writer.close();
-            outputStream.close();
+            if (obj.length() != 0) {
+                OutputStream outputStream = urlConnection.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+                writer.write(obj.toString());
+                writer.close();
+                outputStream.close();
+            }
 
             urlConnection.connect();
 
@@ -143,14 +146,19 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean result) {
         progressDialog.dismiss();
-        if (result) {
-            Intent intent =  new Intent(context, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+        if (context instanceof login_activity) {
+            if (result) {
+                Intent intent =  new Intent(context, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            } else {
+                String message = "Incorrect user credentials";
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+            }
         } else {
-            String message = "Incorrect user credentials";
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+            //TODO: handle the result here
         }
+
 
     }
 }

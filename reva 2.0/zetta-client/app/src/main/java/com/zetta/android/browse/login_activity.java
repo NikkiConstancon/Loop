@@ -1,27 +1,19 @@
 package com.zetta.android.browse;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.zetta.android.R;
-import com.zetta.android.ServerComms;
 
-import java.util.concurrent.ExecutionException;
 import android.os.Handler;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,7 +69,7 @@ public class login_activity extends AppCompatActivity {
         final EditText user = (EditText) findViewById(R.id.input_emailLogin);
         final EditText passw = (EditText) findViewById(R.id.input_passwordLogin);
 
-        user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        /*user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
@@ -86,7 +78,7 @@ public class login_activity extends AppCompatActivity {
                     user.setHint("");
                 }
             }
-        });
+        });*/
 
 
         /* Setting an OnClickListener allows us to do something when this button is clicked. */
@@ -111,10 +103,13 @@ public class login_activity extends AppCompatActivity {
 
                 ServerComms server = new ServerComms(context);
                 String serverURI = "http://" + getString(R.string.serverURL) + ":8080/login";
-                //if (attemptLogin()) TODO: do this thing
-                    //server.execute(serverURI, "Username", user.getText().toString(), "Password", passw.getText().toString());
-                Intent intent =  new Intent(context, MainActivity.class);
-                startActivity(intent);
+                //if (attemptLogin()) {
+                    Intent intent =  new Intent(context, MainActivity.class);
+                    startActivity(intent);
+                //}
+
+                //TODO: do this thing
+                //server.execute(serverURI, "Username", user.getText().toString(), "Password", passw.getText().toString());
 
             }
         });

@@ -1,23 +1,16 @@
 package com.zetta.android.browse;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -28,7 +21,6 @@ import com.zetta.android.ImageLoader;
 import com.zetta.android.ListItem;
 import com.zetta.android.R;
 import com.zetta.android.ZettaDeviceId;
-import com.zetta.android.device.DeviceDetailsActivity;
 import com.zetta.android.device.actions.OnActionClickListener;
 import com.zetta.android.settings.SdkProperties;
 
@@ -61,6 +53,11 @@ public class DeviceListActivity extends Fragment {
         View view = inflater.inflate(R.layout.device_list_activity, container, false);
         super.onCreate(savedInstanceState);
         SdkProperties sdkProperties = SdkProperties.newInstance(getActivity());
+
+        String serverURI = "http://" + getString(R.string.serverURL) + ":8080/patient-info";
+        ServerComms server = new ServerComms(DeviceListActivity.this.getContext());
+        server.execute(serverURI);
+
         DeviceListSdkService sdkService = new DeviceListSdkService();
         deviceListService = new DeviceListService(sdkProperties, sdkService);
 

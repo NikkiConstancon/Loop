@@ -63,10 +63,6 @@
       android:text="BPM"
       tools:text="BPM"/>
 
-
-
-
-
 </LinearLayout>
   <TextView
       android:layout_width="match_parent"

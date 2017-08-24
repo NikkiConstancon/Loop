@@ -74,7 +74,7 @@
             <TextView
                 android:layout_gravity="bottom"
                 android:layout_marginLeft="5dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="8dp"
                 android:textSize="16dp"
                 android:id="@+id/units_simple_stat"
                 android:textColor="@color/colorSecondaryText"

@@ -29,7 +29,7 @@
             >
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="55dp"
 
                 android:orientation="horizontal"
 
@@ -62,7 +62,7 @@
                         android:id="@+id/stat_subtitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Last week"
+                        tools:text="Last week\nSomegords"
                         android:text="Last week"
                         android:textSize="14sp"/>
                 </LinearLayout>
@@ -75,11 +75,7 @@
                 android:layout_marginRight="16dp"
                 android:layout_height="200dp">
             </com.github.mikephil.charting.charts.LineChart>
-            <TextView
-                android:layout_width="match_parent"
 
-                android:layout_height="1dp"
-                android:background="@color/lightGray"/>
             <Button
                 android:layout_width="100dp"
                 android:layout_height="50dp"

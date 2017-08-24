@@ -16,6 +16,7 @@
 package com.zetta.android.browse;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -123,7 +125,7 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
     }
-
+    ImageLoader imageLoader = new ImageLoader();
     /**
      * This method simply returns the number of items to display. It is used behind the scenes
      * to help layout our Views and for animations.
@@ -141,11 +143,12 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     class NumberViewHolder extends RecyclerView.ViewHolder {
 
         //private final
-        ImageLoader imageLoader;
+
         @NonNull private final TextView stat_simple;
         @NonNull private final TextView units_simple_stat;
         @NonNull private final TextView stat_title;
         @NonNull private final TextView stat_subtitle;
+        @NonNull private final ImageView stateImageWidget;
 
         /**
          * Constructor for our ViewHolder. Within this constructor, we get a reference to our
@@ -161,6 +164,7 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             units_simple_stat = (TextView) itemView.findViewById(R.id.units_simple_stat);
             stat_title = (TextView) itemView.findViewById(R.id.stat_title);
             stat_subtitle = (TextView) itemView.findViewById(R.id.stat_subtitle);
+            stateImageWidget = (ImageView) itemView.findViewById(R.id.list_item_device_state_image);
         }
 
         /**
@@ -173,6 +177,8 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             units_simple_stat.setText("" + item.getUnits());
             stat_title.setText("" + item.deviceName + " " + item.getStatName());
             stat_subtitle.setText("Start: " + item.getStart() +"\nEnd:   " + item.getEnd());
+            if (item.getImgURL() != "")
+                imageLoader.load(Uri.parse(item.getImgURL()), stateImageWidget);
         }
     }
 
@@ -180,9 +186,9 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * Cache of the children views for the graphs
      */
     class GraphViewHolder extends RecyclerView.ViewHolder {
-        TextView stat_title;
-        TextView stat_subtitle;
-        ImageLoader imageLoader;
+        @NonNull private final TextView stat_title;
+        @NonNull private final TextView stat_subtitle;
+        @NonNull private final ImageView stateImageWidget;
 
         LineChart chart;
 
@@ -196,12 +202,16 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             chart = (LineChart) itemView.findViewById(R.id.line_chart);
             stat_subtitle = (TextView) itemView.findViewById(R.id.stat_subtitle);
             stat_title = (TextView) itemView.findViewById(R.id.stat_title);
+            stateImageWidget = (ImageView) itemView.findViewById(R.id.list_item_device_state_image);
         }
 
         void bind(GraphStatItem item) {
 
             stat_title.setText(item.getDeviceName() + " " + item.getStatName());
             stat_subtitle.setText("Start: " + item.getStart() +"\nEnd:   " + item.getEnd());
+            if (item.getImgURL() != "")
+                imageLoader.load(Uri.parse(item.getImgURL()), stateImageWidget);
+
             List<Entry> entries = new ArrayList<Entry>();
             for (int i = 0; i < item.getEntries().size(); i++) {
                 entries.add(new Entry(item.getEntries().get(i).x(), item.getEntries().get(i).y()));

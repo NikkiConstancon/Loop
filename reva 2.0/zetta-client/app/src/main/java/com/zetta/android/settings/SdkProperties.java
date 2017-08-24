@@ -41,6 +41,10 @@ public class SdkProperties {
         return "http://" + serverURL + ":1337";
     } // THE SERVER: http://iomt.dedicated.co.za:3009
 
+    public void setUrl(String URL) {
+        serverURL = URL;
+    }
+
     public boolean useMockResponses() {
         return sharedPreferences.getBoolean(mockResponsesKey, false);
     }

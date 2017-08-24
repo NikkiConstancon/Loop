@@ -55,6 +55,10 @@ public class StatFragment extends android.support.v4.app.Fragment
         cards.add(new GraphStatItem("Heart-rate", "", "line-graph", timeStamp, timeStamp, "BPM", entries ));
         // MOCK DATA ENDS HERE
 
+        cards.add(new SimpleStatItem("This thing", "http://i.imgur.com/R9xBixo.png", "average", timeStamp, timeStamp, "D", 57.34 ));
+        cards.add(new SimpleStatItem("That thing", "", "min", timeStamp, timeStamp, "C", 27.34 ));
+        cards.add(new SimpleStatItem("That one", "http://i.imgur.com/R9xBixo.png", "max", timeStamp, timeStamp, "C", 67.34 ));
+
         statList = (RecyclerView) view.findViewById(R.id.stats_list);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
