@@ -1,7 +1,6 @@
-﻿
-
-
-
+﻿/**
+ * @file Encryption keys used throughout the program
+ */
 
 var keys = module.exports  = require("crypto-js");
 

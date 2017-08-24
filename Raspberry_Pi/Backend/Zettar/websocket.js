@@ -1,4 +1,9 @@
-﻿const WebSocket = require('ws');
+﻿/**
+ * @fileOverview
+ * This file contains a simple webSocket server for future development and testing
+ **/
+
+const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({ port: 8080 });
 

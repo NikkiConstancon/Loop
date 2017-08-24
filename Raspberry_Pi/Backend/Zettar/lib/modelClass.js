@@ -1,4 +1,12 @@
-﻿function myArryConcat(arr1, arr2) {
+﻿/**
+ * @file
+ * This file contains a class to enable database model inheritance
+ **/
+
+/**
+ *@brief turn an oject into an array
+ */
+function myArryConcat(arr1, arr2) {
     for (var i in arr2) {
         if (arr1.indexOf(arr2[i]) === -1) {
             arr1.push(arr2[i])

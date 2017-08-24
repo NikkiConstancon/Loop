@@ -1,3 +1,10 @@
+/**
+ * @file
+ * This file is residual and may be removed from the repository
+ * though it comes in handy at times to quickly test a new idea
+ **/
+
+
 // var dbManager = require("./databaseManager");
 // var dbManager1 = require("./dataManager");
 var PatientManager = require("./patientManager");

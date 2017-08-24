@@ -1,4 +1,10 @@
-﻿//NOTE: module.exports is at end of file
+﻿/**
+ * @file
+ * This file hooks the Zetta server to allow collection of streamed data to enable data persistence in the database.
+ */
+
+
+//NOTE: module.exports is at end of file
 var sharedKeys = require('../../Shared/sharedKeys')
 var logger = require('../revaLog')
 
@@ -15,27 +21,29 @@ function Hook(zetta) {
 }
 //--------------------methods--------------------
 
-///wrapper for #listenZettaUpdates
-///@brief regester handelers for spesific device values, use as zetta's server.where clause to define query
-///@arg args {
-///  topicName (non optional): value to hook
-///  where (optional object): the server.where claus for the query
-///}
-///@arg cb (non optional): the callback to bind in the form: function(info, data){}
-///@arg errcb (optional): an error callback if invalid topicName was passed
-///
-///@example 
-///    hook.registerStreamListener({
-///        topicName: 'value',
-///            where: { type: 'state_machine', name: 'heart_monitor' },
-///        cb: function (info, data) {
-///            console.log(info)
-///            console.log(data)
-///        },
-///        errcb: function (e) {
-///            console.log(e)
-///        }
-///    })
+/**
+ *wrapper for #listenZettaUpdates
+ *@brief regester handelers for spesific device values, use as zetta's server.where clause to define query
+ *@arg args {
+ *  topicName (non optional): value to hook
+ *  where (optional object): the server.where claus for the query
+ *}
+ *@arg cb (non optional): the callback to bind in the form: function(info, data){}
+ *@arg errcb (optional): an error callback if invalid topicName was passed
+ *
+ *@example 
+ *    hook.registerStreamListener({
+ *        topicName: 'value',
+ *            where: { type: 'state_machine', name: 'heart_monitor' },
+ *        cb: function (info, data) {
+ *            console.log(info)
+ *            console.log(data)
+ *        },
+ *        errcb: function (e) {
+ *            console.log(e)
+ *        }
+ *    })
+ **/
 Hook.prototype.registerStreamListener = function (args) {
     this.streamListenerArr.push(args)
     return this

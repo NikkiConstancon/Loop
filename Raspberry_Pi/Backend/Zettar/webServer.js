@@ -1,4 +1,12 @@
-﻿
+﻿/**
+ * @file
+ * This file boots up the Webserver that is responsible of receiving requests from the android client
+ * and then preforming the intended procurers and serving the appropriate response.
+ *
+ * @arg --test is a stdin argument that will activate the testing suit intertwined within  most modules
+ * @arg --test-keepAlive is a stdin argument that will prevent the server from killing itestlf after execution
+ * @arg --test-drop is a stdin argument that will cause the database to be automatically dropped after execution
+ **/
 
 const url = require('url');
 
@@ -11,6 +19,13 @@ var sharedKeys = require('../Shared/sharedKeys')
 
 var app = express()
 
+
+/**
+ * @brief
+ * connect the procudure to the server that will handle client email validation
+ *
+ * @precondition [none] This resource is available to all
+ */
 authGuard.initApp(app)
 authGuard.get('/email-confirmation', { web: authGuard.webClass.lowest }, function (req, res, next) {
     var PatientManager = require('./patientManager');
@@ -25,6 +40,15 @@ authGuard.get('/email-confirmation', { web: authGuard.webClass.lowest }, functio
         res.status(400).send(e)
     })
 })
+
+
+/**
+ * @brief
+ * connect the procudure to the server that will handle patient information. The information served
+ * will include the Zettarlet URI and the avialible devices.
+ *
+ * @precondition This resour is guarded and requiers normal system authentication to be accessed
+ */
 authGuard.get('/patient-info', { web: authGuard.webClass.authenticated }, function (req, res, next) {
     var patientManager = require("./patientManager");
     try {
@@ -39,15 +63,15 @@ authGuard.get('/patient-info', { web: authGuard.webClass.authenticated }, functi
     }
 })
 
-
-
-
-
+//initalization of the server
 var transport = 'http'
 server = module.exports = require(transport).createServer(app);
 const WebSocket = require('ws');
 const wss = module.exports.wss = new WebSocket.Server({ server });
 var wssRoot
+/**
+ * @return the the websocket's address that is currently listening on the machine
+ */
 wss.whoAmI = function (options) {
     var authorization = ''
     if (options) {
@@ -59,6 +83,9 @@ wss.whoAmI = function (options) {
 }
 
 
+/**
+ * @brief get stdin paramters for testing to listen on local host
+ */
 var port = 8080
 var listenAddress = '197.242.150.255'
 if (process.argv.indexOf('--test') >= 0) {
@@ -66,7 +93,9 @@ if (process.argv.indexOf('--test') >= 0) {
     console.log('webServer initialized in testing mode, using link address [' + listenAddress + ']')
 }
 
-
+/**
+ * @brief start the web server
+ */
 server.listen(8080, listenAddress, function (err) {
     err && console.log(err)
     wssRoot = server.address().address + (server.address().port !== 80 ? ':' + server.address().port : '')

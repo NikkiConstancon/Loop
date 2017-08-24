@@ -1,3 +1,9 @@
+/**
+ * @file
+ * Cassandra database model that describes the User schema
+ * It also defines some methods to pe performed on Users
+ **/
+
 var Model = require('../lib/modelClass')
 
 const badWords = require('bad-words')

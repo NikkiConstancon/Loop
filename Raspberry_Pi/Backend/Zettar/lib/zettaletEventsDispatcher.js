@@ -1,4 +1,7 @@
-﻿
+﻿/**
+ * @file
+ * This is a test file in development that will dispatch events from the server to the client
+ */
 const webSockMessenger = require('./webSockMessenger')
 
 

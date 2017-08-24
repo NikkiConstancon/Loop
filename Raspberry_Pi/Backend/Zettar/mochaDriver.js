@@ -1,4 +1,16 @@
-﻿///Using mocha programmatically
+﻿/**
+ * @file
+ * This file drives all tests. It will load all files located in the test folder and execute them one by
+ * one using the mocha unit testing framework. Additional processes have been added to make sure that the
+ * database connects before tests are executed, such that premature timeouts are prevented
+ *
+ * @arg --test is a stdin argument that will activate the testing suit intertwined within  most modules
+ * @arg --test-keepAlive is a stdin argument that will prevent the server from killing itestlf after execution
+ * @arg --test-drop is a stdin argument that will cause the database to be automatically dropped after execution
+ */
+
+
+///Using mocha programmatically
 ///https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically
 
 process.argv.push('--test')//emulate arguments
@@ -16,6 +28,9 @@ mocha.timeout(2000)
 var testDir = './test'
 
 
+/**
+ * @brief setup the stdin arugments
+ */
 var willDrop = false
 if (process.argv.indexOf('--test-drop') != -1) {
     willDrop = true
@@ -39,7 +54,9 @@ fs.readdirSync(testDir).filter(function(file){
     );
 });
 
-
+/**
+ * @brief try to connect to the DB and then run the tests at success
+ */
 logger.info('connectig to Cassandra')
 dbMan.try().then(function () {
     logger.level = 'warn';

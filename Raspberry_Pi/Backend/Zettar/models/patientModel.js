@@ -1,3 +1,10 @@
+/**
+ * @file
+ * Cassandra database model that describes the Patient schema
+ * It also defines some methods to pe performed  on patients
+ **/
+
+
 var util = require('util')
 var uuidv1 = require('uuid/v1')
 

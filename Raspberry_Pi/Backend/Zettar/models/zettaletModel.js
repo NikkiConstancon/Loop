@@ -1,4 +1,9 @@
-﻿var Model = require('../lib/modelClass')
+﻿/**
+ * @file
+ * Cassandra database model that describes the Zettalet schema
+ **/
+
+var Model = require('../lib/modelClass')
 
 class ZettaletModel extends Model {
     constructor() {

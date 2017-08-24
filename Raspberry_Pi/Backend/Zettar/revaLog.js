@@ -1,12 +1,17 @@
-﻿//levels: { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
+﻿/**
+ * This file is used to log all errors and transport the text to stdout and a rotating file for
+ * future error tracing and systems analysis
+ *
+ *@enum levels: { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
+ **/
+
+
 var winston = require('winston');
 require('winston-daily-rotate-file');
 var cassandra = require('winston-cassandra').Cassandra;
 
 
 module.exports = winston;
-
-
 winston.level = 'debug';
 
 

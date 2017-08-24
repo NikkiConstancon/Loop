@@ -1,4 +1,12 @@
-﻿const logger = require('../revaLog')
+﻿/**
+ * @fileOverview
+ * That that will allow bidirectional multiplexed communications between the client and the server.
+ * The mediator design pattern is implemented, with the intent is to provide a common platform for
+ * message passing where other modules may implement concrete classes to consume and send messages
+ * across the global system.
+ */
+
+const logger = require('../revaLog')
 const server = require('../webServer')
 
 
@@ -20,7 +28,18 @@ var connecttors = {}
 var closeors = {}
 var subscribers = {}
 var requiered = ['connect', 'close', 'sub']
+/**
+ * @class This class enables sending of messages between  the client and server via a single socket
+ * 
+ * @brief it is a event emmiter pattern that will emit messages to all corresponding  attached messenger protocols
+ */
 const webSockMessenger = module.exports = {
+    /**
+     *@brief attach a series of protocols to be run at client connection, disconnection and messaging
+     *
+     *@param key {sting} is the key to be bound for all procedure clusters
+     *@param options {[function]} is the procedure clusters
+     **/
     attach: function (key, options) {
         if (key === undefined || options == undefined) {
             throw new Error('@webSockMessenger#attach: key or options are not defied')
@@ -55,7 +74,10 @@ function getGreeting() {
     })
 }
 
-
+/**
+ * 
+ * @param {any} field is a filed
+ */
 function parseAuthorizationHeader(field) {
     return new Promise(function (res, rej) {
         if (!field) {
@@ -72,7 +94,10 @@ function parseAuthorizationHeader(field) {
     })
 }
 
-
+/**
+ * 
+ * @param {any} ws is the websocket
+ */
 function authorizeAsync(ws) {
     return new Promise(function (res, rej) {
         return parseAuthorizationHeader(ws.upgradeReq.headers.authorization).then(function (auth) {
@@ -93,7 +118,9 @@ function authorizeAsync(ws) {
 
 
 
-
+/**
+ *@brief attach all the procedure clusters at client connection
+ **/
 wss.on('connection', function connection(ws) {
     authorizeAsync(ws).then(function (param) {
         var ws = param.ws

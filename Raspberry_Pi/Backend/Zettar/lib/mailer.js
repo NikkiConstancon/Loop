@@ -1,4 +1,11 @@
-﻿const querystring = require('querystring')
+﻿/**
+ * @file
+ * This file contains modules and helper utility functions to enable mailing emails to new registered users.
+ *
+ * @todo add functionality to send notifications triggered by events
+ */
+
+const querystring = require('querystring')
 
 var uuid1 = require('uuid/v1')
 var nodemailer = require('nodemailer')
@@ -18,9 +25,20 @@ var transporter = nodemailer.createTransport({
 })
 
 
-
+/**
+ * @class wrapper for email related funcitons
+ */
 var Mailer = module.exports = {
     mailEmialConfirmationUrlPath: '/email-confirmation',
+    /**
+     *@brief send an account calidation email
+     *
+     *@param to the email to send to
+     *@param keyA the necrypted usernam to validate
+     *@param keyB the accept uuid
+     *@parma keyC the decile uuid
+     *@param fullName the name of the user
+     **/
     mailEmialConfirmationUrl: function (to, keyA, keyB, keyC, fullName) {
         pendingSends++
         

@@ -1,3 +1,10 @@
+/**
+ * @file
+ * Test the database singleton patient manager
+ *
+ * @notice logging  is turned off to avid collision with mocha test output
+ **/
+
 var chai = require('chai');
 var expect = chai.expect;
 var assert = chai.assert;

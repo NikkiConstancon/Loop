@@ -1,4 +1,11 @@
-﻿var chai = require('chai');
+﻿/**
+ * @file
+ * Test the webserver's webSocket module that is used for notifications and messaging
+ *
+ * @notice logging  is turned off to avid collision with mocha test output
+ **/
+
+var chai = require('chai');
 var request = require('request').defaults({ jar: true })
 var uuidv1 = require('uuid/v1')
 var expect = chai.expect

@@ -1,7 +1,16 @@
+/**
+ * @fileOverview
+ * The entry point for the node program, where the Zetta server is initialized to allow Zettalets
+ * a connection. This file also starts up the Webserver to allow the android application to make requests.
+ *
+ * @arg --test is a stdin argument that will activate the testing suit intertwined within  most modules
+ * @arg --test-keepAlive is a stdin argument that will prevent the server from killing itestlf after execution
+ * @arg --test-drop is a stdin argument that will cause the database to be automatically dropped after execution
+ **/
+
 
 var zetta = require('zetta');
 var url = require('url');
-// var display = require('./display.js');
 
 require('./webServer')
 var sharedKeys = require('../Shared/sharedKeys')
@@ -18,8 +27,8 @@ var patientDataManager = require("./patientDataManager");
 //  the listen call is deferred to the hook
 var initializedZetta = zetta('peers').name('Zettar')
 
-var callback = function(info, data){
-   // patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
+var callback = function (info, data) {
+    // patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
 
 }
 
@@ -71,7 +80,7 @@ var hook = new Hook(initializedZetta)
     })
     .registerStreamListener({
         topicName: 'concentration',
-        where: { type: 'glucose-meter'},
+        where: { type: 'glucose-meter' },
         cb: callback,
         errcb: function (e) {
             console.log(e)
@@ -79,7 +88,7 @@ var hook = new Hook(initializedZetta)
     })
     .registerStreamListener({
         topicName: 'concentration',
-        where: { type: 'insulin-pump'},
+        where: { type: 'insulin-pump' },
         cb: callback,
         errcb: function (e) {
             console.log(e)
@@ -87,10 +96,9 @@ var hook = new Hook(initializedZetta)
     })
     .registerStreamListener({
         topicName: 'temperature',
-        where: { type: 'thermometer'},
+        where: { type: 'thermometer' },
         cb: callback,
         errcb: function (e) {
             console.log(e)
         }
     })
-  

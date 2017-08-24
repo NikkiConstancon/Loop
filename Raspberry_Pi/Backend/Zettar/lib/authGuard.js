@@ -1,4 +1,11 @@
-﻿
+﻿/**
+ * @file
+ * This file contains utility functions and classes that guards the webserver from unauthorized access.
+ * The webserver initializes the authGuard module to circumvent request and process them before allowing
+ * resource retrieval and process execution
+ */
+
+
 var dbMan = require('../databaseManager');
 var PatientManager = require('../patientManager');
 var mailer = require('./mailer')
@@ -14,8 +21,14 @@ var webClass = {
     root: 1
 }
 
-
+/**
+ * @class that guards the webserver from unauthorized access
+ */
 var authGuard = module.exports = {
+    /**
+     *@param app is used in the same way node express modules are linked to a server
+     *@return an authGuard instance to allow chaining
+     **/
     initApp: function (app) {
         authGuard.app = app
         var session = require('express-session')
@@ -32,6 +45,7 @@ var authGuard = module.exports = {
             extended: true
         }));
 
+        //NB: this function will be called with every startup
         app.use(bootstrapSession)
 
 
@@ -125,21 +139,24 @@ function bootstrapSession(req, res, next) {
     req.revaUser = new UserSession(req)
     req.revaUser.context.lastUrl = req.path
 
-    /*var arr = [];
-    for (var c in authClassMap) {
-        arr.push(c)
-    }
-    const loop = function (i) {
-        if (i >= arr.length) { return }
-        if (pathAuthMap[req.path]) {
-            return new Promise(function (resolve, reject) {
-                return authClassMap[c](resolve, reject, req, res)
-            }).then(function () {
-                next()
-            }).catch(function () { loop(i + 1)})
-        }
-    }
-    loop(0)*/
+
+    /**@example
+     *
+     *var arr = [];
+     *for (var c in authClassMap) {
+     *    arr.push(c)
+     *}
+     *const loop = function (i) {
+     *    if (i >= arr.length) { return }
+     *    if (pathAuthMap[req.path]) {
+     *        return new Promise(function (resolve, reject) {
+     *            return authClassMap[c](resolve, reject, req, res)
+     *        }).then(function () {
+     *            next()
+     *        }).catch(function () { loop(i + 1)})
+     *    }
+     *}
+     *loop(0)*/
     var arr = [];
     for (var c in authClassMap) {
         arr.push(c)
