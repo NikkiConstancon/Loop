@@ -9,7 +9,8 @@
     "zetta-glucose-meter-mock-driver": "~0.0.3",
     "zetta-insulin-pump-mock-driver": "~0.0.1",
     "zetta-mock-heartbeat-sensor": "~0.4.0",
-    "zetta-thermometer-mock-driver": "~0.1.1"
+    "zetta-thermometer-mock-driver": "~0.1.1",
+    "crypto-js":"*"
   },
   "devDependencies": {},
   "scripts": {

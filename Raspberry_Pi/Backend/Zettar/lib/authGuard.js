@@ -1,4 +1,11 @@
-﻿
+﻿/**
+ * @file
+ * This file contains utility functions and classes that guards the webserver from unauthorized access.
+ * The webserver initializes the authGuard module to circumvent request and process them before allowing
+ * resource retrieval and process execution
+ */
+
+
 var dbMan = require('../databaseManager');
 var PatientManager = require('../patientManager');
 var mailer = require('./mailer')
@@ -14,8 +21,14 @@ var webClass = {
     root: 1
 }
 
-
+/**
+ * @class that guards the webserver from unauthorized access
+ */
 var authGuard = module.exports = {
+    /**
+     *@param app is used in the same way node express modules are linked to a server
+     *@return an authGuard instance to allow chaining
+     **/
     initApp: function (app) {
         authGuard.app = app
         var session = require('express-session')
@@ -32,6 +45,7 @@ var authGuard = module.exports = {
             extended: true
         }));
 
+        //NB: this function will be called with every startup
         app.use(bootstrapSession)
 
 
@@ -45,11 +59,10 @@ var authGuard = module.exports = {
         app.post('/registration', function (req, res, next) {
             req.revaUser.signup(req, res, next)
         })
-        authGuard.bindAuthResolver('web', function (resolve, reject, req, res) {
+        authGuard.bindAuthResolver('web', function (resolve, reject, req, authRes) {
             var authObj = pathAuthMap[req.path]
             //must explisitly define lower level at path to pass
             if (!authObj) {
-                res.status(401).send('')
                 reject()
             } else {
                 var level = webClass.lowest
@@ -57,7 +70,7 @@ var authGuard = module.exports = {
                     level = req.revaUser.context.webAuthLevel
                 }
                 if (authObj.web && authObj.web < level) {
-                    res.status(401).send('login required')
+                    authRes.content = { status: 401, send: 'login required' }
                     reject()
                 } else {
                     resolve()
@@ -126,18 +139,57 @@ function bootstrapSession(req, res, next) {
     req.revaUser = new UserSession(req)
     req.revaUser.context.lastUrl = req.path
 
+
+    /**@example
+     *
+     *var arr = [];
+     *for (var c in authClassMap) {
+     *    arr.push(c)
+     *}
+     *const loop = function (i) {
+     *    if (i >= arr.length) { return }
+     *    if (pathAuthMap[req.path]) {
+     *        return new Promise(function (resolve, reject) {
+     *            return authClassMap[c](resolve, reject, req, res)
+     *        }).then(function () {
+     *            next()
+     *        }).catch(function () { loop(i + 1)})
+     *    }
+     *}
+     *loop(0)*/
     var arr = [];
     for (var c in authClassMap) {
         arr.push(c)
     }
+
+    function authResponse() {
+        var storeKey = Symbol()
+        this[storeKey] = { contentSet: false, content: { status: 401, send: 'access denied' }}
+        Object.defineProperty(this, 'content', {
+            get: function () { return this[storeKey].content },
+            set: function (value) {
+                if (!this[storeKey].contentSet) {
+                    this[storeKey].contentSet = true
+                    this[storeKey].content = value
+                }
+            }
+        })
+    }
+
+    var obj = new authResponse()
     const loop = function (i) {
-        if (i >= arr.length) { return }
-        if (pathAuthMap[req.path]) {
+        if (i >= arr.length) {
+            res.status(obj.content.status).send(obj.content.send)
+            res.end()
+        } else if (pathAuthMap[req.path]) {
             return new Promise(function (resolve, reject) {
-                return authClassMap[c](resolve, reject, req, res)
+                return authClassMap[c](resolve, reject, req, obj)
             }).then(function () {
                 next()
-            }).catch(function () { loop(i + 1)})
+            }).catch(function () { loop(i + 1) })
+        } else {
+            res.status(obj.content.status).send(obj.content.send)
+            res.end()
         }
     }
     loop(0)
@@ -148,10 +200,21 @@ function UserSession(req) {
     this.context.requestCount++;
 }
 UserSession.createContext = function () {
-    return { webAuthLevel: webClass.lowest, requestCount: 0 };
+    return {
+        webAuthLevel: webClass.lowest,
+        requestCount: 0,
+        username: undefined
+    };
 }
 UserSession.prototype.signup = function (req, res, next) {
-
+    if (!req.body.Username) {
+        res.status(422).send(JSON.stringify({ error_head: 'Username' }))
+        return
+    }
+    if (!req.body.Password) {
+        res.status(422).send(JSON.stringify({ error_head: 'Password' }))
+        return
+    }
     //TODO: Move to patiantManager
     function deserialize(body) {
         var test = require('../models/patientModel').fields
@@ -165,18 +228,25 @@ UserSession.prototype.signup = function (req, res, next) {
         }
     }
     deserialize(req.body)
-
-    PatientManager.addPatient(req.body).then(function (pat) {
-        res.status(201).send('user created')
-    }).catch(function (e) {
-        res.status(422).send(e)
-    })
+    PatientManager.getPatient(req.body)
+        .then(function () {
+            res.status(422).send(JSON.stringify({ error: req.body.Username + ' is already taken' }))
+        }).catch(function () {
+            return PatientManager.addPatient(req.body).then(function (pat) {
+                res.status(201).send(JSON.stringify({ success:'user created'}))
+            }).catch(function (e) {
+                res.status(422).send(e.message || e)
+            })
+        }).catch(function (e) {
+            res.status(500)
+        })
 }
 UserSession.prototype.login = function (req, res, next) {
     var self = this;
     PatientManager.getPatient({ Username: req.body.Username }).then(function (pat) {
         if (pat.verifyPassword(req.body.Password)) {
             self.context.webAuthLevel = webClass.authenticated;
+            self.context.username = req.body.Username
             res.status(200).send('login successful');
             next()
         } else {

@@ -1,3 +1,12 @@
+/**
+ * @file
+ * This file contained the singleton database manager that will provide a single point 
+ * to the database for continence and better error handling
+ *
+ * @arg --test will initiate the database on the testing keyspace [test] to avoid 
+ * collision with the production keyspace [reva]
+ **/
+
 var models = require('express-cassandra');
 var logger = require('./revaLog');
 
@@ -58,6 +67,12 @@ var self = module.exports = {
             }
         })
     },
+    getKeyspcaeName: function () {
+        return keyspace
+    },
+    /**
+     * @brief drop the test keyspace and exit the program
+     **/
     dropTestKyespaceAndExit: function (exitParam) {
         var exit = function () {
             if (exitParam) {
@@ -126,32 +141,32 @@ models.setDirectory(modelsDir).bind(
 );
 
 
-
-//example usage
-/*
-function t() {
-    var john = new models.instance.users({
-        name: "John1",
-        surname: "Doe",
-        age: 32,
-        test: 'oops!'
-    });
-    john.save(function (err) {
-        if (err) {
-            console.log(err);
-            return;
-        }
-
-
-        models.instance.users.findOne({ name: 'John1' }, function (err, john) {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            //Note that returned variable john here is an instance of your model,
-            //so you can also do john.delete(), john.save() type operations on the instance.
-            console.log('Found ' + john.name + ' to be ' + john.age + ' years old!');
-        });
-    });
-};
-*/
+/**
+ *@example usage
+ *
+ *function t() {
+ *    var john = new models.instance.users({
+ *        name: "John1",
+ *        surname: "Doe",
+ *        age: 32,
+ *        test: 'oops!'
+ *    });
+ *    john.save(function (err) {
+ *        if (err) {
+ *            console.log(err);
+ *            return;
+ *        }
+ *
+ *
+ *        models.instance.users.findOne({ name: 'John1' }, function (err, john) {
+ *            if (err) {
+ *                console.log(err);
+ *                return;
+ *            }
+ *            //Note that returned variable john here is an instance of your model,
+ *            //so you can also do john.delete(), john.save() type operations on the instance.
+ *            console.log('Found ' + john.name + ' to be ' + john.age + ' years old!');
+ *        });
+ *    });
+ *};
+ **/

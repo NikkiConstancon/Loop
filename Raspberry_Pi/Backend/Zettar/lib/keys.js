@@ -1,7 +1,6 @@
-﻿
-
-
-
+﻿/**
+ * @file Encryption keys used throughout the program
+ */
 
 var keys = module.exports  = require("crypto-js");
 
@@ -10,6 +9,10 @@ module.exports.userEmailEncrypt = function (val) {
     return keys.AES.encrypt(val, keys.userEmail).toString()
 }
 module.exports.userEmailDecrypt = function (k) {
-    return keys.AES.decrypt(k.toString(), keys.userEmail).toString(keys.enc.Utf8)
+    try {
+        return keys.AES.decrypt(k.toString(), keys.userEmail).toString(keys.enc.Utf8)
+    } catch (e){
+        return '-'
+    }
 }
 

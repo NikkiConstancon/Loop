@@ -1,3 +1,10 @@
+/**
+ * @file
+ * Cassandra database model that describes the Patient schema
+ * It also defines some methods to pe performed  on patients
+ **/
+
+
 var util = require('util')
 var uuidv1 = require('uuid/v1')
 
@@ -39,6 +46,9 @@ class PatientModel extends Model {
             SubscriberList: {
                 type: "list",
                 typeDef: "<text>"
+            },
+            ZettaletUuid: {
+                type: 'text'
             },
             Email: {
                 type: "text",
@@ -92,8 +102,8 @@ class PatientModel extends Model {
                 default: function () {
                     const dbMan = require('../databaseManager')
                     var name = this.Username;
-                    var context = { c: 'sending', k1: keys.userEmailEncrypt(name), k2: uuidv1() }
-                    mailer.mailEmialConfirmationUrl(this.Email, context.k1, context.k2).then(function () {
+                    var context = { c: 'sending', k1: keys.userEmailEncrypt(name), k2: uuidv1(), k3: uuidv1() }
+                    mailer.mailEmialConfirmationUrl(this.Email, context.k1, context.k2, context.k3, name).then(function () {
                         context.c = 'awaiting'
                         dbMan.models.instance.patient.update({ Username: name }, { RegistrationObject: context });
                     }).catch(function (e) {

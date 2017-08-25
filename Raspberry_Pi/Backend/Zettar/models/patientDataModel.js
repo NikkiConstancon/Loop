@@ -1,3 +1,8 @@
+/**
+ * @file
+ * Cassandra database model that describes the PatientData schema
+ **/
+
 module.exports = {
     fields:{
         PatientUsername    : "text",

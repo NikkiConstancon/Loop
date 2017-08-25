@@ -1,6 +1,15 @@
+/**
+ * @file
+ * Test the database singleton patient manager
+ *
+ * @notice logging  is turned off to avid collision with mocha test output
+ **/
+
 var chai = require('chai');
 var expect = chai.expect;
 var assert = chai.assert;
+
+var uuidv1 = require('uuid/v1')
 
 var dbMan = require('../databaseManager');
 var PatientManager = require('../patientManager');
@@ -51,6 +60,7 @@ module.exports = {
 }
 */
 
+var userName = 'Patient ' + uuidv1()
 
 describe('PatientManager', function () {
     describe('database CRUD', function () {
@@ -58,7 +68,7 @@ describe('PatientManager', function () {
             it('adds a patient to the db', function () {
                 return PatientManager
                     .addPatient({ 
-                        Username: 'Username_test',
+                        Username: userName,
                         Password: CryptoJS.AES.encrypt('Password', patientKey).toString(),
                         AccessPassword: CryptoJS.AES.encrypt('AccessPassword', accessKey).toString(),
                         SubscriberList : ['g@g.com'],
@@ -70,7 +80,7 @@ describe('PatientManager', function () {
                         Reason : 'Disability'})
                     .then((_patient) => {
                         if(_patient != null){
-                            expect(_patient.Username).to.equal('Username_test');
+                            expect(_patient.Username).to.equal(userName);
                             expect(typeof _patient.Password).to.equal('string');
                             expect(typeof _patient.AccessPassword).to.equal('string');
                             expect(typeof _patient.SubscriberList).to.equal('object');
@@ -99,22 +109,31 @@ describe('PatientManager', function () {
     })
     describe('Email validation', function () {
         var poll = function () {
-            return PatientManager.getPatient({ Username: 'Username_test' }).then(function (pat) {
-                if (pat.RegistrationObject.c !== 'sending') {
-                    return PatientManager.validateEmail(pat.RegistrationObject.k1, pat.RegistrationObject.k2).then(function (pat) {
-                        return PatientManager.getPatient({ Username: 'Username_test' }).then(function (pat) {
-                            expect(pat.RegistrationObject.c).to.equal('registered')
-                            expect(pat.RegistrationObject.k1).to.equal(undefined)
-                            expect(pat.RegistrationObject.k2).to.equal(undefined)
+            return PatientManager.getPatient({ Username: userName }).then(function (pat) {
+                if (pat) {
+                    if (pat.RegistrationObject.c !== 'sending') {
+                        var check = (pat.RegistrationObject.c !== 'registered')
+                        return PatientManager.validateEmail(pat.RegistrationObject.k1, pat.RegistrationObject.k2).then(function (pat) {
+                            return PatientManager.getPatient({ Username: userName }).then(function (pat) {
+                                if (check) {
+                                    expect(pat.RegistrationObject.c).to.equal('registered')
+                                    expect(pat.RegistrationObject.k1).to.equal(undefined)
+                                    expect(pat.RegistrationObject.k2).to.equal(undefined)
+                                } else {
+                                    assert(false, 'ALREADY REGISTERED')
+                                }
+                            })
                         })
-                    })
+                    } else {
+                        return new Promise(function (res, rej) {
+                            setTimeout(function () { res() }, 1000)
+                        }).then(poll);
+                    }
                 } else {
-                    return new Promise(function (res, rej) {
-                        setTimeout(function () { res() },1000)
-                    }).then(poll);
+                    assert(false, 'could not get patient to send email')
                 }
             })
         }
-        it('test transition from <sending> to <awaiting> lastly <registered>', poll)
+        it('test transition from <sending> to <awaiting> lastly <registered>', poll).timeout(12000)
     })
 })
