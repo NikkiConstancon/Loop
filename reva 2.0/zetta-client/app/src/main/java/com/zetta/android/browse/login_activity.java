@@ -37,6 +37,9 @@ public class login_activity extends AppCompatActivity {
     private Button registerButton;
     private boolean exit = false;
 
+    /**
+     * Overridden back button press to allow for accidental back presses
+     */
     @Override
     public void onBackPressed()
     {

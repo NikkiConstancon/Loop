@@ -40,6 +40,10 @@ public class MainActivity extends AppCompatActivity
 
     private String zettaUser;
 
+    /**
+     * Main activity that allows for tab functionality and switching of views
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -91,10 +95,18 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Function to get user from server
+     * @return a user from the server
+     */
     public String getUser() {
         return zettaUser;
     }
 
+    /**
+     * Method that sets up tab titles
+     * @param viewPager the pager of the views to be tabbed
+     */
     private void setupViewPager(ViewPager viewPager)
     {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());

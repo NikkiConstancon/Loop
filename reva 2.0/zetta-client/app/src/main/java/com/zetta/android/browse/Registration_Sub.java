@@ -18,6 +18,11 @@ import com.zetta.android.R;
  */
 
 public class Registration_Sub extends AppCompatActivity {
+
+    /**
+     * Overridden on create view to load activity_register_continue_subscriber view
+     * @param savedInstanceState saved instance of view state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,6 +130,9 @@ public class Registration_Sub extends AppCompatActivity {
         }
     };
 
+    /**
+     * Method that completes the subscriber registration process (Validation and intent change)
+     */
     public void registerSub()
     {
         EditText text = (EditText) findViewById(R.id.input_whoSub);

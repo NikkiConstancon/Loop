@@ -19,6 +19,13 @@ public class notifications extends android.support.v4.app.Fragment
     public static final String Tag = "notificationsFragment";
     private Button btnTest;
 
+    /**
+     * Overridden view creator for the notifications section
+     * @param inflater the inflater of the view
+     * @param container the container of the view
+     * @param savedInstanceState the saved instance of the view
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -35,8 +42,15 @@ public class notifications extends android.support.v4.app.Fragment
         return view;
     }
 
+    /**
+     * The default constructor
+     */
     public notifications(){}
 
+    /**
+     * Overridden on activity create method to create appropriate notification view
+     * @param savedInstanceState
+     */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
