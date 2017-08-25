@@ -1,4 +1,11 @@
-﻿var chai = require('chai');
+/**
+ * @file
+ * Test the database singleton user manager
+ *
+ * @notice logging  is turned off to avid collision with mocha test output
+ **/
+
+var chai = require('chai');
 var expect = chai.expect;
 var assert = chai.assert;
 
@@ -14,32 +21,24 @@ describe('UserManager', function () {
         describe('#addUser', function () {
             it('adds a user to the db', function () {
                 return UserManager
-                    .addUser({ name: 'name-test', surname: 'surname-test', age: 100 })
+                    .addUser({ Username: 'name-test', Surname: 'surname-test', Password:'paas', Age: 100 })
                     .then((user) => {
-                        expect(user.name).to.equal('name-test');
-                        expect(user.surname).to.equal('surname-test');
-                        expect(user.age).to.equal(100);
+                        var test = user.getName()
+                        expect(user.Username).to.equal('name-test');
+                        expect(user.Surname).to.equal('surname-test');
+                        expect(user.Age).to.equal(100);
                     })
-            })
-            it('fails if that a passed primary key is invalid', function () {
-                return UserManager
-                    .addUser({ surname: 'surname-test', age: 100 })
-                    .then(function () {
-                        assert(false, 'Unexpected success')
-                    })
-                }, function (err) {
-                    //expect(err).to.be.an.instanceof(Error)
             })
         })
 
-        describe('#getUser', function () {
-            it('gets a user from the db', function () {
+        describe("#getUser", function () {
+            it("gets a user from the db", function () {
                 return UserManager
                     .getUser('name-test')
                     .then((user) => {
-                        expect(user.name).to.equal('name-test');
-                        expect(user.surname).to.equal('surname-test');
-                        expect(user.age).to.equal(100);
+                        expect(user.Username).to.equal('name-test');
+                        expect(user.Surname).to.equal('surname-test');
+                        expect(user.Age).to.equal(100);
                     })
             })
         })

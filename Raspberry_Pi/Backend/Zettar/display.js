@@ -1,4 +1,6 @@
-
+/**
+ * @file This file is residual and may be removed from the reposotory
+ */
 var zetta = require('./node_modules/zetta/lib/pubsub_service.js');
 
 module.exports = function(server){

@@ -1,8 +1,14 @@
+/**
+ * @file
+ * Cassandra database model that describes the PatientData schema
+ **/
+
 module.exports = {
     fields:{
-        patientName    : "text",
-        device : "text",
-        time     : "int"
+        PatientUsername    : "text",
+        DeviceID : "text",
+        TimeStamp     : "timestamp",
+	Value : "float"
     },
-    key:["patientName"]
+    key:["TimeStamp","PatientUsername","DeviceID"]
 }

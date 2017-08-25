@@ -28,6 +28,19 @@
 #Zetta
 *.peers
 *.devices
-
+.DS_STORE
 node_modules
 
+
+
+
+
+#Marthinus's work space
+Raspberry_Pi/Backend/Zettalet/.vs/
+Raspberry_Pi/Backend/Zettalet/Zettalet.njsproj
+Raspberry_Pi/Backend/Zettalet/Zettalet.njsproj.user
+Raspberry_Pi/Backend/Zettalet/Zettalet.sln
+Raspberry_Pi/Backend/Zettar/.vs/
+Raspberry_Pi/Backend/Zettar/Zettar.njsproj
+Raspberry_Pi/Backend/Zettar/Zettar.njsproj.user
+Raspberry_Pi/Backend/Zettar/Zettar.sln

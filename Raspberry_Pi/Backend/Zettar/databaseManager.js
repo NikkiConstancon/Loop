@@ -1,3 +1,12 @@
+/**
+ * @file
+ * This file contained the singleton database manager that will provide a single point 
+ * to the database for continence and better error handling
+ *
+ * @arg --test will initiate the database on the testing keyspace [test] to avoid 
+ * collision with the production keyspace [reva]
+ **/
+
 var models = require('express-cassandra');
 var logger = require('./revaLog');
 
@@ -7,7 +16,7 @@ var dbHostPort = 9042;
 var keyspace = 'reva';
 
 const MAX_GLOBAL_TRY_FAILS = 1;
-const MAX_TRYS = 10;
+const MAX_TRYS = 16;
 const TRYS_INTERVALS = 1000;
 var globalTryFails = 0;
 
@@ -17,42 +26,79 @@ var self = module.exports = {
     models: models,///expose express-cassandra
     connected: false,///set to true if connected
 
-    ///The function passed will only exicute if a connection is established.
-    ///if not initally connected, intermidiate checks will be made to test if a connection has been made
-    /// for a maximum number of 'MAX_TRYS'
-    ///if 'MAX_TRYS' is reached and the error callback 'errorcb' was defined, then 'errorcb' will be called.
-    try: function(fun) {
-        var maxFailHandeler = function () {
-            logger.error('databaseManager:try max fails encountered. TODO: notify tech support');
-        }
-        var context = {};
-        var args = arguments;
-        if (!self.connected) {
-            if (globalTryFails < MAX_GLOBAL_TRY_FAILS) {
-                var tiks = MAX_TRYS;
-                var timeoutFun = function () {
-                    logger.debug('databaseManager:try tick');
-                    if (!self.connected) {
-                        if (tiks-- > 0) {
-                            setTimeout(timeoutFun, TRYS_INTERVALS);
-                        } else {
-                            globalTryFails++;
-                            !(globalTryFails < MAX_GLOBAL_TRY_FAILS) && maxFailHandeler();
-                            logger.error('databaseManager:try failed, global fail count: ' + globalTryFails);
-                            if (context.errorcb) {
-                                context.errorcb();
+    /**
+    @brief: as a promise, will ensure a connectd db. Will make @param retry number of attempts to connect if no connection
+        is established
+    @TODO: handle faliurs, e.g. notify tech support etc.
+    @return: a promise
+    **/
+    try: (retry, intervals) => {
+        return new Promise(function (resolve, reject) {
+            var maxFailHandeler = function () {
+                msg = '#databaseManager#try max fails encountered. TODO: notify tech support';
+                logger.error(msg)
+                reject(msg)
+            }
+            if (!self.connected) {
+                if (globalTryFails < MAX_GLOBAL_TRY_FAILS) {
+                    var tiks = retry || MAX_TRYS
+                    var timeoutFun = function () {
+                        logger.debug('#databaseManager#try tick')
+                        if (!self.connected) {
+                            if (tiks-- > 0) {
+                                setTimeout(timeoutFun, TRYS_INTERVALS)
+                            } else {
+                                globalTryFails++
+                                !(globalTryFails < MAX_GLOBAL_TRY_FAILS) && maxFailHandeler()
+                                var msg = '#databaseManager#try failed, global fail count: ' + globalTryFails;
+                                logger.error(msg)
+                                reject(msg)
                             }
+                        } else {
+                            resolve(self)
                         }
-                    } else {
-                        fun(args);
-                    }
-                };
-                setTimeout(timeoutFun, TRYS_INTERVALS);
+                    };
+                    setTimeout(timeoutFun, intervals || TRYS_INTERVALS)
+                } else {
+                    maxFailHandeler()
+                }
             } else {
-                maxFailHandeler();
+                resolve(self)
+            }
+        })
+    },
+    getKeyspcaeName: function () {
+        return keyspace
+    },
+    /**
+     * @brief drop the test keyspace and exit the program
+     **/
+    dropTestKyespaceAndExit: function (exitParam) {
+        var exit = function () {
+            if (exitParam) {
+                process.exit(exitParam)
+            } else {
+                process.exit()
             }
         }
-        return context;
+        if (keyspace === 'test') {
+            const cassandra = require('cassandra-driver')
+            var client = new cassandra.Client({ contactPoints: dbHostAddress, keyspace: keyspace, socketOptions:{readTimeout: 10 } })
+            client.connect(function (err, result) {
+                if (err) {
+                    //logger.error(err)
+                    exit()
+                } else {
+                    client.execute('drop keyspace ' + keyspace).then(function () {
+                        //logger.debug('here')
+                        exit()
+                    }).catch(function (e) {
+                        //logger.error(e)
+                        exit()
+                    })
+                }
+            })
+        }
     }
 };
 
@@ -86,7 +132,7 @@ models.setDirectory(modelsDir).bind(
         }
     },
     function(err) {
-        if (err) logger.error(err.message);
+        if (err) logger.error('#DatabaseManager: ls' + err.message);
         else {
             self.connected = true;
             logger.info('Cassandra connect to ' + dbHostAddress + ':' + dbHostPort + ' timeuuid:', models.timeuuid());
@@ -95,32 +141,32 @@ models.setDirectory(modelsDir).bind(
 );
 
 
-
-//example usage
-/*
-function t() {
-    var john = new models.instance.users({
-        name: "John1",
-        surname: "Doe",
-        age: 32,
-        test: 'oops!'
-    });
-    john.save(function (err) {
-        if (err) {
-            console.log(err);
-            return;
-        }
-
-
-        models.instance.users.findOne({ name: 'John1' }, function (err, john) {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            //Note that returned variable john here is an instance of your model,
-            //so you can also do john.delete(), john.save() type operations on the instance.
-            console.log('Found ' + john.name + ' to be ' + john.age + ' years old!');
-        });
-    });
-};
-*/
+/**
+ *@example usage
+ *
+ *function t() {
+ *    var john = new models.instance.users({
+ *        name: "John1",
+ *        surname: "Doe",
+ *        age: 32,
+ *        test: 'oops!'
+ *    });
+ *    john.save(function (err) {
+ *        if (err) {
+ *            console.log(err);
+ *            return;
+ *        }
+ *
+ *
+ *        models.instance.users.findOne({ name: 'John1' }, function (err, john) {
+ *            if (err) {
+ *                console.log(err);
+ *                return;
+ *            }
+ *            //Note that returned variable john here is an instance of your model,
+ *            //so you can also do john.delete(), john.save() type operations on the instance.
+ *            console.log('Found ' + john.name + ' to be ' + john.age + ' years old!');
+ *        });
+ *    });
+ *};
+ **/

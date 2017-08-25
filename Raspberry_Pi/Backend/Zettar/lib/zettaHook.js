@@ -1,4 +1,11 @@
-﻿//NOTE: module.exports is at end of file
+﻿/**
+ * @file
+ * This file hooks the Zetta server to allow collection of streamed data to enable data persistence in the database.
+ */
+
+
+//NOTE: module.exports is at end of file
+var sharedKeys = require('../../Shared/sharedKeys')
 var logger = require('../revaLog')
 
 //====================BEGIN CLASS Hook====================
@@ -14,27 +21,29 @@ function Hook(zetta) {
 }
 //--------------------methods--------------------
 
-///wrapper for #listenZettaUpdates
-///@brief regester handelers for spesific device values, use as zetta's server.where clause to define query
-///@arg args {
-///  topicName (non optional): value to hook
-///  where (optional object): the server.where claus for the query
-///}
-///@arg cb (non optional): the callback to bind in the form: function(info, data){}
-///@arg errcb (optional): an error callback if invalid topicName was passed
-///
-///@example 
-///    hook.registerStreamListener({
-///        topicName: 'value',
-///            where: { type: 'state_machine', name: 'heart_monitor' },
-///        cb: function (info, data) {
-///            console.log(info)
-///            console.log(data)
-///        },
-///        errcb: function (e) {
-///            console.log(e)
-///        }
-///    })
+/**
+ *wrapper for #listenZettaUpdates
+ *@brief regester handelers for spesific device values, use as zetta's server.where clause to define query
+ *@arg args {
+ *  topicName (non optional): value to hook
+ *  where (optional object): the server.where claus for the query
+ *}
+ *@arg cb (non optional): the callback to bind in the form: function(info, data){}
+ *@arg errcb (optional): an error callback if invalid topicName was passed
+ *
+ *@example 
+ *    hook.registerStreamListener({
+ *        topicName: 'value',
+ *            where: { type: 'state_machine', name: 'heart_monitor' },
+ *        cb: function (info, data) {
+ *            console.log(info)
+ *            console.log(data)
+ *        },
+ *        errcb: function (e) {
+ *            console.log(e)
+ *        }
+ *    })
+ **/
 Hook.prototype.registerStreamListener = function (args) {
     this.streamListenerArr.push(args)
     return this
@@ -62,14 +71,20 @@ var dataHandelerMap = {
     '_peer/connect': function (obj) {
         //console.log(obj)
         //console.log('connect')
+
         for (var i in this.streamListenerArr) {
             var params = this.streamListenerArr[i]
             params.server = this.server
             params.from = obj.peer.name
-            listenZettaUpdates(params)
+            params.connect && params.connect(obj.peer)
+            params.cb && listenZettaUpdates(params)
         }
     },
     '_peer/disconnect': function (obj) {
+        for (var i in this.streamListenerArr) {
+            var params = this.streamListenerArr[i]
+            params.disconnect && params.disconnect(obj.peer)
+        }
         //console.log('disconnect')
         //console.log(obj)
     }
@@ -109,7 +124,7 @@ var listenZettaUpdates = function (args) {
         server.observe([server.from(from).where(where)], function (thing) {
             try {
                 //capture info
-                var info = { from: from, topicName: topicName, where: where }
+                var info = { from: sharedKeys.decrypt(from), topicName: topicName, where: where }
                 var key = buildObserveKeyForHook(thing, topicName)
                 logger.debug('#listenZettaStream: key:', key)
                 hookObserveEmiter(thing, key, function () {
