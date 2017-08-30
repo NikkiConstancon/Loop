@@ -5,21 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:text="Notifications"
-        android:layout_marginTop="150dp"
-        android:id="@+id/notificationsTabTitle"
-        tools:ignore="HardcodedText" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/notificationsButton"
-        android:text="Test3"
-        android:layout_below="@id/notificationsTabTitle"
-        tools:ignore="HardcodedText" />
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rvNotif" />
 
 </LinearLayout>
