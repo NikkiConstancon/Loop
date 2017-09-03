@@ -22,6 +22,10 @@ import java.util.regex.Pattern;
 
 public class Registration_Cont extends AppCompatActivity{
 
+    /**
+     * Overridden on create method to load register_continue view
+     * @param savedInstanceState saved instance of view state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +53,9 @@ public class Registration_Cont extends AppCompatActivity{
         });
     }
 
+    /**
+     * Method that continues the registration of patients (Validation and intent change)
+     */
     public void contPatReg()
     {
         EditText text = (EditText) findViewById((R.id.input_addr));

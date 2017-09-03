@@ -24,6 +24,10 @@ public class Registration_Patient extends AppCompatActivity{
     boolean checkedRad = false;
     boolean age = false, illness = false, accident = false, disability = false;
 
+    /**
+     * Overridden on create method to load activity_register_continue_patient view
+     * @param savedInstanceState saved instance of view state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,6 +129,9 @@ public class Registration_Patient extends AppCompatActivity{
         }
     };
 
+    /**
+     * Method that completes the patient registration process (Validation and intent change)
+     */
     public void registerPatient()
     {
 
@@ -168,19 +175,19 @@ public class Registration_Patient extends AppCompatActivity{
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
         }
-        else if(ageVal < 0 || ageVal > 130)
+        else if(ageVal < 1 || ageVal > 130)
         {
             builder1.setMessage("Age is out of bounds, please input an appropriate age.");
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
         }
-        else if(weight < 0 || weight > 600)
+        else if(weight < 1 || weight > 600)
         {
             builder1.setMessage("Weight is out of bounds, please input an appropriate weight.");
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
         }
-        else if(height < 0 || height > 3)
+        else if(height < 1 || height > 3)
         {
             builder1.setMessage("Height is out of bounds, please input an appropriate height.");
             AlertDialog alertWarning = builder1.create();
