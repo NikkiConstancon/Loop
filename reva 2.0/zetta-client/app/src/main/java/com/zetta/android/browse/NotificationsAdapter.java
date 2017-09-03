@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,10 +20,7 @@ import com.zetta.android.R;
 
 import java.util.List;
 
-import static android.R.color.holo_red_light;
-import static android.R.color.tertiary_text_dark;
 import static android.graphics.Color.BLACK;
-import static android.graphics.Color.MAGENTA;
 import static android.graphics.Color.TRANSPARENT;
 
 /**
@@ -91,15 +89,28 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         notifViewHolder.notifTitle.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
         notifViewHolder.notifContent.setText(notifs.get(position).getNoteContent());
         notifViewHolder.img.setImageResource(notifs.get(position).getImageSource());
-        notifViewHolder.cardView.setBackgroundColor(notifs.get(position).getSeverity());
+
+        GradientDrawable shape = new GradientDrawable();
+        shape.setCornerRadius(15);
+        shape.setColor(notifs.get(position).getSeverity());
+        shape.setStroke(2, Color.parseColor("#38ACEC"));
 
         notifViewHolder.advice.setText("Get Advice");
+        notifViewHolder.advice.setTextColor(Color.parseColor("#FFFFFF"));
 
-        notifViewHolder.cardView.setCardElevation(4);
-        notifViewHolder.cardView.setRadius(20);
+        notifViewHolder.cardView.setBackground(shape);
 
         notifViewHolder.close.setText("X");
         notifViewHolder.close.setBackgroundColor(TRANSPARENT);
+
+        notifViewHolder.advice.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                Toast.makeText(myCont,"No advice for this notification" ,Toast.LENGTH_SHORT).show();
+            }
+        });
 
         notifViewHolder.close.setOnClickListener(new View.OnClickListener()
         {
@@ -110,10 +121,9 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
                 notifyItemRemoved(position);
 
-
                 notifyItemRangeChanged(position, notifs.size());
 
-                Toast.makeText(myCont,"Removed notification" ,Toast.LENGTH_SHORT).show();
+                Toast.makeText(myCont,"Removed notification " + position + "size: " + notifs.size() ,Toast.LENGTH_SHORT).show();
             }
         });
     }

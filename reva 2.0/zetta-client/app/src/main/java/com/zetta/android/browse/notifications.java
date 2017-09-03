@@ -64,6 +64,8 @@ public class notifications extends android.support.v4.app.Fragment
         list.add(new NotificationsObject("Heart Rate", "ReVA has detected strong deviations from the norm. Please contact a medical professional immediately.", R.drawable.ic_heart, RED));
         list.add(new NotificationsObject("Temperature", "ReVA has detected moderate deviations from the norm. Consider contacting a medical professional.", R.drawable.ic_notifications_black_24dp, YELLOW));
         list.add(new NotificationsObject("Glucose", "ReVA has detected slight deviations from the norm. Please check on the patient.", R.drawable.ic_settings_black_24dp, GREEN));
+        list.add(new NotificationsObject("Glucose", "ReVA has detected strong deviations from the norm. Please contact a medical professional immediately.", R.drawable.ic_dashboard_black_24dp, RED));
+        list.add(new NotificationsObject("Glucose", "ReVA has detected moderate deviations from the norm. Consider contacting a medical professional.", R.drawable.ic_help_black_24dp, YELLOW));
     }
 
     /**
