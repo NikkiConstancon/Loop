@@ -60,7 +60,7 @@ class DeviceList {
             for (ZIKServer server : servers) {
                 if (server.getName().equals(name)) { //hotfix
                     ZettaStyle serverStyle = zettaStyleParser.parseStyle(server);
-                    items.add(createServerListItem(serverStyle, server)); //DOESNT SHOW SERVER INFO ANYMORE
+                    items.add(createServerListItem(serverStyle, server));
 
                     List<ZIKDevice> zikDevices = server.getDevices();
 
@@ -71,11 +71,14 @@ class DeviceList {
                             items.add(createDeviceListItem(server, device));
                         }
                     }
-                    //hasServer = true;
+                    hasServer = true;
                 }
             }
-            if (!hasServer) {// hotfix
-                // Don't know what to do here
+
+
+            if (!hasServer && !servers.isEmpty()) {// hotfix
+                ZettaStyle serverStyle = zettaStyleParser.parseStyle(servers.get(0));
+                items.add(createEmptyServerListItem(serverStyle));
             }
 
             return items;

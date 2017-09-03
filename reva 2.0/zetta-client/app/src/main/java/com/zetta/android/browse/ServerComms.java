@@ -5,10 +5,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.zetta.android.R;
 import com.zetta.android.browse.MainActivity;
 
 import org.json.JSONException;
@@ -172,6 +174,13 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
             } else {
                 String message = "Incorrect user credentials";
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                TextInputLayout til = (TextInputLayout)  activity.findViewById(R.id.login_email_label);
+                til.setErrorEnabled(true);
+                til.setError("Type in your username");
+
+                til = (TextInputLayout)    activity.findViewById(R.id.login_pass_label);
+                til.setErrorEnabled(true);
+                til.setError("Type in your password");
             }
         } else {
             Log.d("result", this.result);
