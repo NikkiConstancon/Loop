@@ -108,14 +108,14 @@ public class login_activity extends AppCompatActivity {
                 String serverURI = "http://" + getString(R.string.serverURL) + ":8080/login";
                 //if (attemptLogin()) {
                         //HOTFIX FROM HERE
-                    //Intent intent =  new Intent(login_activity.this, MainActivity.class);
-                    //intent.putExtra("Username", user.getText().toString());
-                    //startActivity(intent);
+                    Intent intent =  new Intent(login_activity.this, MainActivity.class);
+                    intent.putExtra("Username", user.getText().toString());
+                    startActivity(intent);
 //                        HOTFIX FROM HERE
                 //}
 
                 //TODO: do this thing
-                server.execute(serverURI, "Username", user.getText().toString(), "Password", passw.getText().toString());
+                //server.execute(serverURI, "Username", user.getText().toString(), "Password", passw.getText().toString());
 
             }
         });

@@ -64,7 +64,7 @@ public class DeviceListActivity extends Fragment {
         MainActivity activity = (MainActivity) getActivity();
         String myDataFromActivity = activity.getUser();
 
-        String serverURI = getString(R.string.serverURL) + ":3009";
+        String serverURI = getString(R.string.serverURL) + ":1337";
         sdkProperties.setUrl(serverURI);
         Log.d("data", myDataFromActivity);
         DeviceListSdkService sdkService = new DeviceListSdkService(myDataFromActivity); // this is a hotfix

@@ -1,9 +1,13 @@
 package com.zetta.android.browse;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +23,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
+
 /**
  * Created by Hristian Vitrychenko on 11/08/2017.
  * Made to do something 22/08/2017
@@ -32,12 +38,23 @@ public class StatFragment extends android.support.v4.app.Fragment
     private StatListAdapter statListAdapter;
     private List<StatItem> cards = new ArrayList<>();
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.stat_hist_fragment, container, false);
         super.onCreate(savedInstanceState);
+        final FloatingActionButton myFab = (FloatingActionButton) view.findViewById(R.id.myFAB);
+        myFab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Snackbar.make(v, "Hello Snackbar", Snackbar.LENGTH_LONG).show();
 
+            }
+        });
+
+
+
+        //getFab(StatFragment.this.getContext(), (ViewGroup)view.getParent());
         // MOCK DATA STARTS HERE
         String timeStamp = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date());
         cards.add(new SimpleStatItem("Temperature", "http://i.imgur.com/R9xBixo.png", "average", timeStamp, timeStamp, "C", 37.34 ));
@@ -70,6 +87,12 @@ public class StatFragment extends android.support.v4.app.Fragment
         statList.setAdapter(statListAdapter);
         return view;
     }
+
+
+//    public FloatingActionButton getFab(Context context, ViewGroup parent) {
+//        LayoutInflater inflater = LayoutInflater.from(context);
+//        return (FloatingActionButton) inflater.inflate(R.layout.myfab, parent, false);
+//    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
