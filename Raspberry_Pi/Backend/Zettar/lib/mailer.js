@@ -42,7 +42,7 @@ var Mailer = module.exports = {
     mailEmialConfirmationUrl: function (to, keyA, keyB, keyC, fullName) {
         pendingSends++
         
-        var html = require('fs').readFileSync('./resources/email.html', 'utf8').toString()
+        var html = require('fs').readFileSync('../resources/email.html', 'utf8').toString()
         html = html.replace('{{fullName}}', fullName)
         html = html.replace('{{endUserAgreement}}', server.whoAmI() + '/end-user-agreement')
         html = html.replace('{{date}}', (new Date()).toString())

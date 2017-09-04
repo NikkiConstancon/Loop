@@ -63,40 +63,32 @@ var hook = new Hook(initializedZetta)
         }
     })
     .registerStreamListener({
-        topicName: 'value',
-        where: { type: 'state_machine', name: 'heart_monitor' },
+        topicName: 'vitals',
+        where: { type: 'Heart', name: 'Heart-rate' },
         cb: callback,
         errcb: function (e) {
             console.log(e)
         }
     })
     .registerStreamListener({
-        topicName: 'value',
-        where: { type: 'state_machine', name: 'temp_monitor' },
+        topicName: 'vitals',
+        where: { type: 'thermometer', name: 'Body_temperature' },
         cb: callback,
         errcb: function (e) {
             console.log(e)
         }
     })
     .registerStreamListener({
-        topicName: 'concentration',
-        where: { type: 'glucose-meter' },
+        topicName: 'vitals',
+        where: { type: 'glucose' },
         cb: callback,
         errcb: function (e) {
             console.log(e)
         }
     })
     .registerStreamListener({
-        topicName: 'concentration',
-        where: { type: 'insulin-pump' },
-        cb: callback,
-        errcb: function (e) {
-            console.log(e)
-        }
-    })
-    .registerStreamListener({
-        topicName: 'temperature',
-        where: { type: 'thermometer' },
+        topicName: 'vitals',
+        where: { type: 'insulin' },
         cb: callback,
         errcb: function (e) {
             console.log(e)
