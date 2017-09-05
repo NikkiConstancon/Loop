@@ -23,12 +23,19 @@ var mailer = require('../lib/mailer')
 var keys = require('../lib/keys')
 var logger = require('../revaLog')
 
-const userModel = require('./usersModel')
-class PatientModel extends userModel.class {
+var Model = require('../lib/modelClass')
+class PatientModel extends Model {
     constructor() {
         super()
 //-------------------------------begin fields---------------------------------//
         this.fields = {
+            Username: 'text',
+            Password: {
+                type: "text",
+                rule: {
+                    required: true
+                }
+            },
             AccessPassword: {
                 type: "text",
                 default: function () { return encrypt(uuidv1()) },
@@ -109,6 +116,7 @@ class PatientModel extends userModel.class {
             }
         }
 //-------------------------------End fields---------------------------------//
+        this.key = ["Username"]
         this.methods = {
             verifyPassword: function (value) {
                 return decrypt(this.Password) === value

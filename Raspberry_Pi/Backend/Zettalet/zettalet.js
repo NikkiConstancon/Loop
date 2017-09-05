@@ -11,7 +11,7 @@ if (process.argv.indexOf('--test') >= 0) {
 }
 
 zetta()
-    .name(require('./name'))
+    .name("nikki")//.name(require('./name'))
 	.use(scout)
 	.use(display)
     .link(linkAddress)
