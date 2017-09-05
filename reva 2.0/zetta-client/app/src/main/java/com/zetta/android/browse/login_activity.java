@@ -7,12 +7,17 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
+import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
 import android.os.Handler;
 
@@ -142,9 +147,16 @@ public class login_activity extends AppCompatActivity {
                 startActivity(intent);
                 String message = "Register clicked!";
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-
             }
         });
+        userManagerEndpoint.bind(this);
+        pulseEndpoint.bind(this);
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        pulseEndpoint.unbind(this);
+        userManagerEndpoint.unbind(this);
     }
 
     /**
@@ -205,5 +217,44 @@ public class login_activity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+
+
+    PulseEndpoint pulseEndpoint = new PulseEndpoint();
+    class PulseEndpoint extends RevaWebsocketEndpoint {
+        private final String TAG = this.getClass().getName();
+        @Override
+        public String key() {
+            return "Pulse";
+        }
+
+        public void onMessage(String message){
+            Log.i("STUFF", message );
+
+        }
+        public void onMessage(LinkedTreeMap obj){
+            Log.i("STUFF", obj.toString() );
+        }
+    }
+
+
+    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
+    class UserManagerEndpoint extends RevaWebsocketEndpoint {
+        private final String TAG = this.getClass().getName();
+        @Override
+        public String key() {
+            return "UserManager";
+        }
+        @Override
+        public void onServiceConnect(RevaWebSocketService service) {
+            String authId = service.getAuthId();
+            if(authId != null && authId.compareTo("--ANONYMOUS--") != 0) {
+                Toast.makeText(login_activity.this, "Welcome " + authId, Toast.LENGTH_SHORT).show();
+                Intent intent =  new Intent(login_activity.this, MainActivity.class);
+                intent.putExtra("Username", service.getAuthId().toString());
+                startActivity(intent);
+            }
+        }
     }
 }
