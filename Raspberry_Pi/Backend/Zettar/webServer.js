@@ -15,6 +15,11 @@ var parseurl = require('parseurl')
 var authGuard = require('./lib/authGuard')
 var sharedKeys = require('../Shared/sharedKeys')
 
+var fs = require('fs');
+var privateKey = fs.readFileSync('../Shared/reva-key.pem', 'utf8');
+var certificate = fs.readFileSync('../Shared/reva-cert.pem', 'utf8');
+var credentials = { key: privateKey, cert: certificate };
+
 
 
 var app = express()
@@ -66,6 +71,7 @@ authGuard.get('/patient-info', { web: authGuard.webClass.authenticated }, functi
 //initalization of the server
 var transport = 'http'
 server = module.exports = require(transport).createServer(app);
+module.exports.whoAmI = function (param) { return serverAmWhoAmI(param) }
 const WebSocket = require('ws');
 const wss = module.exports.wss = new WebSocket.Server({ server });
 var wssRoot
@@ -96,16 +102,34 @@ if (process.argv.indexOf('--test') >= 0) {
 /**
  * @brief start the web server
  */
-server.listen(8080, listenAddress, function (err) {
+server.listen(8080, '192.168.56.1', function (err) {
     err && console.log(err)
     wssRoot = server.address().address + (server.address().port !== 80 ? ':' + server.address().port : '')
 
-    server.whoAmI = function (path) {
+    serverAmWhoAmI = function (path) {
         return transport + '://' + server.address().address + (server.address().port !== 80 ? ':' + server.address().port : '') + (path ? path : '')
     }
     console.log('\tserver started ', server.address())
 })
+var serverAmWhoAmI = function () { return "" }
 
+
+
+
+var httpsServer = require('https').createServer(credentials, app);
+httpsServer.listen(8443);
+
+var wsss = new WebSocket.Server({
+    server: httpsServer
+});
+
+wsss.on('connection', function connection(ws) {
+    ws.on('message', function incoming(message) {
+        console.log('received: %s', message);
+    });
+
+    ws.send('something');
+});
 
 
 

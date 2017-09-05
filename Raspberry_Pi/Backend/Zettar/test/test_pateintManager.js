@@ -62,7 +62,7 @@ module.exports = {
 
 var userName = 'Patient ' + uuidv1()
 
-describe('PatientManager', function () {
+xdescribe('PatientManager', function () {
     describe('database CRUD', function () {
         describe('#addPatient', function () {
             it('adds a patient to the db', function () {
