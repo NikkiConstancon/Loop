@@ -30,9 +30,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import javax.net.ssl.SSLContext;
@@ -45,7 +47,10 @@ import javax.net.ssl.X509TrustManager;
  */
 
 public class RevaWebSocketService extends Service {
+    private final String serviceInstanceUuid = UUID.randomUUID().toString();
+    private int seviceBoundCount = 0;
     // ------------------------------ BEGIN PUBLICS -------------------------------------------
+    public static final String SERVICE_USER_MANAGER_NAME = "UserManager";
     public synchronized boolean setLogin(String authId, String password) {
         if (isConnected()) {
             revaWebSocket.close();
@@ -97,13 +102,7 @@ public class RevaWebSocketService extends Service {
 
     public static class Publisher {
         public synchronized void send(Object obj) {
-            if (!publisherMessagePoolMap.containsKey(key)) {
-                publisherMessagePoolMap.put(key, new ArrayList<Object>());
-            }
-            publisherMessagePoolMap.get(key).add(obj);
-            if (scoutThread != null) {
-                scoutThread.interrupt();
-            }
+            addToMessagePool(key, obj);
         }
 
         public synchronized void send(String key, Object obj) {
@@ -161,6 +160,15 @@ public class RevaWebSocketService extends Service {
     private SharedPreferences getPref() {
         return this.getSharedPreferences(SHARED_PREF_KEYSPACE, Context.MODE_PRIVATE);
     }
+    private static void addToMessagePool(String key, Object obj){
+        if (!publisherMessagePoolMap.containsKey(key)) {
+            publisherMessagePoolMap.put(key, new ArrayList<Object>());
+        }
+        publisherMessagePoolMap.get(key).add(obj);
+        if (scoutThread != null) {
+            scoutThread.interrupt();
+        }
+    }
 
     private final IBinder mBinder = new LocalBinder();
     //-------------------------------BEGIN OVERRIDES -------------------------
@@ -169,7 +177,6 @@ public class RevaWebSocketService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        trustAllHosts();//for now care for MAN IN THE MIDDLE
         Toast.makeText(this, "WebSocketService Started ", Toast.LENGTH_LONG).show();
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -184,15 +191,30 @@ public class RevaWebSocketService extends Service {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public synchronized IBinder onBind(Intent intent) {
         prefs = this.getSharedPreferences(SHARED_PREF_KEYSPACE, Context.MODE_PRIVATE);
+        seviceBoundCount++;
+        addToMessagePool(SERVICE_USER_MANAGER_NAME, "IPC_SEVICE_BOUND_COUNT!=0");
         return mBinder;
+    }
+    @Override
+    public synchronized boolean onUnbind(Intent intent){
+        seviceBoundCount--;
+        if(seviceBoundCount == 0) {
+            addToMessagePool(SERVICE_USER_MANAGER_NAME, "IPC_SEVICE_BOUND_COUNT=0");
+        }
+        return false;//Return true if you would like to have the service's onRebind(Intent) method later called when new clients bind to it.
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
+
+        if(revaWebSocket != null){
+            revaWebSocket.close();
+            revaWebSocket = null;
+        }
     }
 
     @Override
@@ -217,17 +239,17 @@ public class RevaWebSocketService extends Service {
     private class RevaWebSocket extends WebSocketClient {
         private RevaWebSocket(URI serverUri, Draft draft, Map<String, String> httpHeaders, int timeout) {
             super(serverUri, draft, httpHeaders, timeout);
-            Log.d(TAG, "RevaWebSocket");
+            Log.d(TAG, "--NEW-- RevaWebSocket");
         }
 
         private RevaWebSocket(URI serverURI) {
             super(serverURI);
-            Log.d(TAG, "RevaWebSocket");
+            Log.d(TAG, "--NEW-- RevaWebSocket");
         }
 
         @Override
         public void onOpen(ServerHandshake handshakedata) {
-            Log.d(TAG, "new connection opened");
+            Log.d(TAG, "--OPENED--");
             if (flagSocketConnected) {
                 revaWebSocket.close();
             }
@@ -247,7 +269,7 @@ public class RevaWebSocketService extends Service {
         public void onClose(int code, String reason, boolean remote) {
             connectionSemaphore.release();
             flagSocketConnected = false;
-            Log.d(TAG, "closed with exit code " + code + " additional info: " + reason);
+            Log.d(TAG, "--CLOSED--  code: " + code + "  info: " + reason);
 
             Bundle bundle = new Bundle();
             bundle.putString(IPC_SOCKET_CLOSED, "TODO@RevaWebService$RevaWebSocket#onClose");
@@ -258,7 +280,7 @@ public class RevaWebSocketService extends Service {
 
         @Override
         public void onMessage(String message) {
-            Log.d(TAG, "received message: " + message);
+            Log.d(TAG, "--msg--" + message);
 
             GsonBuilder builder = new GsonBuilder();
             LinkedTreeMap msgObj = (LinkedTreeMap) builder.create().fromJson(message, Object.class);
@@ -267,11 +289,16 @@ public class RevaWebSocketService extends Service {
                 if (msgObj != null) {
                     for (Object entry : msgObj.entrySet()) {
                         Map.Entry<Object, Object> pair = (Map.Entry<Object, Object>) entry;
+
+
                         ResultReceiver subscriber = subscriberReceiverMap.get(pair.getKey());
                         if (subscriber != null) {
-                            Bundle bundle = new Bundle();
-                            bundle.putString(IPC_SOCKET_MESSAGE_PULLED, pair.getValue().toString());
-                            subscriber.send(0, bundle);
+                            List messageList = (List)pair.getValue();
+                            for(Object o : messageList) {
+                                Bundle bundle = new Bundle();
+                                bundle.putString(IPC_SOCKET_MESSAGE_PULLED, o.toString());
+                                subscriber.send(0, bundle);
+                            }
                         }
                     }
                 }
@@ -283,7 +310,7 @@ public class RevaWebSocketService extends Service {
         @Override
         public void onError(Exception ex) {
             connectionSemaphore.release();
-            Log.d(TAG, "an error occurred:" + ex);
+            Log.d(TAG, "--ERROR--" + ex);
         }
     }
     // ----------------------------------- END WebSocket -------------------------------------
@@ -292,7 +319,7 @@ public class RevaWebSocketService extends Service {
     //Got from
     // https://stackoverflow.com/questions/44572162/java-websocket-cannot-resolve-setwebsocketfactory
     //https://github.com/TooTallNate/Java-WebSocket/issues/263
-    public void trustAllHosts() {
+    public void trustAllHosts(WebSocketClient client) {
         TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             public X509Certificate[] getAcceptedIssuers() {
                 X509Certificate[] myTrustedAnchors = new X509Certificate[0];
@@ -311,8 +338,8 @@ public class RevaWebSocketService extends Service {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustAllCerts, new SecureRandom());
             SSLSocketFactory factory = sslContext.getSocketFactory();
-            revaWebSocket.setSocket(factory.createSocket());
-            revaWebSocket.connectBlocking();
+            client.setSocket(factory.createSocket());
+            client.connectBlocking();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -364,8 +391,13 @@ public class RevaWebSocketService extends Service {
             if (isConnected()) {
                 revaWebSocket.close();
             }
+            boolean wasNull = revaWebSocket == null;
             revaWebSocket = buildRevaWebSocket();
+            if(wasNull){
+                //trustAllHosts(revaWebSocket);//for now care for MAN IN THE MIDDLE
+            }
             revaWebSocket.connect();
+
         } catch (InterruptedException e) {
         }
     }
@@ -401,6 +433,7 @@ public class RevaWebSocketService extends Service {
     private Map<String, String> genHeader() {
         Map<String, String> httpHeaders = new TreeMap<>();
         httpHeaders.put("Authorization", getAuthForHeader());
+        httpHeaders.put("serviceInstanceUuid",  serviceInstanceUuid);
         return httpHeaders;
     }
 

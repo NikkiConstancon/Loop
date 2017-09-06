@@ -220,7 +220,7 @@ public class Registration extends AppCompatActivity {
         @Override
         public void onServiceConnect(RevaWebSocketService service) {
             if(service.getAuthForHeader() == null) {
-                service.setLogin("--ANONYMOUS--", "");
+                //service.setLogin("--ANONYMOUS--", "");
             }
         }
     }

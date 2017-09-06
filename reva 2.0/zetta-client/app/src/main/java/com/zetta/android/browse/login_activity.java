@@ -23,6 +23,8 @@ import android.os.Handler;
 
 import org.json.JSONException;
 
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -151,12 +153,14 @@ public class login_activity extends AppCompatActivity {
         });
         userManagerEndpoint.bind(this);
         pulseEndpoint.bind(this);
+        realTimeDataEndpoint.bind(this);
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
-        pulseEndpoint.unbind(this);
         userManagerEndpoint.unbind(this);
+        pulseEndpoint.unbind(this);
+        realTimeDataEndpoint.unbind(this);
     }
 
     /**
@@ -221,6 +225,35 @@ public class login_activity extends AppCompatActivity {
 
 
 
+
+
+
+    RealTimeDataEndpoint realTimeDataEndpoint = new RealTimeDataEndpoint();
+    class RealTimeDataEndpoint extends RevaWebsocketEndpoint {
+        private final String TAG = this.getClass().getName();
+        @Override
+        public String key() {
+            return "RTDS";
+        }
+
+        public void onMessage(String message){
+            Log.i("STUFF", message );
+        }
+        public void onMessage(LinkedTreeMap obj){
+            try {
+                for (Map.Entry<String, List> entry : ((Map<String, List>) obj).entrySet()){
+                    String patientName = entry.getKey();
+                    for(Map row : (List<Map<String, Double>>)entry.getValue()){
+                        Log.i(TAG, patientName + " " + row.toString());
+                    }
+                }
+            }catch (Exception e){
+                Log.e(TAG, e.toString());
+            }
+        }
+    }
+
+
     PulseEndpoint pulseEndpoint = new PulseEndpoint();
     class PulseEndpoint extends RevaWebsocketEndpoint {
         private final String TAG = this.getClass().getName();
@@ -231,7 +264,6 @@ public class login_activity extends AppCompatActivity {
 
         public void onMessage(String message){
             Log.i("STUFF", message );
-
         }
         public void onMessage(LinkedTreeMap obj){
             Log.i("STUFF", obj.toString() );
@@ -244,7 +276,7 @@ public class login_activity extends AppCompatActivity {
         private final String TAG = this.getClass().getName();
         @Override
         public String key() {
-            return "UserManager";
+            return RevaWebSocketService.SERVICE_USER_MANAGER_NAME;
         }
         @Override
         public void onServiceConnect(RevaWebSocketService service) {

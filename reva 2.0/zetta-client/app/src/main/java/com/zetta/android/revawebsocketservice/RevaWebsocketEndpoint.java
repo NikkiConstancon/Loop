@@ -54,8 +54,16 @@ public abstract class RevaWebsocketEndpoint {
         context.unbindService(mConnection);
     }
 
+    public final void dispableEndpoint(){
+        //TODO disable streaming to this spessific endpoint
+    }
+    public final void enableEndpoint(){
+        //TODO enable streaming to this spessific endpoint
+    }
+
     public PushChainer getPushChainer(){return new PushChainer();}
     public PushChainer getPushChainer(String tag){return new PushChainer(tag);}
+
 
     public class PushChainer{
         Map<String, Object> map = new TreeMap<>();
