@@ -114,7 +114,7 @@ server.listen(8080, '192.168.56.1', function (err) {
 var serverAmWhoAmI = function () { return "" }
 
 
-
+/*
 
 var httpsServer = require('https').createServer(credentials, app);
 httpsServer.listen(8443);
@@ -133,6 +133,6 @@ wsss.on('connection', function connection(ws) {
 
 
 
-
+*/
 
 

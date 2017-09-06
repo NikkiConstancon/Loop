@@ -12,6 +12,7 @@ const server = require('../webServer')
 
 var dbMan = require('../databaseManager');
 var PatientManager = require('../patientManager');
+var uuidv1 = require('uuid/v1')
 
 
 
@@ -28,11 +29,11 @@ const patientManager = require('../patientManager')
 
 
 
+var requirePersistentLinkMap = {}//set to true if publishers' messages should be delivered even if the app is not open
 var connecttors = {}
 var closeors = {}
 var subscribers = {}
 var requiered = ['connect', 'close', 'sub']
-var publisherUserSendMap = {};
 /**
  * @class This class enables sending of messages between  the client and server via a single socket
  * 
@@ -60,9 +61,15 @@ const webSockMessenger = module.exports = {
         connecttors[key] = options.connect//functon(user, publishFun(msg, errcb)
         subscribers[key] = options.sub //funcction(user, message)
         closeors[key] = options.close//functon(user)
-        publisherUserSendMap[key] = {};
-    }
+        if (options.requirePersistentLink) {
+            requirePersistentLinkMap[key] = true
+        }
+    },
+    getUserSocketContextMap: function () { return userSocketContextMap },
+    getUserSocketContext: function (user) { return userSocketContextMap[user] }
 }
+    //keys as userId and values as {deviceUuid: userSocketContext}
+var userSocketContextMap = {}
 
 
 function parseError(key, error, message) {
@@ -84,18 +91,21 @@ function getGreeting() {
  * 
  * @param {any} field is a filed
  */
-function parseAuthorizationHeader(field) {
+function parseAuthorizationHeader(header) {
+    authField = header.authorization
+    
     return new Promise(function (res, rej) {
-        if (!field) {
-            rej(parseError('webSockMessenger', 'authorization header not set, though it is required'))
+        if (!authField) {
+            //return rej(parseError('webSockMessenger', 'authorization header not set, though it is required'))
+            res({ Username: '--ANONYMOUS--', Password: '', serviceInstanceUuid: header.serviceinstanceuuid })
         }
         try {
-            var auth = field.split(' ')
+            var auth = authField.split(' ')
             var str = new Buffer(auth[1], 'base64').toString()
             var strs = str.split(':')
-            res({ Username: strs[0], Password: strs[1] })
+            return res({ Username: strs[0], Password: strs[1], serviceInstanceUuid: header.serviceinstanceuuid })
         } catch (e) {
-            rej(parseError(parseError('webSockMessenger', e)))
+            return rej(parseError(parseError('webSockMessenger', e)))
         }
     })
 }
@@ -106,33 +116,39 @@ function parseAuthorizationHeader(field) {
  */
 function authorizeAsync(ws) {
     return new Promise(function (res, rej) {
-        return parseAuthorizationHeader(ws.upgradeReq.headers.authorization).then(function (auth) {
+        return parseAuthorizationHeader(ws.upgradeReq.headers).then(function (auth) {
+            var ret = { ws: ws, user: auth.Username, serviceInstanceUuid: auth.serviceInstanceUuid }
             if (auth.Username === "--ANONYMOUS--") {
-                return res({ ws: ws, user: auth.Username });
+                return res(ret);
             } else {
                 return patientManager.getPatient(auth).then(function (pat) {
                     if (pat.verifyPassword(auth.Password)) {
-                        res({ ws: ws, user: auth.Username })
+                        return res(ret)
                     } else {
                         rej(parseError('webSockMessenger', 'invalid password'))
                     }
                 }).catch(function (e) {
-                    rej(parseError('webSockMessenger', e))
+                    return rej(parseError('webSockMessenger', e))
                 })
             }
         }).catch(function (err) {
-            rej(err)
+            return rej(err)
         })
+    }).catch(function (err) {
+        return rej(err)
     })
 }
 
 //Constructor
-function ServicePublisher(serviceKey, userId, ws) {
+function ServicePublisher(context, serviceKey, userId, ws, connectUid) {
     var key = serviceKey
     var user = userId
     this.serviceKey = serviceKey
     this.userId = userId;
-    this.sender = function (msg, errcb) {
+
+    var queue = []
+    var timeOut = null
+    function pushMessage(msg, errcb) {
         var errcb = errcb
         msgObj = { [key]: msg }
         msg = JSON.stringify(msgObj)
@@ -141,26 +157,63 @@ function ServicePublisher(serviceKey, userId, ws) {
             ws.send(msg, errcb)
         } else {
             ws.send(msg, function (err) {
-                if (err) { logger.error('@WebSockMessenger#connection', err) }
+                if (err) {
+                    //TODO hadle these errors
+                    logger.error('@WebSockMessenger#connection', err)
+                    logger.error('@WebSockMessenger#connection msg:', msg)
+                    try {
+                        delete userSocketContextMap[user][connectUid]
+                    } catch (e) {
+                        logger.error('@WebSockMessenger#connection:delete', e)
+                    }
+                    ws.close()
+                }
             })
         }
     }
-    publisherUserSendMap[key][user] = this.sender;
-    publisherUserSendMap[key][user].user = user;
-    publisherUserSendMap[key][user].publisher = this;
-    connecttors[key](publisherUserSendMap[key][user])
+    this.publisher = function (msg, errcb) {
+        if (!ws.ipc_sevice_bound && !requirePersistentLinkMap[key]) {
+            return
+        }
+        queue.push(msg)
+        if (!timeOut) {
+            timeOut = setTimeout(function () {
+                pushMessage(queue, errcb)
+                queue = []
+                timeOut = null
+            },8)//for accumalting data befor sending
+        }
+    }
+    this.publisher.ws = ws
+    this.publisher.user = user
+    this.publisher.context = this
+    connecttors[key](this.publisher)
 }
 
+
 function userSocketContext(param) {
+    if (userSocketContextMap[param.user] && userSocketContextMap[param.user][param.serviceInstanceUuid]) {
+        c = logger.warn('@WebSocketMessenger$userSocketContext:userSocketContextMap duplicate keys', param)
+        ws.send('serviceInstanceUuid in use , closing [' + param.serviceInstanceUuid + ']')
+        ws.close()
+        return
+    }
+    userSocketContextMap[param.user] || (userSocketContextMap[param.user] = {})
+    var connectUid = uuidv1();
+    userSocketContextMap[param.user][connectUid] = this;
+
     var ws = param.ws
     var user = param.user
+    var publisherMap = {}
 
+    this.publisherMap = publisherMap
+    ws.ipc_sevice_bound = false//deactivate moste servecies to stop thrashing the connection if app not in focus. NOTE! ws is shared
     ws.send(getGreeting(user), function (err) {
         if (err) { logger.error('@WebSockMessenger', err) }
     })
-
+    
     for (var key in connecttors) {
-        new ServicePublisher(key, user, ws)
+        publisherMap[key] = new ServicePublisher(this, key, user, ws, connectUid)
     }
     ws.on('message', function (message) {
         //TODO set publisher to be users socket.send
@@ -169,9 +222,9 @@ function userSocketContext(param) {
             var json = JSON.parse(message)
             for (var k in json) {
                 if (subscribers[k]) {
+                    var publisher = publisherMap[k].publisher
                     if (json[k] instanceof Array) {
                         for (var msgNum = 0; msgNum < json[k].length; msgNum++) {
-                            publisher = publisherUserSendMap[k][user]
                             subscribers[k](publisher, json[k][msgNum]);
                         }
                     } else {
@@ -190,9 +243,11 @@ function userSocketContext(param) {
         }
     });
     ws.on('close', function close() {
+        try {
+            delete userSocketContextMap[param.user][connectUid]
+        } catch (e){ }
         logger.debug('@WebSockMessenger#close: user=' + user)
         for (var key in closeors) {
-            closeors[key](publisherUserSendMap[key][user])
         }
     });
 }
@@ -223,6 +278,13 @@ webSockMessenger.attach('UserManager', {
     },
     sub: function (publisher, obj) {
         console.log(obj);
+        if (obj === "IPC_SEVICE_BOUND_COUNT=0") {
+            publisher.ws.ipc_sevice_bound = false
+            return
+        } else if (obj === "IPC_SEVICE_BOUND_COUNT!=0") {
+            publisher.ws.ipc_sevice_bound = true
+            return
+        }
         if (obj.TEST_EMAIL_AVAILABLE) {
             obj.TEST_EMAIL_AVAILABLE = true;
             publisher(obj);
@@ -254,7 +316,8 @@ webSockMessenger.attach('UserManager', {
                 })
         }
         logger.info(obj);
-    }
+    },
+    requirePersistentLink:true
 })
 
 
@@ -267,14 +330,15 @@ webSockMessenger.attach('Pulse', {
             publisher(count++, function (err) {
                 err && clearInterval(publisher.ival)
             })
-        }, 1000)
+        }, 4000)
     },
     close: function (publisher) {
         clearInterval(publisher.ival)
     },
     sub: function (publisher, obj) {
         publisher(obj)
-    }
+    },
+    requirePersistentLink: true
 })
 
 
