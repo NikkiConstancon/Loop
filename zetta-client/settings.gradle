@@ -1,4 +1,0 @@
-include ':libs:zetta-sdk-android-master', ':zettakit'
-include ':app'
-
-project(':zettakit').projectDir = new File('libs/zetta-sdk-android-master/zettakit')
