@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:baselineAligned="false"
+    tools:layout_editor_absoluteY="25dp"
+    tools:layout_editor_absoluteX="0dp"
+    tools:context="com.zetta.android.browse.AddSimpleStat"
+    android:theme="@style/AppThemeLight">
+    <TextView
+        android:layout_width="428dp"
+        android:layout_height="40dp"
+        android:text="Add Simple Statistic"
+        android:textSize="20sp"
+        android:textColor="@color/colorTextIcons"
+        android:background="#38ACEC"
+        android:gravity="center"
+        android:id="@+id/toolbar_add_stat"
+        tools:ignore="HardcodedText"
+        android:layout_marginStart="28dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="28dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="8dp" />
+
+    <ScrollView
+        android:id="@+id/stat_scroll"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_add_stat"
+        android:scrollbars="vertical"
+        android:scrollbarStyle="insideInset"
+        android:padding ="10dp">
+
+        <TableLayout
+            android:id="@+id/stat_table_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp">
+
+
+            <TextView
+                android:id="@+id/txt_simp_stat_device"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Please choose a vital to view"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar_add_stat"
+                tools:ignore="HardcodedText" />
+
+            <Spinner
+                android:id="@+id/spin_choose_vital"
+                android:layout_width="50dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:entries="@array/vitals_array"
+                android:prompt="@string/vitals_prompt"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_simp_stat_device" />
+
+            <TextView
+                android:id="@+id/txt_simp_stat_select"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Please choose a statistic to view"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar_add_stat"
+                tools:ignore="HardcodedText" />
+
+            <Spinner
+                android:id="@+id/spin_choose_simp_stat"
+                android:layout_width="50dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:entries="@array/stat_array"
+                android:prompt="@string/simp_stat_prompt"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_simp_stat_device" />
+
+            <TextView
+                android:id="@+id/txt_simp_stat_date1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="Please pick beginning date"
+                android:textSize="20sp"
+                app:layout_constraintHorizontal_bias="0.505"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spin_choose_vital"
+                tools:ignore="HardcodedText" />
+
+            <DatePicker
+                android:id="@+id/simp_datePicker"
+                android:layout_width="0dp"
+                android:layout_height="134dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="0dp"
+                android:calendarViewShown="false"
+                android:datePickerMode="spinner"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_simp_stat_date1" />
+
+            <TextView
+                android:id="@+id/txt_simp_stat_time1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center"
+                android:text="Please pick beginning time"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/simp_datePicker"
+                tools:ignore="HardcodedText" />
+
+            <TimePicker
+                android:id="@+id/timePicker"
+                android:layout_width="253dp"
+                android:layout_height="142dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="0dp"
+                android:timePickerMode="spinner"
+                app:layout_constraintHorizontal_bias="0.503"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_simp_stat_time1" />
+
+            <TextView
+                android:id="@+id/txt_simp_stat_date2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="Please pick end date"
+                android:textSize="20sp"
+                app:layout_constraintHorizontal_bias="0.505"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spin_choose_vital"
+                tools:ignore="HardcodedText" />
+
+            <DatePicker
+                android:id="@+id/simp_datePicker2"
+                android:layout_width="0dp"
+                android:layout_height="134dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="0dp"
+                android:calendarViewShown="false"
+                android:datePickerMode="spinner"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_simp_stat_date1" />
+
+            <TextView
+                android:id="@+id/txt_simp_stat_time2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center"
+                android:text="Please pick end time"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/simp_datePicker"
+                tools:ignore="HardcodedText" />
+
+            <TimePicker
+                android:id="@+id/timePicker2"
+                android:layout_width="253dp"
+                android:layout_height="142dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="0dp"
+                android:timePickerMode="spinner"
+                app:layout_constraintHorizontal_bias="0.503"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_simp_stat_time2" />
+
+            <TextView
+                android:id="@+id/txt_stat_graph_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center"
+                android:text="Would you like for it to be displayed as a graph?"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/simp_datePicker"
+                tools:ignore="HardcodedText" />
+            <RadioGroup
+                android:id="@+id/radioGroupStat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="15dp">
+
+                <RadioButton
+                    android:id="@+id/rad_statYes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Yes"
+                    android:textColor="@color/textColorPrimary"
+                    tools:ignore="HardcodedText"
+                    tools:text="Yes" />
+
+                <RadioButton
+                    android:id="@+id/rad_statNo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:checked="true"
+                    android:text="No"
+                    android:textColor="@color/textColorPrimary"
+
+                    tools:ignore="HardcodedText,RtlHardcoded" />
+            </RadioGroup>
+
+            <Spinner
+                android:id="@+id/spin_choose_interval"
+                android:layout_width="50dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="20dp"
+                android:entries="@array/intervals_array"
+                android:prompt="@string/stat_interval_prompt"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_simp_stat_device" />
+
+            <Button
+                android:id="@+id/btn_add_simple_stat"
+                android:text="Add Statistic"
+
+                tools:ignore="HardcodedText"
+                android:textColor="@color/colorTextIcons"
+                android:background="#38ACEC"
+                android:layout_marginBottom="30dp"/>
+        </TableLayout>
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

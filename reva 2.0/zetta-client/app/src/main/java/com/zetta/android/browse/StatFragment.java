@@ -1,6 +1,7 @@
 package com.zetta.android.browse;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -45,9 +46,11 @@ public class StatFragment extends android.support.v4.app.Fragment
         View view = inflater.inflate(R.layout.stat_hist_fragment, container, false);
         super.onCreate(savedInstanceState);
         final FloatingActionButton myFab = (FloatingActionButton) view.findViewById(R.id.myFAB);
+
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Snackbar.make(v, "Hello Snackbar", Snackbar.LENGTH_LONG).show();
+                Intent toAddStat = new Intent(getActivity(), AddSimpleStat.class);
+                startActivityForResult(toAddStat, 0);
 
             }
         });
