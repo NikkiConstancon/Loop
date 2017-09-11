@@ -152,14 +152,14 @@ public class login_activity extends AppCompatActivity {
             }
         });
         userManagerEndpoint.bind(this);
-        pulseEndpoint.bind(this);
+        //pulseEndpoint.bind(this);
         realTimeDataEndpoint.bind(this);
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
         userManagerEndpoint.unbind(this);
-        pulseEndpoint.unbind(this);
+        //pulseEndpoint.unbind(this);
         realTimeDataEndpoint.unbind(this);
     }
 
@@ -254,7 +254,7 @@ public class login_activity extends AppCompatActivity {
     }
 
 
-    PulseEndpoint pulseEndpoint = new PulseEndpoint();
+    /*PulseEndpoint pulseEndpoint = new PulseEndpoint();
     class PulseEndpoint extends RevaWebsocketEndpoint {
         private final String TAG = this.getClass().getName();
         @Override
@@ -268,7 +268,7 @@ public class login_activity extends AppCompatActivity {
         public void onMessage(LinkedTreeMap obj){
             Log.i("STUFF", obj.toString() );
         }
-    }
+    }*/
 
 
     UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();

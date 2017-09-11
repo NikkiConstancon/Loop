@@ -364,9 +364,9 @@ public class RevaWebSocketService extends Service {
                     }
                 }
             })).start();
-        } else {
+        } /*else {
             revaWebSocket.send("{pulse:0}");
-        }
+        }*/
     }
 
     private static Gson gson = new Gson();
@@ -420,7 +420,7 @@ public class RevaWebSocketService extends Service {
     private RevaWebSocket buildRevaWebSocket() {
         try {
             return new RevaWebSocket(
-                    new URI("ws://192.168.56.1:8080"),
+                    new URI("ws://" + getString(R.string.serverURL) + ":8080"),
                     new Draft_6455(),
                     genHeader(),
                     tryConnectTimeout
