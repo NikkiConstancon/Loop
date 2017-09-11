@@ -95,6 +95,7 @@ public class StatFragment extends android.support.v4.app.Fragment
                     aray.add(card.getEntries().get(i));
                 }
                 Intent intent = new Intent(getContext(), MoreGraph.class);
+                intent.putExtra("title", card.getDeviceName() + " " + card.getStatName());
                 intent.putExtra("entries",  aray);
                 startActivity(intent);
             }

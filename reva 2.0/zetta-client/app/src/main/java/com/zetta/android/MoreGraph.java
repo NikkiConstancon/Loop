@@ -3,6 +3,7 @@ package com.zetta.android;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
@@ -26,13 +27,20 @@ public class MoreGraph extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.more_graph);
+
+        // Setting the toolbar up
+        Toolbar toolbar = (Toolbar) findViewById(R.id.graph_toolbar);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        String title = getIntent().getStringExtra("title");
+        getSupportActionBar().setTitle(title);
+
+
+
         LineChart chart = (LineChart) findViewById(R.id.more_line_chart);
         ArrayList<GraphEntry> ontray = (ArrayList<GraphEntry>) getIntent().getSerializableExtra("entries");
-
-        //stat_title.setText(item.getDeviceName() + " " + item.getStatName());
-        //stat_subtitle.setText("Start: " + item.getStart() +"\nEnd:   " + item.getEnd());
-        //if (item.getImgURL() != "")
-        //    imageLoader.load(Uri.parse(item.getImgURL()), stateImageWidget);
 
         List<Entry> entries = new ArrayList<Entry>();
         for (int i = 0; i < ontray.size(); i++) {
@@ -52,5 +60,11 @@ public class MoreGraph extends AppCompatActivity {
         chart.setData(lineData);
 
         chart.invalidate();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }
