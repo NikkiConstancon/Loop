@@ -458,7 +458,6 @@ public class RevaWebSocketService extends Service {
                     }
                 }
             })).start();
-        } else {
         }
     }
 
@@ -503,8 +502,11 @@ public class RevaWebSocketService extends Service {
 
     private RevaWebSocket buildRevaWebSocket() {
         try {
+            String url = "wss://" + getString(R.string.serverURL) + ":" + getString(R.string.webSocketServerPort);
+            Log.i(TAG, "--CONNECTING-TO--" + url);
             return new RevaWebSocket(
-                    new URI("wss://" + getString(R.string.serverURL) + ":" + getString(R.string.webSocketServerPort)),
+                    new URI(url),
+                    //new URI("ws://" + getString(R.string.serverURL) + ":8080"),
                     new Draft_6455(),
                     genHeader(),
                     tryConnectTimeout
