@@ -54,6 +54,10 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeLight"></activity>
+        <activity android:name=".browse.AddSimpleStat"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeLight"></activity>
 
 
         <service android:name=".revawebsocketservice.RevaWebSocketService"/>
