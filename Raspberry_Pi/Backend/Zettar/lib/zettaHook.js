@@ -124,7 +124,7 @@ var listenZettaUpdates = function (args) {
         server.observe([server.from(from).where(where)], function (thing) {
             try {
                 //capture info
-                var info = { from: sharedKeys.decrypt(from) || '--UNREGISTERED--', type: thing.type, name:thing.name, topicName: topicName}
+                var info = { from: from, type: thing.type, name:thing.name, topicName: topicName}
                 var key = buildObserveKeyForHook(thing, topicName)
                 logger.debug('#listenZettaStream: key:', key)
                 hookObserveEmiter(thing, key, function (response) {

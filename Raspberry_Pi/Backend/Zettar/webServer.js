@@ -70,7 +70,7 @@ authGuard.get('/patient-info', { web: authGuard.webClass.authenticated }, functi
 
 //initalization of the server
 var transport = 'http'
-server = module.exports = require(transport).createServer(app);
+server = module.exports = httpsServer = require('https').createServer(credentials, app)//require(transport).createServer(app);
 module.exports.whoAmI = function (param) { return serverAmWhoAmI(param) }
 const WebSocket = require('ws');
 const wss = module.exports.wss = new WebSocket.Server({ server });
@@ -102,7 +102,7 @@ if (process.argv.indexOf('--test') >= 0) {
 /**
  * @brief start the web server
  */
-server.listen(8080, '192.168.56.1', function (err) {
+server.listen(8080, function (err) {
     err && console.log(err)
     wssRoot = server.address().address + (server.address().port !== 80 ? ':' + server.address().port : '')
 

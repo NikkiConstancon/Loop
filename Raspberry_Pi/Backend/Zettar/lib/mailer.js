@@ -42,7 +42,12 @@ var Mailer = module.exports = {
         const server = require('../webServer')//moved here because of circular require
         pendingSends++
         
-        var html = require('fs').readFileSync('../resources/email.html', 'utf8').toString()
+        var html
+        try {
+            html = require('fs').readFileSync('../resources/email.html', 'utf8').toString()
+        } catch (e) {
+            html = require('fs').readFileSync('./resources/email.html', 'utf8').toString()
+        }
         html = html.replace('{{fullName}}', fullName)
         html = html.replace('{{endUserAgreement}}', server.whoAmI() + '/end-user-agreement')
         html = html.replace('{{date}}', (new Date()).toString())

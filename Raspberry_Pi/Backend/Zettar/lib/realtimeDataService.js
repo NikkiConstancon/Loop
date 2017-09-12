@@ -1,6 +1,4 @@
 ﻿
-try {
-
     const webSockMessenger = require('./webSockMessenger')
     const patientManager = require("../patientManager");
 
@@ -17,8 +15,8 @@ try {
         for (var user in userSocketContextMap) {
             for (var context in userSocketContextMap[user]) {
                 var usc = userSocketContextMap[user][context]
-                var publisher = usc.publisherMap[serviceName].publisher
-                publisher(msg)
+                var service = usc.subServiceMap[serviceName]
+                service.publish(msg)
             }
         }
     }
@@ -30,9 +28,9 @@ try {
                 setTimeout(function () {
                     pushData({ [info.from]: fromQueueMap[info.from] })
                     fromQueueMap[info.from] = null
-                }, 32)
+                }, 8)
             }
-            fromQueueMap[info.from].push({ [info.name]: response.data })
+            fromQueueMap[info.from].push({ [info.name]: response.data.toPrecision(3) })
 
 
 
@@ -52,16 +50,12 @@ try {
     webSockMessenger.attach(serviceName, {
         connect: function (publisher) {
             var count = 0;
-            publisher(count++, function (err) {
+            publisher.publish(count++, function (err) {
             })
         },
         close: function (publisher) {
         },
         sub: function (publisher, obj) {
-            publisher(obj)
+            publisher.publish(obj)
         }
     })
-
-} catch (e) {
-    logger.error('@realtimeDataService$GLOBAL', e)
-}

@@ -88,7 +88,7 @@ var hook = new Hook(initializedZetta)
             console.log(e)
         }
     })
-    .registerStreamListener({
+    /*.registerStreamListener({
         topicName: 'vitals',
         where: { type: 'Heart', name: 'Heart-rate' },
         cb: callback,
@@ -119,4 +119,4 @@ var hook = new Hook(initializedZetta)
         errcb: function (e) {
             console.log(e)
         }
-    })
+    })*/
