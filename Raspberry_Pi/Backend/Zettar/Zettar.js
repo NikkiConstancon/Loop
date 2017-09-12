@@ -30,8 +30,8 @@ const realtimeDataService = require('./lib/realtimeDataService')
 var initializedZetta = zetta('peers').name('Zettar')
 
 var callback = function (info, data) {
-    // patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
-    //realtimeDataService.push(info.from, 
+
+    patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
     info
 }
 

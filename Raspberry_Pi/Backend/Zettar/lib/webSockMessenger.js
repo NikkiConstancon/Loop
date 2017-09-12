@@ -12,6 +12,7 @@ const server = require('../webServer')
 
 var dbMan = require('../databaseManager');
 var PatientManager = require('../patientManager');
+var SubscriberManager = require('../subscriberManager');
 var uuidv1 = require('uuid/v1')
 
 
@@ -20,11 +21,10 @@ const WebSocket = require('ws');
 const wss = module.exports.wss = server.wss
 
 
-const patientManager = require('../patientManager')
 
 
 
-
+const CHANNEL_KEY = "|^|"
 var USER_ANONYMOUS = '--ANONYMOUS--'
 
 
@@ -96,15 +96,24 @@ function authorize(ws) {
                 ret.user = USER_ANONYMOUS
                 res(ret)
             } else {
-                return patientManager.getPatient(auth).then(function (pat) {
+                return PatientManager.getPatient(auth).then(function (pat) {
                     if (pat.verifyPassword(auth.Password)) {
                         res(ret)
                     } else {
                         rej(('webSockMessenger$authorizeAsync --- TODO ---  invalid password'))
                     }
                 }).catch(function (e) {
-                    ret.user = USER_ANONYMOUS
-                    res(ret)
+    //THIS IS NOT HOW USER MANAGEMENT SHOULD WORK !! WE NEED TO RETHINK THE USER'S LAYOUT
+    //THIS WILL ONLY CAUSE ERRORS AND GRIEF DOWN THE ROAD
+    //HONESTLY DON'T KNOW WHY THE INITIAL DESIGN WAS NOT FOLLOWED (MAYBE IT IS JUST ME THAT IS INCAPABLE TO COMPREHEND THE CURRENT LAYOUT)
+                    auth.Email = auth.Username
+                    return SubscriberManager.getsubscriber(auth).then(function (thisIsSoWrong) {
+                        //todo validate password
+                        res(ret)
+                    }).catch(function (e) {
+                        ret.user = USER_ANONYMOUS
+                        res(ret)
+                    })
                 })
             }
         }).catch(function (err) {
@@ -287,6 +296,102 @@ webSockMessenger.attach('RCC', {
 
 
 
+function DispatchChannels(handlers, publisher, rootMsg, channeler) {
+    var obj = rootMsg[CHANNEL_KEY]
+    if (obj) {
+        try {
+            for (var key in obj) {
+                function channeler(msg, errcb) {
+                    publisher.publish({ [CHANNEL_KEY]: { [key]: msg } }, errcb)
+                }
+                var msg = obj[key]
+                handlers[key](publisher, msg, key, channeler)
+            }
+        } catch (e) {
+            logger.debug(e, obj)
+        }
+    }
+}
+
+function DispatchMessages(handlers, publisher, rootMsg, channeler) {
+    try {
+        for (var key in rootMsg) {
+            var msg = rootMsg[key]
+            handlers[key](publisher, msg, key, channeler)
+        }
+    } catch (e) {
+        logger.debug(e, rootMsg)
+    }
+}
+
+
+
+var userManagerChannels = {
+    REGISTER: function (publisher, msg, key, channeler) {
+        DispatchMessages({
+            VALIDATE_EMAIL: function (publisher, msg, key) {
+                channeler({ PASS: true })
+                //channeler({ PASS: false, ERROR: "This email address is not available" })
+            },
+            REGISTER_PATIENT: function (publisher, msg, key) {
+                var obj = msg;
+                //TODO: Move to patiantManager
+                function deserialize(obj) {
+                    var test = require('../models/patientModel').fields
+                    for (var key in test) {
+                        switch (test[key].type) {
+                            case 'int': { obj[key] && (obj[key] = parseInt(obj[key])) } break
+                            case 'float': { obj[key] && (obj[key] = parseFloat(obj[key])) } break
+                        }
+                    }
+                }
+                deserialize(obj)
+                PatientManager.getPatient(obj)
+                    .then(function () {
+                        channeler({ PATIENT_ERROR: 'This username has been taken', PATIENT_PASS: false })
+                    }).catch(function () {
+                        return PatientManager.addPatient(obj).then(function (pat) {
+                            channeler({ PATIENT_PASS: true })
+                        }).catch(function (e) {
+                            channeler({ PATIENT_ERROR: e.message || e, PATIENT_PASS: false })
+                        })
+                    }).catch(function (e) {
+                        logger.error('@webSockMessenger$UserManager#sub:KEY_REGISTER_USER', e)
+                        channeler({ PATIENT_ERROR: 'something went wrong', PATIENT_PASS: false })
+                    })
+            },
+            REGISTER_NON_PATIENT: function (publisher, msg, key) {
+                var obj = msg;
+                //TODO: Move to patiantManager
+                function deserialize(obj) {
+                    var test = require('../models/patientModel').fields
+                    for (var key in test) {
+                        switch (test[key].type) {
+                            case 'int': { obj[key] && (obj[key] = parseInt(obj[key])) } break
+                            case 'float': { obj[key] && (obj[key] = parseFloat(obj[key])) } break
+                        }
+                    }
+                }
+                deserialize(obj)
+                SubscriberManager.getsubscriber(obj)
+                    .then(function () {
+                        //ugly prot i.e. copy and paste mostly form patient
+                        channeler({ NON_PATIENT_ERROR: 'This email has been taken', NON_PATIENT_PASS: false })
+                    }).catch(function () {
+                        return SubscriberManager.addSubscriber(obj).then(function (pat) {
+                            channeler({ NON_PATIENT_PASS: true })
+                        }).catch(function (e) {
+                            channeler({ NON_PATIENT_ERROR: e.message || e, NON_PATIENT_PASS: false })
+                        })
+                    }).catch(function (e) {
+                        logger.error('@webSockMessenger$UserManager#sub:KEY_REGISTER_USER', e)
+                        channeler({ NON_PATIENT_ERROR: 'something went wrong', NON_PATIENT_PASS: false })
+                    })
+            }
+        }, publisher, msg)
+    }
+}
+
 webSockMessenger.attach('UserManager', {
     connect: function (publisher) {
         //publisher.publish("--HELLO-- ");
@@ -294,6 +399,9 @@ webSockMessenger.attach('UserManager', {
     close: function (publisher) {
     },
     sub: function (publisher, obj) {
+        DispatchChannels(userManagerChannels, publisher, obj)
+
+        /*
         if (obj.TEST_EMAIL_AVAILABLE) {
             //obj.TEST_EMAIL_AVAILABLE = 'This email address is not available'
             obj.TEST_EMAIL_AVAILABLE = ''
@@ -326,6 +434,7 @@ webSockMessenger.attach('UserManager', {
                 })
         }
         logger.info(obj);
+        */
     },
     requirePersistentLink: true,
     defaultEnabled: true
@@ -335,306 +444,17 @@ webSockMessenger.attach('Pulse', {
     connect: function (publisher) {
         var count = 0;
         publisher.ival = setInterval(function () {
-            publisher.publish(count++, function (err) {
+            publisher.publish({ "|^|": { A: "a", B: "b", email:"email" } }, function (err) {
                 err && clearInterval(publisher.ival)
             })
-        }, 5000)
+        }, 300000)
     },
     close: function (publisher) {
         clearInterval(publisher.ival)
     },
     sub: function (publisher, obj) {
-        publisher.publish(obj)
+        //publisher.publish(obj)
     },
     requirePersistentLink: true,
     defaultEnabled: true
 })
-
-/*
-    //keys as userId and values as {deviceUuid: userSocketContext}
-var userSocketContextMap = {}
-
-
-function parseError(key, error, message) {
-    var obj = {}
-    error && (obj.server = error)
-    message && (obj.client = message)
-    return JSON.stringify({
-        error: { [key]: obj }
-    })
-}
-
-function getGreeting() {
-    return JSON.stringify({
-        init: { webSockMessenger: 'succsess' }
-    })
-}
-
-function parseAuthorizationHeader(header) {
-    authField = header.authorization
-    
-    return new Promise(function (res, rej) {
-        if (!authField) {
-            //return rej(parseError('webSockMessenger', 'authorization header not set, though it is required'))
-            res({ Username: '--ANONYMOUS--', Password: '', serviceInstanceUuid: header.serviceinstanceuuid })
-        }
-        try {
-            var auth = authField.split(' ')
-            var str = new Buffer(auth[1], 'base64').toString()
-            var strs = str.split(':')
-            return res({ Username: strs[0], Password: strs[1], serviceInstanceUuid: header.serviceinstanceuuid })
-        } catch (e) {
-            return rej(parseError(parseError('webSockMessenger', e)))
-        }
-    })
-}
-
-function authorizeAsync(ws) {
-    return new Promise(function (res, rej) {
-        return parseAuthorizationHeader(ws.upgradeReq.headers).then(function (auth) {
-            var ret = { ws: ws, user: auth.Username, serviceInstanceUuid: auth.serviceInstanceUuid }
-            if (auth.Username === "--ANONYMOUS--") {
-                return res(ret);
-            } else {
-                return patientManager.getPatient(auth).then(function (pat) {
-                    if (pat.verifyPassword(auth.Password)) {
-                        return res(ret)
-                    } else {
-                        rej(parseError('webSockMessenger', 'invalid password'))
-                    }
-                }).catch(function (e) {
-                    return rej(parseError('webSockMessenger', e))
-                })
-            }
-        }).catch(function (err) {
-            return rej(err)
-        })
-    }).catch(function (err) {
-        return rej(err)
-    })
-}
-
-//Constructor
-function ServicePublisher(context, serviceKey, userId, ws, connectUid) {
-    this.connectUid
-    this.key = serviceKey
-    this.user = userId
-    this.userId = userId
-    this.queue = []
-    this.timeOut = null
-    this.ws = ws
-    this.enabled = enablementMap[this.key]
-    this.context = context
-}
-ServicePublisher.prototype.publish = function (msg, errcb) {
-    if (!this.enabled || (!this.ws.rcc_service_bound && !requirePersistentLinkMap[this.key])) {
-        return
-    }
-    this.queue.push(msg)
-    if (!this.timeOut) {
-        this.timeOut = setTimeout(function () {
-            this.pushMessage(this.queue, errcb)
-            this.queue = []
-            this.timeOut = null
-        }, 16)//for accumalting data befor sending
-    }
-}
-
-ServicePublisher.prototype.pushMessage = function (msg, errcb) {
-    var errcb = errcb
-    var key = this.key
-    var ws = this.ws
-    msgObj = { [key]: msg }
-    msg = JSON.stringify(msgObj)
-    logger.debug('on-publish', key, msg)
-    if (errcb) {
-        ws.send(msg, errcb)
-    } else {
-        ws.send(msg, function (err) {
-            if (err) {
-                //TODO hadle these errors
-                logger.error('@WebSockMessenger#connection', err)
-                logger.error('@WebSockMessenger#connection msg:', msg)
-                try {
-                    delete userSocketContextMap[this.user][this.connectUid]
-                } catch (e) {
-                    logger.error('@WebSockMessenger#connection:delete', e)
-                }
-                ws.close()
-            }
-        })
-    }
-}
-
-
-function userSocketContext(param) {
-    if (userSocketContextMap[param.user] && userSocketContextMap[param.user][param.serviceInstanceUuid]) {
-        c = logger.warn('@WebSocketMessenger$userSocketContext:userSocketContextMap duplicate keys', param)
-        ws.send('serviceInstanceUuid in use , closing [' + param.serviceInstanceUuid + ']')
-        ws.close()
-        return
-    }
-    userSocketContextMap[param.user] || (userSocketContextMap[param.user] = {})
-    var connectUid = uuidv1();
-    userSocketContextMap[param.user][connectUid] = this;
-
-    var ws = param.ws
-    var user = param.user
-    var publisherMap = {}
-
-    this.publisherMap = publisherMap
-    ws.rcc_service_bound = false//deactivate moste servecies to stop thrashing the connection if app not in focus. NOTE! ws is shared
-    ws.send(getGreeting(user), function (err) {
-        if (err) { logger.error('@WebSockMessenger', err) }
-    })
-    
-    for (var key in connecttors) {
-        publisherMap[key] = new ServicePublisher(this, key, user, ws, connectUid)
-        connecttors[key](publisherMap[key])
-    }
-    ws.on('message', function (message) {
-        //TODO set publisher to be users socket.send
-        logger.debug('on-message', message)
-        try {
-            var json = JSON.parse(message)
-            for (var k in json) {
-                if (subscribers[k]) {
-                    var publisher = publisherMap[k].publisher
-                    if (json[k] instanceof Array) {
-                        for (var msgNum = 0; msgNum < json[k].length; msgNum++) {
-                            subscribers[k](publisher, json[k][msgNum]);
-                        }
-                    } else {
-                        subscribers[k](publisher, json[k]);
-                    }
-                } else {
-                    logger.warn("@WebSoekcetMessenger#ws.on('message'): lost message! " + k);
-                }
-            }
-        } catch (e) {
-            var errMsg = JSON.stringify({
-                error: { msg: message, err: e.message }
-            })
-            logger.error(errMsg)
-            ws.send(errMsg)
-        }
-    });
-    ws.on('close', function close() {
-        try {
-            delete userSocketContextMap[param.user][connectUid]
-        } catch (e){ }
-        logger.debug('@WebSockMessenger#close: user=' + user)
-        for (var key in closeors) {
-        }
-    });
-}
-
-
-wss.on('connection', function connection(ws) {
-    authorizeAsync(ws).then(function (param) {
-        new userSocketContext(param)
-    }).catch(function (e) {
-        ws.send(e)
-        ws.close()
-        e && logger.error(e)
-    })
-
-})
-
-
-
-
-webSockMessenger.attach('RCC', {
-    connect: function (publisher) {
-    },
-    close: function (publisher) {
-        clearInterval(publisher.ival)
-    },
-    sub: function (publisher, obj) {
-        var boundCount = obj.SERVICE_BOUND_COUNT
-        if (boundCount !== undefined) {
-            if (boundCount == 0) {
-                publisher.ws.rcc_service_bound = false
-            } else {
-                publisher.ws.rcc_service_bound = true
-            }
-        }
-        if (obj.PAUSE_SERVICE) {
-
-        }
-        if (obj.RESUME_SERVICE) {
-
-        }
-    },
-    requirePersistentLink: true,
-    defaultEnabled: true
-})
-
-webSockMessenger.attach('UserManager', {
-    connect: function (publisher) {
-        publisher.publish("--HELLO-- " + publisher.user);
-    },
-    close: function (publisher) {
-    },
-    sub: function (publisher, obj) {
-        if (obj.TEST_EMAIL_AVAILABLE) {
-            obj.TEST_EMAIL_AVAILABLE = 'This email address is not available'
-            //obj.TEST_EMAIL_AVAILABLE = ''
-            publisher.publish(obj);
-        }else if (obj.KEY_REGISTER_USER) {
-           delete obj.KEY_REGISTER_USER
-            //TODO: Move to patiantManager
-            function deserialize(obj) {
-                var test = require('../models/patientModel').fields
-                for (var key in test) {
-                    switch (test[key].type) {
-                        case 'int': { obj[key] && (obj[key] = parseInt(obj[key])) } break
-                        case 'float': { obj[key] && (obj[key] = parseFloat(obj[key])) } break
-                    }
-                }
-            }
-            deserialize(obj)
-            PatientManager.getPatient(obj)
-                .then(function () {
-                    publisher.publish({ KEY_REGISTER_USER: { Username: 'This username has been taken' } })
-                }).catch(function () {
-                    return PatientManager.addPatient(obj).then(function (pat) {
-                        publisher.publish({ KEY_REGISTER_USER: true })
-                    }).catch(function (e) {
-                        publisher.publish({ KEY_REGISTER_USER: { ERROR: e.message || e }})
-                    })
-                }).catch(function (e) {
-                    logger.error('@webSockMessenger$UserManager#sub:KEY_REGISTER_USER', e)
-                    publisher.publish({ KEY_REGISTER_USER: { ERROR: 'something went wrong'}})
-                })
-        }
-        logger.info(obj);
-    },
-    requirePersistentLink: true,
-    defaultEnabled: true
-})
-
-
-
-
-webSockMessenger.attach('Pulse', {
-    connect: function (publisher) {
-        var count = 0;
-        publisher.ival = setInterval(function () {
-            publisher.publish(count++, function (err) {
-                err && clearInterval(publisher.ival)
-            })
-        }, 4000)
-    },
-    close: function (publisher) {
-        clearInterval(publisher.ival)
-    },
-    sub: function (publisher, obj) {
-        publisher.publish(obj)
-    },
-    requirePersistentLink: true
-})
-
-
-
-*/
