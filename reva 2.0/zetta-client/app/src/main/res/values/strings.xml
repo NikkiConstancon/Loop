@@ -22,5 +22,6 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name="serverURL">192.168.1.70</string>
+    <string name="serverURL">192.168.56.1</string>
+    <string name="webSocketServerPort">8080</string>
 </resources>

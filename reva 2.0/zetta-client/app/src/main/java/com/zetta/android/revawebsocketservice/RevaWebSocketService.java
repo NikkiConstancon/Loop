@@ -16,8 +16,13 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
+import com.zetta.android.browse.MainActivity;
+import com.zetta.android.browse.login_activity;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
@@ -35,7 +40,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -48,7 +58,6 @@ import javax.net.ssl.X509TrustManager;
 
 public class RevaWebSocketService extends Service {
     private final String serviceInstanceUuid = UUID.randomUUID().toString();
-    private int seviceBoundCount = 0;
     // ------------------------------ BEGIN PUBLICS -------------------------------------------
     public static final String SERVICE_USER_MANAGER_NAME = "UserManager";
     public synchronized boolean setLogin(String authId, String password) {
@@ -59,36 +68,20 @@ public class RevaWebSocketService extends Service {
             Log.v(TAG, "#setLogin: prefs is null");
             return false;
         }
-        String credentials = authId + ":" + password;
-        String basicAuth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-
-        prefs.edit().putString(SHARED_PREF_KEY_AUTHID, authId).apply();
-        boolean r = prefs.edit().putString(SHARED_PREF_KEY_AUTH_BASIC_HASH_RAW, basicAuth).commit();
+        boolean r = commitCredentials(authId, password);
         setForceConnect();
         return r;
     }
 
+    public boolean isLoggedIn(){
+        return getAuthId() != "";
+    }
     public String getAuthId() {
         return getPref().getString(SHARED_PREF_KEY_AUTHID, null);
     }
 
 
     public synchronized static Publisher localStartService(Context context, Intent intent, String key) {
-        if (!flagServiceStarted) {
-            flagServiceStarted = true;
-            context.startService(new Intent(context, RevaWebSocketService.class));
-        }
-        ResultReceiver subscriber = intent.getParcelableExtra(SUBSCRIBER);
-        if (subscriber != null) {
-            Bundle bundle = new Bundle();
-            bundle.putString("start", "The start msg");
-            subscriber.send(0, bundle);
-
-
-            subscriberReceiverMap.put(key, subscriber);
-        } else {
-            Log.e(TAG, "public static Publisher localStartService(Context context, Intent intent, String key): subscriber is null");
-        }
 
         context.startService(intent);
         return new Publisher(key);
@@ -112,10 +105,16 @@ public class RevaWebSocketService extends Service {
         }
 
         private String key;
-
         private Publisher(String key_) {
             key = key_;
         }
+    }
+
+    protected void rccPauseService(String key){
+        rccPublishPauseResume(key, false);
+    }
+    protected void rccResumeService(String key){
+        rccPublishPauseResume(key, true);
     }
     // ------------------------------ END PUBLICS -------------------------------------------
 
@@ -131,45 +130,124 @@ public class RevaWebSocketService extends Service {
     protected static final String IPC_SOCKET_CLOSED = "IPC_SOCKET_CLOSED";
     protected static final String IPC_SOCKET_MESSAGE_PULLED = "pull";
 
+    private static final String RCC_SERVICE_NAME = "RCC";
+    private static final String RCC_KEY_PAUSE_RESUME = "PAUSE_RESUME";
+    private static final String RCC_KEY_PAUSE_RESUME_KEY_ENABLEMENT = "ENABLEMENT";
+    private static final String RCC_KEY_PAUSE_RESUME_KEY_SERVICE_NAME = "SERVICE_KEY";
+    private static final String RCC_KEY_SERVICE_BINDING_KEY_STATE = "ENABLEMENT";
+    private static final String RCC_KEY_SERVICE_BINDING_KEY_NAME = "SERVICE_KEY";
+    private static final String RCC_KEY_SERVICE_BINDING = "SERVICE_BINDING";
+
     private SharedPreferences prefs = null;
 
-    private static boolean flagServiceStarted = false;
 
 
+    private ReentrantLock publisherMessagePoolMapLock = new ReentrantLock();
     private static Map<String, List<Object>> publisherMessagePoolMap = new HashMap<>();
 
 
-    private final static Map<String, ResultReceiver> subscriberReceiverMap = new HashMap<>();
+    private final static List<String> serviceBoundList = new LinkedList<>();
+    private final static Map<String, List<ResultReceiver>> subscriberReceiverMap = new HashMap<>();
 
-
-    private static class PublisherResultReceiver extends ResultReceiver {
-        String key;
-
-        private PublisherResultReceiver(String key_) {
-            super(null);
-            this.key = key_;
-        }
-
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-
-            //do websocket stuff
-        }
-    }
 
     private SharedPreferences getPref() {
         return this.getSharedPreferences(SHARED_PREF_KEYSPACE, Context.MODE_PRIVATE);
     }
-    private static void addToMessagePool(String key, Object obj){
-        if (!publisherMessagePoolMap.containsKey(key)) {
-            publisherMessagePoolMap.put(key, new ArrayList<Object>());
-        }
-        publisherMessagePoolMap.get(key).add(obj);
-        if (scoutThread != null) {
-            scoutThread.interrupt();
+    private static void addToMessagePool(String key, Object obj) {
+        synchronized (RevaWebSocketService.class) {
+            if (!publisherMessagePoolMap.containsKey(key)) {
+                publisherMessagePoolMap.put(key, new ArrayList<Object>());
+            }
+            publisherMessagePoolMap.get(key).add(obj);
+            if (scoutThread != null) {
+                scoutThread.interrupt();
+            }
         }
     }
 
+    private void rccPublishPauseResume(String key, boolean enabled){
+        JsonObject keys = new JsonObject();
+        keys.addProperty(RCC_KEY_PAUSE_RESUME_KEY_ENABLEMENT, enabled);
+        keys.addProperty(RCC_KEY_PAUSE_RESUME_KEY_SERVICE_NAME, key);
+        JsonObject json = new JsonObject();
+        json.add(RCC_KEY_PAUSE_RESUME, keys);
+        addToMessagePool(RCC_SERVICE_NAME, json);
+    }
+
+    private boolean clearAuthBasicToNull(){
+        prefs.edit().putString(SHARED_PREF_KEY_AUTHID, null).apply();
+        return prefs.edit().putString(SHARED_PREF_KEY_AUTH_BASIC_HASH_RAW, null).commit();
+    }
+    private boolean commitCredentials(String authId, String password){
+        String credentials = authId + ":" + password;
+        String basicAuth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+
+        prefs.edit().putString(SHARED_PREF_KEY_AUTHID, authId).apply();
+        return prefs.edit().putString(SHARED_PREF_KEY_AUTH_BASIC_HASH_RAW, basicAuth).commit();
+    }
+
+    static Publisher rccPublisher = null;
+    RCCEndpoint rccEndpoint = new RCCEndpoint();
+    class RCCEndpoint extends RevaWebsocketEndpoint {
+        private final String TAG = this.getClass().getName();
+        public void onMessage(LinkedTreeMap obj){
+            try {
+                JsonObject jsonObject = gson.toJsonTree(obj).getAsJsonObject();
+                JsonElement e = jsonObject.get("ERROR");
+                JsonObject jsonError = e.getAsJsonObject();
+                if (jsonError.has("AUTH")){
+                    //TODO send to UserManager
+                    clearAuthBasicToNull();
+                }
+            }catch (Exception e){
+                Log.e(TAG, "Error at onMessage with: " + obj.toString());
+            }
+        }
+        @Override
+        public String key() {
+            return RCC_SERVICE_NAME;
+        }
+    }
+
+
+    protected synchronized static void notifyServiceBind(String key, ResultReceiver subscriberResultReceiver){
+        rccPushServiceBinding(key, true);
+        if(!serviceBoundList.contains(key)){
+            serviceBoundList.add(key);
+        }
+        if (subscriberResultReceiver != null) {
+            if (key != null) {
+                if(!subscriberReceiverMap.containsKey(key)){
+                    subscriberReceiverMap.put(key, new LinkedList<ResultReceiver>());
+                }
+                if(!subscriberReceiverMap.get(key).contains(subscriberResultReceiver)){
+                    subscriberReceiverMap.get(key).add(subscriberResultReceiver);
+                }
+            }
+        }
+    }
+    protected synchronized static void notifyServiceUnbind(String key, ResultReceiver subscriberResultReceiver){
+        rccPushServiceBinding(key, false);
+        serviceBoundList.remove(key);
+        if(subscriberReceiverMap.containsKey(key)){
+            subscriberReceiverMap.get(key).remove(subscriberResultReceiver);
+        }
+    }
+    //call this at socket connect
+    private  static void rccPublishServiceBindings(){
+        for(String key : serviceBoundList){
+            rccPushServiceBinding(key, true);
+        }
+    }
+    private static void rccPushServiceBinding(String key, boolean enabled){
+        JsonObject keys = new JsonObject();
+        keys.addProperty(RCC_KEY_SERVICE_BINDING_KEY_STATE, enabled);
+        keys.addProperty(RCC_KEY_SERVICE_BINDING_KEY_NAME, key);
+        JsonObject json = new JsonObject();
+        json.add(RCC_KEY_SERVICE_BINDING, keys);
+        addToMessagePool(RCC_SERVICE_NAME, json);
+
+    }
     private final IBinder mBinder = new LocalBinder();
     //-------------------------------BEGIN OVERRIDES -------------------------
     static final String TAG = "RevaWebSocketService";
@@ -177,6 +255,8 @@ public class RevaWebSocketService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        runSouct = true;
+
         Toast.makeText(this, "WebSocketService Started ", Toast.LENGTH_LONG).show();
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -188,21 +268,16 @@ public class RevaWebSocketService extends Service {
         mNotificationManager.notify(001, mBuilder.build());
 
         initScout();
+        rccPublisher = rccEndpoint.bind(RevaWebSocketService.this);
     }
 
     @Override
     public synchronized IBinder onBind(Intent intent) {
         prefs = this.getSharedPreferences(SHARED_PREF_KEYSPACE, Context.MODE_PRIVATE);
-        seviceBoundCount++;
-        addToMessagePool(SERVICE_USER_MANAGER_NAME, "IPC_SEVICE_BOUND_COUNT!=0");
         return mBinder;
     }
     @Override
     public synchronized boolean onUnbind(Intent intent){
-        seviceBoundCount--;
-        if(seviceBoundCount == 0) {
-            addToMessagePool(SERVICE_USER_MANAGER_NAME, "IPC_SEVICE_BOUND_COUNT=0");
-        }
         return false;//Return true if you would like to have the service's onRebind(Intent) method later called when new clients bind to it.
     }
 
@@ -210,6 +285,8 @@ public class RevaWebSocketService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
+
+        runSouct = false;
 
         if(revaWebSocket != null){
             revaWebSocket.close();
@@ -219,15 +296,23 @@ public class RevaWebSocketService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int startId, int flags) {
+        /*
+        NOTE! this was moved to notifyServiceBind()
         if (intent != null) {
             ResultReceiver subscriberResultReceiver = intent.getParcelableExtra(RevaWebSocketService.SUBSCRIBER);
             if (subscriberResultReceiver != null) {
                 String key = intent.getStringExtra(RevaWebSocketService.SUBSCRIBER_KEY);
                 if (key != null) {
-                    subscriberReceiverMap.put(key, subscriberResultReceiver);
+                    if(!subscriberReceiverMap.containsKey(key)){
+                        subscriberReceiverMap.put(key, new LinkedList<ResultReceiver>());
+                    }
+                    if(!subscriberReceiverMap.get(key).contains(subscriberResultReceiver)){
+                        subscriberReceiverMap.get(key).add(subscriberResultReceiver);
+                    }
                 }
             }
         }
+        */
         return START_STICKY;
     }
 
@@ -250,31 +335,34 @@ public class RevaWebSocketService extends Service {
         @Override
         public void onOpen(ServerHandshake handshakedata) {
             Log.d(TAG, "--OPENED--");
-            if (flagSocketConnected) {
+            if (revaWebSocket != null) {
                 revaWebSocket.close();
             }
-            flagSocketConnected = true;
+            revaWebSocket = RevaWebSocket.this;
+            rccPublishServiceBindings();
 
-            connectionSemaphore.release();
             flagForceReconnect = false;
 
             Bundle bundle = new Bundle();
             bundle.putString(IPC_SOCKET_OPENED, gson.toJson(handshakedata));
-            for (Map.Entry<String, ResultReceiver> entry : subscriberReceiverMap.entrySet()) {
-                entry.getValue().send(0, bundle);
+            for (Map.Entry<String, List<ResultReceiver>> entry : subscriberReceiverMap.entrySet()) {
+                for(ResultReceiver rr : entry.getValue()) {
+                    rr.send(0, bundle);
+                }
             }
+            scoutThread.interrupt();
         }
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
-            connectionSemaphore.release();
-            flagSocketConnected = false;
             Log.d(TAG, "--CLOSED--  code: " + code + "  info: " + reason);
 
             Bundle bundle = new Bundle();
             bundle.putString(IPC_SOCKET_CLOSED, "TODO@RevaWebService$RevaWebSocket#onClose");
-            for (Map.Entry<String, ResultReceiver> entry : subscriberReceiverMap.entrySet()) {
-                entry.getValue().send(0, bundle);
+            for (Map.Entry<String, List<ResultReceiver>> entry : subscriberReceiverMap.entrySet()) {
+                for(ResultReceiver rr : entry.getValue()) {
+                    rr.send(0, bundle);
+                }
             }
         }
 
@@ -291,12 +379,18 @@ public class RevaWebSocketService extends Service {
                         Map.Entry<Object, Object> pair = (Map.Entry<Object, Object>) entry;
 
 
-                        ResultReceiver subscriber = subscriberReceiverMap.get(pair.getKey());
-                        if (subscriber != null) {
-                            List messageList = (List)pair.getValue();
-                            for(Object o : messageList) {
+                        List<ResultReceiver> subscriberList = subscriberReceiverMap.get(pair.getKey());
+                        if (subscriberList != null) {
+                            for(ResultReceiver subscriber : subscriberList) try {
+                                List messageList = (List) pair.getValue();
+                                for (Object o : messageList) {
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString(IPC_SOCKET_MESSAGE_PULLED, gson.toJson(o));
+                                    subscriber.send(0, bundle);
+                                }
+                            }catch (ClassCastException e){
                                 Bundle bundle = new Bundle();
-                                bundle.putString(IPC_SOCKET_MESSAGE_PULLED, o.toString());
+                                bundle.putString(IPC_SOCKET_MESSAGE_PULLED, gson.toJson(pair.getValue()));
                                 subscriber.send(0, bundle);
                             }
                         }
@@ -309,7 +403,6 @@ public class RevaWebSocketService extends Service {
 
         @Override
         public void onError(Exception ex) {
-            connectionSemaphore.release();
             Log.d(TAG, "--ERROR--" + ex);
         }
     }
@@ -319,7 +412,7 @@ public class RevaWebSocketService extends Service {
     //Got from
     // https://stackoverflow.com/questions/44572162/java-websocket-cannot-resolve-setwebsocketfactory
     //https://github.com/TooTallNate/Java-WebSocket/issues/263
-    public void trustAllHosts(WebSocketClient client) {
+    public WebSocketClient trustAllHosts(WebSocketClient client) {
         TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             public X509Certificate[] getAcceptedIssuers() {
                 X509Certificate[] myTrustedAnchors = new X509Certificate[0];
@@ -344,6 +437,7 @@ public class RevaWebSocketService extends Service {
         catch (Exception e){
             e.printStackTrace();
         }
+        return client;
     }
     private synchronized void initScout() {
         //NOTE !! scout now also sends messages in message pool!
@@ -352,7 +446,7 @@ public class RevaWebSocketService extends Service {
             (scoutThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while (true) {
+                    while (runSouct) {
                         if (shouldReconnect()) {
                             buildAndConnect();
                         }
@@ -365,21 +459,21 @@ public class RevaWebSocketService extends Service {
                 }
             })).start();
         } else {
-            revaWebSocket.send("{pulse:0}");
         }
     }
 
     private static Gson gson = new Gson();
 
-    private void runBroker() {
-        if (isConnected()) {
-            //TODO syncronyze pushhing (i.e. send) to the pool (currenty there is a chance that map gets cleared while other thread is pusshing too pool)
-            if (publisherMessagePoolMap.size() > 0) {
-                String send = gson.toJson(publisherMessagePoolMap);
-                Log.d(TAG, "#runBroker: sending! " + send);
-                if (getAuthForHeader() != "" && isConnected()) {
-                    revaWebSocket.send(send);
-                    publisherMessagePoolMap.clear();
+    private synchronized void runBroker() {
+        synchronized (RevaWebSocketService.class) {
+            if (isConnected()) {
+                if (publisherMessagePoolMap.size() > 0) {
+                    String send = gson.toJson(publisherMessagePoolMap);
+                    Log.d(TAG, "#runBroker: sending! " + send);
+                    if (getAuthForHeader() != "" && isConnected()) {
+                        revaWebSocket.send(send);
+                        publisherMessagePoolMap.clear();
+                    }
                 }
             }
         }
@@ -387,18 +481,8 @@ public class RevaWebSocketService extends Service {
 
     private void buildAndConnect() {
         try {
-            connectionSemaphore.acquire();
-            if (isConnected()) {
-                revaWebSocket.close();
-            }
-            boolean wasNull = revaWebSocket == null;
-            revaWebSocket = buildRevaWebSocket();
-            if(wasNull){
-                //trustAllHosts(revaWebSocket);//for now care for MAN IN THE MIDDLE
-            }
-            revaWebSocket.connect();
-
-        } catch (InterruptedException e) {
+            trustAllHosts(buildRevaWebSocket()).connect();
+        } catch (Exception e) {
         }
     }
 
@@ -420,7 +504,7 @@ public class RevaWebSocketService extends Service {
     private RevaWebSocket buildRevaWebSocket() {
         try {
             return new RevaWebSocket(
-                    new URI("ws://192.168.56.1:8080"),
+                    new URI("wss://" + getString(R.string.serverURL) + ":" + getString(R.string.webSocketServerPort)),
                     new Draft_6455(),
                     genHeader(),
                     tryConnectTimeout
@@ -453,15 +537,14 @@ public class RevaWebSocketService extends Service {
         return revaWebSocket.isOpen();
     }
 
-    private boolean flagSocketConnected = false;//use this to ensure only one open socket
     private boolean flagForceReconnect = false;
     private final int START_SLEEP_MS = 1000;
     private final int SCOUT_MAX_SLEEP = 10000;
-    private final int tryConnectTimeout = 4000;
+    private final int tryConnectTimeout = 5000;
     private int sleepMs = START_SLEEP_MS;
     private boolean scoutRunning = false;
-    private static Semaphore connectionSemaphore = new Semaphore(4);
     private static Thread scoutThread = null;
     private static RevaWebSocket revaWebSocket = null;
+    private boolean runSouct = true;
     // ----------------------------------- END socket Management ------------------------------
 }

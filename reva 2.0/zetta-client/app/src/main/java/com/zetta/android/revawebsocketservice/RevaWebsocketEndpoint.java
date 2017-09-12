@@ -39,26 +39,43 @@ public abstract class RevaWebsocketEndpoint {
     //NOTE! may return null;
     public final RevaWebSocketService.Publisher getPublisher(){return mPublisher;}
     public final RevaWebSocketService.Publisher bind (Context context) {
+        if(mPublisher != null){
+            return mPublisher;
+        }
         Intent subscriberIntent = new Intent(context, RevaWebSocketService.class);
+        String tmpTest = key();
         subscriberIntent.putExtra(
                 RevaWebSocketService.SUBSCRIBER,
-                new SubscriberResultReceiver(null));
+                subscriberResultReceiver);
         subscriberIntent.putExtra(
                 RevaWebSocketService.SUBSCRIBER_KEY,
                 key()
         );
+
         context.bindService(subscriberIntent, mConnection, Context.BIND_AUTO_CREATE);
+        RevaWebSocketService.notifyServiceBind(key(), subscriberResultReceiver);
         return (mPublisher = RevaWebSocketService.localStartService(context, subscriberIntent, key()));
     }
     public final void unbind(Context context){
-        context.unbindService(mConnection);
+        if(mPublisher != null) {
+            mPublisher = null;
+            context.unbindService(mConnection);
+            RevaWebSocketService.notifyServiceUnbind(key(), subscriberResultReceiver);
+        }
     }
 
-    public final void dispableEndpoint(){
-        //TODO disable streaming to this spessific endpoint
+    private Boolean flagResumeService = null;
+    public final void autoService(){
+        flagResumeService = null;
+        resumeOrPause();
     }
-    public final void enableEndpoint(){
-        //TODO enable streaming to this spessific endpoint
+    public final void pauseService(){
+        flagResumeService = false;
+        resumeOrPause();
+    }
+    public final void resumeService(){
+        flagResumeService = true;
+        resumeOrPause();
     }
 
     public PushChainer getPushChainer(){return new PushChainer();}
@@ -87,6 +104,7 @@ public abstract class RevaWebsocketEndpoint {
     }
 
     private static GsonBuilder builder = new GsonBuilder();
+    SubscriberResultReceiver subscriberResultReceiver = new SubscriberResultReceiver(null);
     class SubscriberResultReceiver extends ResultReceiver {
         public SubscriberResultReceiver(Handler handler) {
             super(handler);
@@ -110,6 +128,7 @@ public abstract class RevaWebsocketEndpoint {
             }
             got = resultData.getString(RevaWebSocketService.IPC_SOCKET_OPENED);
             if(got != null) {
+                resumeOrPause();
                 onOpen(got);
             }
         }
@@ -123,6 +142,7 @@ public abstract class RevaWebsocketEndpoint {
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             mService = ((RevaWebSocketService.LocalBinder) service).getService();
+            resumeOrPause();
             onServiceConnect(mService);
         }
         @Override
@@ -131,4 +151,14 @@ public abstract class RevaWebsocketEndpoint {
             onServiceDisconnect();
         }
     };
+
+    private void resumeOrPause() {
+        if (flagResumeService != null && mService != null) {
+            if (flagResumeService) {
+                mService.rccResumeService(key());
+            } else {
+                mService.rccPauseService(key());
+            }
+        }
+    }
 }

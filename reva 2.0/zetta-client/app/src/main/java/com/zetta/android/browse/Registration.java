@@ -4,6 +4,7 @@ package com.zetta.android.browse;
  * Created by Hristian Vitrychenko on 27/07/2017.
  */
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,17 +16,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
-
-import org.w3c.dom.Text;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +35,8 @@ public class Registration extends AppCompatActivity {
      *
      * @param savedInstanceState used to save instance
      */
+    ProgressDialog connectToCloudWaitDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,7 +127,7 @@ public class Registration extends AppCompatActivity {
         confPass = text.getText().toString();
 
         Context context = this;
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+        final AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please double check kiss your details");
         builder1.setCancelable(true);
 
@@ -172,6 +170,24 @@ public class Registration extends AppCompatActivity {
             //NOTE! Moved the startActivityForResult execute after confirmation of available email
             //TODO what if no connection? -> override onConnect/Disconnect etc.
             userManagerEndpoint.getPublisher().send(KEY_EMAIL_AVAILABLE, regEmail);
+
+            connectToCloudWaitDialog = new ProgressDialog(this){
+                @Override
+                public void onBackPressed() {
+                    connectToCloudWaitDialog.dismiss();
+                    builder1.setMessage("We could not connect to the cloud.\nPlease try again later.");
+                    AlertDialog alertWarning = builder1.create();
+                    alertWarning.show();
+
+                    connectToCloudWaitDialog = null;
+                    super.onBackPressed();
+                }
+            };
+            connectToCloudWaitDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            connectToCloudWaitDialog.setMessage("...connecting to the cloud...");
+            connectToCloudWaitDialog.setIndeterminate(true);
+            connectToCloudWaitDialog.setCanceledOnTouchOutside(false);
+            connectToCloudWaitDialog.show();
         }
     }
 
@@ -187,27 +203,33 @@ public class Registration extends AppCompatActivity {
             GsonBuilder builder = new GsonBuilder();
 
             if (obj.containsKey(KEY_EMAIL_AVAILABLE)) {
-                if ((Boolean)obj.get(KEY_EMAIL_AVAILABLE)) {
-                    if (patient) {
-                        /////////////////////////////////////////change intent to Registration_cont
-                        Intent toReg = new Intent(Registration.this, Registration_Cont.class);
-                        toReg.putExtra("regEmail", regEmail);
-                        toReg.putExtra("regPass", regPass);
-                        startActivityForResult(toReg, 0);
-                    } else {
-                        ////////////////////////////////////////change intent to Registration_Sub
-                        Intent toSub = new Intent(Registration.this, Registration_Sub.class);
-                        toSub.putExtra("regEmail", regEmail);
-                        toSub.putExtra("regPass", regPass);
-                        startActivityForResult(toSub, 0);
-                    }
-                } else {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            EditText text = (EditText) findViewById(R.id.input_emailReg);
-                            text.setError("This email is not available");
+                if (connectToCloudWaitDialog != null) {
+                    connectToCloudWaitDialog.dismiss();
+                    try {
+                        final String emailFieldError = (String) obj.get(KEY_EMAIL_AVAILABLE);
+                        if (emailFieldError.length() == 0) {
+                            if (patient) {
+                                /////////////////////////////////////////change intent to Registration_cont
+                                Intent toReg = new Intent(Registration.this, Registration_Cont.class);
+                                toReg.putExtra("regEmail", regEmail);
+                                toReg.putExtra("regPass", regPass);
+                                startActivityForResult(toReg, 0);
+                            } else {
+                                ////////////////////////////////////////change intent to Registration_Sub
+                                Intent toSub = new Intent(Registration.this, Registration_Sub.class);
+                                toSub.putExtra("regEmail", regEmail);
+                                toSub.putExtra("regPass", regPass);
+                                startActivityForResult(toSub, 0);
+                            }
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    EditText text = (EditText) findViewById(R.id.input_emailReg);
+                                    text.setError(emailFieldError);
+                                }
+                            });
                         }
-                    });
+                    }catch (ClassCastException e){}
                 }
             }
         }
@@ -219,9 +241,6 @@ public class Registration extends AppCompatActivity {
 
         @Override
         public void onServiceConnect(RevaWebSocketService service) {
-            if(service.getAuthForHeader() == null) {
-                //service.setLogin("--ANONYMOUS--", "");
-            }
         }
     }
 }

@@ -82,7 +82,7 @@ public class login_activity extends AppCompatActivity {
         final EditText user = (EditText) findViewById(R.id.input_emailLogin);
         final EditText passw = (EditText) findViewById(R.id.input_passwordLogin);
 
-        /*user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
@@ -91,7 +91,7 @@ public class login_activity extends AppCompatActivity {
                     user.setHint("");
                 }
             }
-        });*/
+        });
 
 
         /* Setting an OnClickListener allows us to do something when this button is clicked. */
@@ -163,6 +163,17 @@ public class login_activity extends AppCompatActivity {
         realTimeDataEndpoint.unbind(this);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+        realTimeDataEndpoint.resumeService();
+    }
+    @Override
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+        realTimeDataEndpoint.pauseService();
+    }
+
     /**
      * Validation of login details and attempt to continue to main
      */
@@ -227,8 +238,7 @@ public class login_activity extends AppCompatActivity {
 
 
 
-
-    RealTimeDataEndpoint realTimeDataEndpoint = new RealTimeDataEndpoint();
+        RealTimeDataEndpoint realTimeDataEndpoint = new RealTimeDataEndpoint();
     class RealTimeDataEndpoint extends RevaWebsocketEndpoint {
         private final String TAG = this.getClass().getName();
         @Override
@@ -250,6 +260,10 @@ public class login_activity extends AppCompatActivity {
             }catch (Exception e){
                 Log.e(TAG, e.toString());
             }
+        }
+        @Override
+        public void onServiceConnect(RevaWebSocketService service) {
+            resumeService();
         }
     }
 
@@ -281,12 +295,15 @@ public class login_activity extends AppCompatActivity {
         @Override
         public void onServiceConnect(RevaWebSocketService service) {
             String authId = service.getAuthId();
+            boolean f = service.isLoggedIn();
+            /*
             if(authId != null && authId.compareTo("--ANONYMOUS--") != 0) {
                 Toast.makeText(login_activity.this, "Welcome " + authId, Toast.LENGTH_SHORT).show();
                 Intent intent =  new Intent(login_activity.this, MainActivity.class);
                 intent.putExtra("Username", service.getAuthId().toString());
                 startActivity(intent);
             }
+            */
         }
     }
 }

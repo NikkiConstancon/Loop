@@ -272,7 +272,7 @@ public class Registration_Patient extends AppCompatActivity {
                                 Log.e(TAG, ((LinkedTreeMap)obj.get(KEY_REGISTER_USER)).toString());
                                 //TODO: something went wrong!
                             }
-                        }catch (Exception e){
+                        }catch (Exception e) {
                             Log.e(TAG, e.toString());
                         }
                     }
