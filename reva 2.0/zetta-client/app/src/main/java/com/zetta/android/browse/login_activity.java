@@ -82,7 +82,7 @@ public class login_activity extends AppCompatActivity {
         final EditText user = (EditText) findViewById(R.id.input_emailLogin);
         final EditText passw = (EditText) findViewById(R.id.input_passwordLogin);
 
-        user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        /*user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
@@ -91,7 +91,7 @@ public class login_activity extends AppCompatActivity {
                     user.setHint("");
                 }
             }
-        });
+        });*/
 
 
         /* Setting an OnClickListener allows us to do something when this button is clicked. */
@@ -153,25 +153,14 @@ public class login_activity extends AppCompatActivity {
         });
         userManagerEndpoint.bind(this);
         //pulseEndpoint.bind(this);
-        realTimeDataEndpoint.bind(this);
+
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
         userManagerEndpoint.unbind(this);
         //pulseEndpoint.unbind(this);
-        realTimeDataEndpoint.unbind(this);
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();  // Always call the superclass method first
-        realTimeDataEndpoint.resumeService();
-    }
-    @Override
-    public void onPause() {
-        super.onPause();  // Always call the superclass method first
-        realTimeDataEndpoint.pauseService();
     }
 
     /**
@@ -238,34 +227,7 @@ public class login_activity extends AppCompatActivity {
 
 
 
-        RealTimeDataEndpoint realTimeDataEndpoint = new RealTimeDataEndpoint();
-    class RealTimeDataEndpoint extends RevaWebsocketEndpoint {
-        private final String TAG = this.getClass().getName();
-        @Override
-        public String key() {
-            return "RTDS";
-        }
 
-        public void onMessage(String message){
-            Log.i("STUFF", message );
-        }
-        public void onMessage(LinkedTreeMap obj){
-            try {
-                for (Map.Entry<String, List> entry : ((Map<String, List>) obj).entrySet()){
-                    String patientName = entry.getKey();
-                    for(Map row : (List<Map<String, Double>>)entry.getValue()){
-                        Log.i(TAG, patientName + " " + row.toString());
-                    }
-                }
-            }catch (Exception e){
-                Log.e(TAG, e.toString());
-            }
-        }
-        @Override
-        public void onServiceConnect(RevaWebSocketService service) {
-            resumeService();
-        }
-    }
 
 
     /*PulseEndpoint pulseEndpoint = new PulseEndpoint();

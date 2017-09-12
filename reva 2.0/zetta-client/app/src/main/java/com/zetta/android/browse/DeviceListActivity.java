@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.novoda.notils.logger.simple.Log;
 import com.zetta.android.BuildConfig;
 import com.zetta.android.ImageLoader;
@@ -25,9 +26,12 @@ import com.zetta.android.R;
 import com.zetta.android.ZettaDeviceId;
 import com.zetta.android.device.DeviceDetailsActivity;
 import com.zetta.android.device.actions.OnActionClickListener;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
+import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.SdkProperties;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,9 +45,6 @@ public class DeviceListActivity extends Fragment {
     static {
         Log.setShowLogs(BuildConfig.DEBUG);
     }
-    public static void onBackgroundTaskDataObtained(String URL) {
-
-    }
 
     private DeviceListService deviceListService;
     private DeviceListAdapter adapter;
@@ -51,7 +52,6 @@ public class DeviceListActivity extends Fragment {
     private EmptyLoadingView emptyLoadingWidget;
     private BottomSheetBehavior<? extends View> bottomSheetBehavior;
     private QuickActionsAdapter quickActionsAdapter;
-    private SwipeRefreshLayout pullRefreshWidget;
     private static SdkProperties sdkProperties;
 
     @Nullable
@@ -90,10 +90,103 @@ public class DeviceListActivity extends Fragment {
         deviceListWidget.setItemAnimator(null);
 
         bottomSheetBehavior = BottomSheetBehavior.from(deviceQuickActionsWidget);
-        pullRefreshWidget = (SwipeRefreshLayout) view.findViewById(R.id.pull_refresh);
-        pullRefreshWidget.setOnRefreshListener(onPullRefreshListener);
 
+
+        // real time data streaming NEW AND SHINY WEBSOCKET BIZ
+        realTimeDataEndpoint.bind(this.getContext());
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        //pulseEndpoint.unbind(this);
+        realTimeDataEndpoint.unbind(this.getContext());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+
+        updateState();
+        if (deviceListService.hasRootUrl()) {
+            deviceListService.getDeviceList(onDeviceListLoaded);
+        }
+
+        realTimeDataEndpoint.resumeService();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+        realTimeDataEndpoint.pauseService();
+    }
+
+    RealTimeDataEndpoint realTimeDataEndpoint = new RealTimeDataEndpoint();
+
+    class RealTimeDataEndpoint extends RevaWebsocketEndpoint {
+        private final String TAG = this.getClass().getName();
+        @Override
+        public String key() {
+            return "RTDS";
+        }
+
+        public void onMessage(String message){
+            android.util.Log.i("STUFF", message );
+        }
+        public void onMessage(LinkedTreeMap obj){
+            List<ListItem> list = adapter.getListItems();
+            try {
+                for (Map.Entry<String, List> entry : ((Map<String, List>) obj).entrySet()){
+                    String patientName = entry.getKey();
+
+
+                    if (list.get(0) instanceof ServerListItem) {
+                        ServerListItem temp = (ServerListItem) list.get(0); // first item in list is server name
+                        Log.i("NAME", temp.getName());
+                    }
+                    List<ListItem> toBeAdded = new ArrayList<ListItem>();
+                    for(Map row : (List<Map<String, Double>>)entry.getValue()){
+
+                        android.util.Log.i(TAG, patientName + " " + row.toString());
+                        //TODO: this is SOOOOOOO inefficient, must fix!!
+
+                        Iterator<ListItem> iter = list.iterator();
+
+                        while (iter.hasNext()) {
+                            ListItem item = iter.next();
+                            if (item instanceof DeviceListItem) {
+                                DeviceListItem temp = (DeviceListItem)item;
+                                String title = row.toString();     // full file name
+
+                                String[] parts = title.split("\\=");
+
+                                title = parts[0].substring(1);
+                                String state = parts[1].substring(0, parts[1].length()-1);
+
+                                if (temp.getName().equals(title)) {
+                                    Log.d("ISEQ", title + " FOUND");
+                                    temp.setState(state);
+                                    toBeAdded.add(temp);
+                                }
+                            }
+
+                        }
+
+                    }
+                    
+                    adapter.update(toBeAdded);
+
+                }
+            }catch (Exception e){
+                android.util.Log.e(TAG, e.toString());
+            }
+        }
+        @Override
+        public void onServiceConnect(RevaWebSocketService service) {
+            resumeService();
+        }
     }
 
     @Override
@@ -139,15 +232,6 @@ public class DeviceListActivity extends Fragment {
         }
     };
 
-    @NonNull private final SwipeRefreshLayout.OnRefreshListener onPullRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            Toast.makeText(getActivity(), "Refreshing...", Toast.LENGTH_SHORT).show();
-            deviceListService.getDeviceList(onDeviceListLoaded);
-            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
-        }
-    };
-
     @NonNull private final DeviceListService.Callback onQuickActionsCallback = new DeviceListService.Callback() {
         @Override
         public void on(@NonNull List<ListItem> listItems) {
@@ -155,16 +239,7 @@ public class DeviceListActivity extends Fragment {
         }
     };
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        updateState();
-        if (deviceListService.hasRootUrl()) {
-            deviceListService.getDeviceList(onDeviceListLoaded);
-            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate); //starts listening for stream updates
-        }
-    }
-
+    /*
     @NonNull private final DeviceListService.DevicesUpdateListener onStreamedUpdate = new DeviceListService.DevicesUpdateListener() {
         @Override
         public void onUpdated(@NonNull List<ListItem> listItems) {
@@ -174,14 +249,15 @@ public class DeviceListActivity extends Fragment {
             adapter.update(listItems); //when there is an update the list adapter is updated
         }
     };
+    */
+
 
     @NonNull private final DeviceListService.Callback onDeviceListLoaded = new DeviceListService.Callback() {
         @Override
         public void on(@NonNull List<ListItem> listItems) {
             adapter.replaceAll(listItems);
-            pullRefreshWidget.setRefreshing(false);
             updateState();
-            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
+            //deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
         }
     };
 
@@ -198,12 +274,5 @@ public class DeviceListActivity extends Fragment {
             emptyLoadingWidget.setVisibility(View.VISIBLE);
             deviceListWidget.setVisibility(View.GONE);
         }
-    }
-
-
-    @Override
-    public void onPause() {
-        deviceListService.stopMonitoringStreamedUpdates();
-        super.onPause();
     }
 }

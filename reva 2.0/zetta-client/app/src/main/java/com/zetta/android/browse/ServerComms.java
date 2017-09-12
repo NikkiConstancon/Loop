@@ -184,7 +184,7 @@ public class ServerComms extends AsyncTask<String, Void, Boolean> {
             }
         } else {
             Log.d("result", this.result);
-            DeviceListActivity.onBackgroundTaskDataObtained(this.result);
+            //DeviceListActivity.onBackgroundTaskDataObtained(this.result);
             //TODO: handle the result here
         }
 
