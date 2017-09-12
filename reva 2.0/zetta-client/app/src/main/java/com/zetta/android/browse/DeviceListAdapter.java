@@ -19,10 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    @NonNull
-    public List<ListItem> getListItems() {
-        return listItems;
-    }
 
     @NonNull private final List<ListItem> listItems = new ArrayList<>();
 

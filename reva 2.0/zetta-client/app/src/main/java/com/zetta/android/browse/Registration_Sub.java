@@ -6,12 +6,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
+import com.zetta.android.revawebsocketservice.ChannelPublisher;
+import com.zetta.android.revawebsocketservice.CloudAwaitObject;
+import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Hristian Vitrychenko on 22/08/2017.
@@ -52,6 +61,7 @@ public class Registration_Sub extends AppCompatActivity {
                 registerSub();
             }
         });
+        userManagerEndpoint.bind(this);
     }
 
     RadioGroup rg4;
@@ -133,15 +143,14 @@ public class Registration_Sub extends AppCompatActivity {
     /**
      * Method that completes the subscriber registration process (Validation and intent change)
      */
-    public void registerSub()
-    {
+    public void registerSub() {
         EditText text = (EditText) findViewById(R.id.input_whoSub);
         toWho = text.getText().toString();
         text = (EditText) findViewById(R.id.input_subToPatientPass);
         toWhoPass = text.getText().toString();
 
         final Context context = this;
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+        final AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please fill in all details.");
         builder1.setCancelable(true);
 
@@ -155,17 +164,65 @@ public class Registration_Sub extends AppCompatActivity {
 
         //Need some database validation here!
 
-        if(toWho.length() < 1 || toWhoPass.length() < 1 || checkedRad == false)
-        {
+        if (toWho.length() < 1 || toWhoPass.length() < 1 || checkedRad == false) {
             builder1.setMessage("Please fill in all details.");
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
-        }
-        else
-        {
-            String regEmail = getIntent().getStringExtra("regEmail");
-            String regPass = getIntent().getStringExtra("regPass");
+        } else {
+            final String regEmail = getIntent().getStringExtra("regEmail");
+            final String regPass = getIntent().getStringExtra("regPass");
 
+            //Relation: "doctor",
+            //PatientList: {Username: "Username_test", AccessPassword: "AccessPassword"}
+            Map<String, String> PatientList = new TreeMap<>();
+            PatientList.put("Username", toWho);
+            PatientList.put("AccessPassword", toWhoPass);
+            Map<String, Object> sendMap = new TreeMap<>();
+            sendMap.put("Email", regEmail);
+            sendMap.put("Password", regPass);
+            sendMap.put("Relation", "-TO-GET-THE-RELATION-");
+            sendMap.put("PatientList", PatientList);
+
+
+
+            userManagerEndpoint.attachCloudAwaitObject(true, new CloudAwaitObject("REGISTER") {
+                @Override
+                public Object get(Object obj, ChannelPublisher pub) {
+                    Object ret = null;
+                    try {
+                        final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>) obj;
+                        if ((boolean) got.get("NON_PATIENT_PASS")) {
+                            ret = true;
+                            userManagerEndpoint.getService().setLogin(regEmail, regPass);
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(Registration_Sub.this, "Welcome " + regEmail, Toast.LENGTH_LONG).show();
+                                    Intent intent = new Intent(Registration_Sub.this, MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    intent.putExtra("Username", regEmail.toString());
+                                    startActivity(intent);
+                                }
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    try {
+                                        builder1.setMessage((String) got.get("NON_PATIENT_ERROR"));
+                                        AlertDialog alertWarning = builder1.create();
+                                        alertWarning.show();
+                                    } catch (Exception e) {
+                                    }
+                                }
+                            });
+                        }
+                    } catch (Exception e) {
+                        Log.e(this.getClass().getName(), e.toString());
+                    }
+                    return ret;
+                }
+            }).send(this, "REGISTER_NON_PATIENT", sendMap);
+
+/*
             builder1.setPositiveButton(
                     "OK",
                     new DialogInterface.OnClickListener() {
@@ -182,8 +239,17 @@ public class Registration_Sub extends AppCompatActivity {
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
             //register subscriber in database
-
+*/
         }
         //Database validation needed for this section in terms of existing users and subscriber passwords
+    }
+
+
+    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
+    class UserManagerEndpoint extends RevaWebsocketEndpoint {
+        @Override
+        public String key() {
+            return "UserManager";
+        }
     }
 }
