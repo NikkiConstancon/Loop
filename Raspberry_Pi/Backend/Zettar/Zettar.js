@@ -33,6 +33,9 @@ var callback = function (info, data) {
 
     patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
     info
+    // patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
+//console.log(data[0].topic)
+//console.log(info.from)
 }
 
 //pass the initialized zetta var to a new hook
@@ -50,6 +53,7 @@ var hook = new Hook(initializedZetta)
         connect: function (peer) {
             patientManager.bindZettalet(peer.name, encodeURI(peer.name))
                 .then(function (pat) {
+
                     //do it this way, else field is out of date
                     patientManager.getPatient(pat).then(function (pat) {
                         logger.info('user [' + pat.Username + "]'s device connected with api uri: " + pat.ZettaletUuid)

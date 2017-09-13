@@ -60,7 +60,7 @@ module.exports = {
 }
 */
 
-var userName = 'Patient ' + uuidv1()
+var userName = 'Patient'
 
 xdescribe('PatientManager', function () {
     describe('database CRUD', function () {
@@ -95,17 +95,32 @@ xdescribe('PatientManager', function () {
             })
         })
 
-        // describe("#getPatient", function () {
-        //     it("gets a user from the db", function () {
-        //         return PatientManager
-        //             .getPatient('name-test')
-        //             .then((user) => {
-        //                 expect(user.name).to.equal('name-test');
-        //                 expect(user.surname).to.equal('surname-test');
-        //                 expect(user.age).to.equal(100);
-        //             })
-        //     })
-        // })
+        describe("#checkUsernameExists", function () {
+            it("username is already in use", function () {
+                return PatientManager
+                    .checkUsernameExists(userName)
+                    .then((user) => {
+                        expect(user).to.equal(true);
+                    })
+            })
+            it("username is not in use", function () {
+                return PatientManager
+                    .checkUsernameExists("no-One")
+                    .then((user) => {
+                        expect(user).to.equal(false);
+                    })
+            })
+        })
+
+        describe("#getPatient", function () {
+            it("gets a user from the db", function () {
+                return PatientManager
+                    .getPatient({Username : userName})
+                    .then((user) => {
+                        expect(user.Username).to.equal(userName);
+                    })
+            })
+        })
     })
     describe('Email validation', function () {
         var poll = function () {
