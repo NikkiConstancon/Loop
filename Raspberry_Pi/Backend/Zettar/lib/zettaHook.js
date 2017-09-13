@@ -124,11 +124,11 @@ var listenZettaUpdates = function (args) {
         server.observe([server.from(from).where(where)], function (thing) {
             try {
                 //capture info
-                var info = { from: sharedKeys.decrypt(from), topicName: topicName, where: where }
+                var info = { from: from, type: thing.type, name:thing.name, topicName: topicName}
                 var key = buildObserveKeyForHook(thing, topicName)
                 logger.debug('#listenZettaStream: key:', key)
-                hookObserveEmiter(thing, key, function () {
-                    cb(info, arguments)
+                hookObserveEmiter(thing, key, function (response) {
+                    cb(info, response)
                 })
             } catch (e) {
                 logger.debug('#listenZettaStream', e)
@@ -145,7 +145,8 @@ var buildObserveKeyForHook = function (thing, topicName) {
 }
 var hookObserveEmiter = function (thing, emiterKey, cb) {
     if (!thing._socket._events[emiterKey]) {
-        throw new Error('#hookZettaEmiter: invalid emiterKey ' + emiterKey)
+        logger.warn('@ZettaHook$hookObserveEmiter: no explicitly bound key [' + emiterKey +']')
+        //throw new Error('#hookZettaEmiter: invalid emiterKey ' + emiterKey)
     }
     thing._socket._events[emiterKey] = cb
 }

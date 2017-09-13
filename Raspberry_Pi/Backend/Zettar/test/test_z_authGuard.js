@@ -22,7 +22,7 @@ var server = require('../webServer.js')
 
 var lastLogLevel;
 var username = 'authGuard ' + uuidv1()
-describe('AuthGuard', function () {
+xdescribe('AuthGuard', function () {
     describe('server response', function () {
         before(function () {
             lastLogLevel = logger.level

@@ -110,7 +110,7 @@ var patientManager = module.exports = {
             dbMan.try().then(function () {
                 dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
                     if (err || !found) {
-                        err = err || 'invalid username'
+                        err = err || { clientSafe: 'Could not find ' + _patient.Username }
                         logger.error(err)
                         reject(err)
                     } else {

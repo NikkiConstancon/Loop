@@ -22,22 +22,31 @@ var dbManager1 = require("./userManager");
 var patientManager = require("./patientManager");
 var patientDataManager = require("./patientDataManager");
 
+const realtimeDataService = require('./lib/realtimeDataService')
+
 
 //init zetta as usual, but dont call link yet
 //  the listen call is deferred to the hook
 var initializedZetta = zetta('peers').name('Zettar')
 
 var callback = function (info, data) {
+
+    patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
+    info
     // patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
-console.log(data[0].topic)
-console.log(info.from)
+//console.log(data[0].topic)
+//console.log(info.from)
 }
 
 //pass the initialized zetta var to a new hook
 var hook = new Hook(initializedZetta)
     //call listen as you wold on zetta
-    .listen(3009, function () {
-        console.log('Zettar is running : 3009');
+    .listen(3009, function (e) {
+        if (e) {
+            console.log("Zetta errot:", e)
+        } else {
+            console.log('Zettar is running');
+        }
     })
     //here you hook the streams
     .registerStreamListener({
@@ -65,6 +74,25 @@ var hook = new Hook(initializedZetta)
         }
     })
     .registerStreamListener({
+        //temporary for testing with old stuff
+        topicName: 'value',
+        cb: function (info, response) {
+            realtimeDataService.publish(info, response);
+        },
+        errcb: function (e) {
+            console.log(e)
+        }
+    })
+    .registerStreamListener({
+        topicName: 'vitals',
+        cb: function (info, response) {
+            realtimeDataService.publish(info, response);
+        },
+        errcb: function (e) {
+            console.log(e)
+        }
+    })
+    /*.registerStreamListener({
         topicName: 'vitals',
         where: { type: 'Heart', name: 'Heart-rate' },
         cb: callback,
@@ -95,4 +123,4 @@ var hook = new Hook(initializedZetta)
         errcb: function (e) {
             console.log(e)
         }
-    })
+    })*/
