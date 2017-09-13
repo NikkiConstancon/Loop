@@ -29,21 +29,13 @@ const realtimeDataService = require('./lib/realtimeDataService')
 //  the listen call is deferred to the hook
 var initializedZetta = zetta('peers').name('Zettar')
 
-var callback = function (info, data) {
-
-    patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
-    info
-    // patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
-//console.log(data[0].topic)
-//console.log(info.from)
-}
 
 //pass the initialized zetta var to a new hook
 var hook = new Hook(initializedZetta)
     //call listen as you wold on zetta
     .listen(3009, function (e) {
         if (e) {
-            console.log("Zetta errot:", e)
+            console.log("Zetta error:", e)
         } else {
             console.log('Zettar is running');
         }
@@ -74,53 +66,12 @@ var hook = new Hook(initializedZetta)
         }
     })
     .registerStreamListener({
-        //temporary for testing with old stuff
-        topicName: 'value',
+        topicName: 'vitals',
         cb: function (info, response) {
             realtimeDataService.publish(info, response);
+            patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.type, TimeStamp: response.timestamp, Value: parseFloat(response.data) });
         },
         errcb: function (e) {
             console.log(e)
         }
     })
-    .registerStreamListener({
-        topicName: 'vitals',
-        cb: function (info, response) {
-            realtimeDataService.publish(info, response);
-        },
-        errcb: function (e) {
-            console.log(e)
-        }
-    })
-    /*.registerStreamListener({
-        topicName: 'vitals',
-        where: { type: 'Heart', name: 'Heart-rate' },
-        cb: callback,
-        errcb: function (e) {
-            console.log(e)
-        }
-    })
-    .registerStreamListener({
-        topicName: 'vitals',
-        where: { type: 'thermometer', name: 'Body_temperature' },
-        cb: callback,
-        errcb: function (e) {
-            console.log(e)
-        }
-    })
-    .registerStreamListener({
-        topicName: 'vitals',
-        where: { type: 'glucose' },
-        cb: callback,
-        errcb: function (e) {
-            console.log(e)
-        }
-    })
-    .registerStreamListener({
-        topicName: 'vitals',
-        where: { type: 'insulin' },
-        cb: callback,
-        errcb: function (e) {
-            console.log(e)
-        }
-    })*/
