@@ -175,7 +175,7 @@ public class DeviceListActivity extends Fragment {
                         }
 
                     }
-                    
+
                     adapter.update(toBeAdded);
 
                 }
