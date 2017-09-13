@@ -58,7 +58,7 @@ class DeviceList {
             List<ListItem> items = new ArrayList<>();
             boolean hasServer = false; //hotfix
             for (ZIKServer server : servers) {
-                if (server.getName().equals(name)) { //hotfix
+               // if (server.getName().equals(name)) { //hotfix
                     ZettaStyle serverStyle = zettaStyleParser.parseStyle(server);
                     items.add(createServerListItem(serverStyle, server));
 
@@ -72,7 +72,7 @@ class DeviceList {
                         }
                     }
                     hasServer = true;
-                }
+                //}
             }
 
 
@@ -115,7 +115,7 @@ class DeviceList {
         @NonNull
         public DeviceListItem createDeviceListItem(@NonNull ZIKServer server, @NonNull ZIKDevice device) {
             ZettaStyle style = zettaStyleParser.parseStyle(server, device);
-            String state = "NS";
+            String state = getState(server, device);
 
             Map<String, Object> properties = device.getProperties();
             String val = String.valueOf(properties.get("units"));

@@ -1,9 +1,11 @@
 package com.zetta.android.browse;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,12 +13,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
+import com.zetta.android.revawebsocketservice.ChannelPublisher;
+import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Hristian Vitrychenko on 22/08/2017.
@@ -201,10 +209,10 @@ public class Registration_Patient extends AppCompatActivity {
             alertWarning.show();
         } else {
             String regEmail = getIntent().getStringExtra("regEmail");
-            String regPass = password = getIntent().getStringExtra("regPass");
+            String regPass = getIntent().getStringExtra("regPass");
             String address = getIntent().getStringExtra("address");
-            String username = userName = userId = getIntent().getStringExtra("username");
-            String subPass = getIntent().getStringExtra("subPass");
+            final String username = getIntent().getStringExtra("username");
+            final String subPass = getIntent().getStringExtra("subPass");
 
             /*
                 Username: username,
@@ -217,69 +225,55 @@ public class Registration_Patient extends AppCompatActivity {
                 Height: 32,
                 Reason: 'Disability'
              */
-            userManagerEndpoint.getPushChainer(KEY_REGISTER_USER)
-                    .put("Email", regEmail)
-                    .put("Password", regPass)
-                    .put("Address", address)
-                    .put("Username", username)
-                    .put("AccessPassword", subPass)
-                    .send();
+
+            Map<String,String> sendMap = new TreeMap<>();
+            sendMap.put("Email", regEmail);
+            sendMap.put("Password", regPass);
+            sendMap.put("Address", address);
+            sendMap.put("Username", username);
+            sendMap.put("AccessPassword", subPass);
+
+            userManagerEndpoint.attachCloudAwaitObject(true, new CloudAwaitObject("REGISTER") {
+                @Override
+                public Object get(Object obj, ChannelPublisher pub) {
+                    Object ret = null;
+                    try{
+                        final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>)obj;
+                        if((boolean)got.get("PATIENT_PASS")) {
+                            ret = true;
+                            userManagerEndpoint.getService().setLogin(username, subPass);
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(Registration_Patient.this, "Welcome " + username, Toast.LENGTH_LONG).show();
+                                    Intent intent = new Intent(Registration_Patient.this, MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    intent.putExtra("Username", username.toString());
+                                    startActivity(intent);
+                                }
+                            });
+                        }else {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    try {
+                                        builder1.setMessage((String)got.get("PATIENT_ERROR"));
+                                        AlertDialog alertWarning = builder1.create();
+                                        alertWarning.show();
+                                    }catch (Exception e){}
+                                }
+                            });
+                        }
+                    }catch (Exception e){Log.e(this.getClass().getName(), e.toString());}
+                    return ret;
+                }
+            }).send(this, "REGISTER_PATIENT", sendMap);
 
             //NOTE! Moved the startActivityForResult execute after confirmation from server
         }
 
 
     }
-
-    String userName = "";
-    String userId = "";
-    String password = "";
-    final String KEY_REGISTER_USER = "KEY_REGISTER_USER";
     UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
-
     class UserManagerEndpoint extends RevaWebsocketEndpoint {
-        private final String TAG = this.getClass().getName();
-
-        @Override
-        public void onMessage(final LinkedTreeMap obj) {
-            Log.d(TAG, obj.toString());
-
-            if (obj.containsKey(KEY_REGISTER_USER)) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        //try because of cast etc.
-                        try {
-                            if ((Boolean) obj.get(KEY_REGISTER_USER)) {
-                                //Sucsess !
-                                userManagerEndpoint.getService().setLogin(userId, password);
-                                builder1.setPositiveButton(
-                                        "OK",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.cancel();
-                                                Intent toLogin = new Intent(Registration_Patient.this, login_activity.class);
-                                                toLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                toLogin.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                                                startActivityForResult(toLogin, 0);
-                                            }
-                                        });
-                                builder1.setMessage("You have been registered!");
-                                AlertDialog alertWarning = builder1.create();
-                                alertWarning.show();
-                            } else {
-                                //Fail !
-                                Log.e(TAG, ((LinkedTreeMap)obj.get(KEY_REGISTER_USER)).toString());
-                                //TODO: something went wrong!
-                            }
-                        }catch (Exception e) {
-                            Log.e(TAG, e.toString());
-                        }
-                    }
-                });
-            }
-        }
-
         @Override
         public String key() {
             return "UserManager";

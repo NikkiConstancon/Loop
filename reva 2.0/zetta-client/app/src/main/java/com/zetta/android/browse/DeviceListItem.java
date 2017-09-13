@@ -19,7 +19,7 @@ class DeviceListItem implements ListItem {
 
     public DeviceListItem(@NonNull ZettaDeviceId zettaDeviceId,
                           @NonNull String name,
-                          String state,
+                          @NonNull String state,
                           @NonNull ZettaStyle style,
                           @NonNull String unitOfMeasure) {
         deviceId = zettaDeviceId;
@@ -27,11 +27,6 @@ class DeviceListItem implements ListItem {
         this.state = state;
         this.style = style;
         this.unitOfMeasure = unitOfMeasure;
-    }
-
-    @NonNull
-    public ZettaStyle getStyle() {
-        return style;
     }
 
     @NonNull
@@ -59,7 +54,7 @@ class DeviceListItem implements ListItem {
         return state;
     }
 
-    public void setState(String str) { this.state = str; }
+    public void setState(String str) { state = str; }
 
     @NonNull
     public Uri getStateImageUri() {

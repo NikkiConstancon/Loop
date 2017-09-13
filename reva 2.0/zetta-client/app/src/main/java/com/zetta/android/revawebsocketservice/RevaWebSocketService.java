@@ -398,6 +398,7 @@ public class RevaWebSocketService extends Service {
                 }
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
+                Log.e(TAG, "--ON--" + message);
             }
         }
 

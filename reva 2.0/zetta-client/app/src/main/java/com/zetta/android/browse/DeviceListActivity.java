@@ -45,6 +45,9 @@ public class DeviceListActivity extends Fragment {
     static {
         Log.setShowLogs(BuildConfig.DEBUG);
     }
+    public static void onBackgroundTaskDataObtained(String URL) {
+
+    }
 
     private DeviceListService deviceListService;
     private DeviceListAdapter adapter;
@@ -52,6 +55,7 @@ public class DeviceListActivity extends Fragment {
     private EmptyLoadingView emptyLoadingWidget;
     private BottomSheetBehavior<? extends View> bottomSheetBehavior;
     private QuickActionsAdapter quickActionsAdapter;
+    private SwipeRefreshLayout pullRefreshWidget;
     private static SdkProperties sdkProperties;
 
     @Nullable
@@ -90,10 +94,9 @@ public class DeviceListActivity extends Fragment {
         deviceListWidget.setItemAnimator(null);
 
         bottomSheetBehavior = BottomSheetBehavior.from(deviceQuickActionsWidget);
+        pullRefreshWidget = (SwipeRefreshLayout) view.findViewById(R.id.pull_refresh);
+        pullRefreshWidget.setOnRefreshListener(onPullRefreshListener);
 
-
-        // real time data streaming NEW AND SHINY WEBSOCKET BIZ
-        realTimeDataEndpoint.bind(this.getContext());
         return view;
     }
 
@@ -135,6 +138,7 @@ public class DeviceListActivity extends Fragment {
         public void onMessage(String message){
             android.util.Log.i("STUFF", message );
         }
+
         public void onMessage(LinkedTreeMap obj){
             List<ListItem> list = adapter.getListItems();
             try {
@@ -232,6 +236,15 @@ public class DeviceListActivity extends Fragment {
         }
     };
 
+    @NonNull private final SwipeRefreshLayout.OnRefreshListener onPullRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            Toast.makeText(getActivity(), "Refreshing...", Toast.LENGTH_SHORT).show();
+            deviceListService.getDeviceList(onDeviceListLoaded);
+            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
+        }
+    };
+
     @NonNull private final DeviceListService.Callback onQuickActionsCallback = new DeviceListService.Callback() {
         @Override
         public void on(@NonNull List<ListItem> listItems) {
@@ -239,7 +252,6 @@ public class DeviceListActivity extends Fragment {
         }
     };
 
-    /*
     @NonNull private final DeviceListService.DevicesUpdateListener onStreamedUpdate = new DeviceListService.DevicesUpdateListener() {
         @Override
         public void onUpdated(@NonNull List<ListItem> listItems) {
@@ -249,15 +261,14 @@ public class DeviceListActivity extends Fragment {
             adapter.update(listItems); //when there is an update the list adapter is updated
         }
     };
-    */
-
 
     @NonNull private final DeviceListService.Callback onDeviceListLoaded = new DeviceListService.Callback() {
         @Override
         public void on(@NonNull List<ListItem> listItems) {
             adapter.replaceAll(listItems);
+            pullRefreshWidget.setRefreshing(false);
             updateState();
-            //deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
+            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
         }
     };
 

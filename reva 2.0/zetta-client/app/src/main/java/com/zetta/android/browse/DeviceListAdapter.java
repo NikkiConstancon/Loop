@@ -19,12 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    @NonNull private final List<ListItem> listItems = new ArrayList<>();
+
     @NonNull
     public List<ListItem> getListItems() {
         return listItems;
     }
-
-    @NonNull private final List<ListItem> listItems = new ArrayList<>();
 
     @NonNull private final ImageLoader imageLoader;
     @NonNull private final OnDeviceClickListener onDeviceClickListener;
@@ -35,6 +36,8 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.imageLoader = imageLoader;
         this.onDeviceClickListener = onDeviceClickListener;
     }
+
+
 
     public void replaceAll(@NonNull List<ListItem> listItems) {
         this.listItems.clear();
