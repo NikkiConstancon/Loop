@@ -101,6 +101,7 @@ public class Registration extends AppCompatActivity
     String regEmail = "", regPass = "", confPass = "", address = "", username = "", subPass = "", confSubPass = "";
     int ageVal = 0;
     double weight = 0, height = 0;
+    final Context context = this;
 
 
 
@@ -116,7 +117,7 @@ public class Registration extends AppCompatActivity
         text = (EditText) findViewById(R.id.input_confirmPassReg);
         confPass = text.getText().toString();
 
-        Context context = this;
+        final Context context = this;
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please double check kiss your details");
         builder1.setCancelable(true);
@@ -175,10 +176,22 @@ public class Registration extends AppCompatActivity
         else
         {
             ////////////////////////////////////////change intent to Login (Since it's a subscriber registering)
-            Intent toLogin = new Intent(context, login_activity.class);
-            toLogin.putExtra("regEmail", regEmail);
-            toLogin.putExtra("regPass", regPass);
-            startActivityForResult(toLogin, 0);
+
+            builder1.setPositiveButton(
+                    "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                            Intent toLogin = new Intent(context, login_activity.class);
+                            toLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            toLogin.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            startActivityForResult(toLogin, 0);
+                        }
+                    });
+            builder1.setMessage("You have been registered!");
+            AlertDialog alertWarning = builder1.create();
+            alertWarning.show();
         }
     }
 }
