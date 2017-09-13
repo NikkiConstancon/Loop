@@ -14,7 +14,7 @@
     <TextView
         android:layout_width="428dp"
         android:layout_height="40dp"
-        android:text="Add Simple Statistic"
+        android:text="Add New Statistic"
         android:textSize="20sp"
         android:textColor="@color/colorTextIcons"
         android:background="#38ACEC"

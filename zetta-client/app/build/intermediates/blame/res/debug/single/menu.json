@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\build\\intermediates\\res\\merged\\debug\\menu\\menu_events.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\src\\main\\res\\menu\\menu_events.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\build\\intermediates\\res\\merged\\debug\\menu\\menu_device_details.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\src\\main\\res\\menu\\menu_device_details.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\build\\intermediates\\res\\merged\\debug\\menu\\navigation.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\src\\main\\res\\menu\\navigation.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\build\\intermediates\\res\\merged\\debug\\menu\\bottom_navigation_main.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\src\\main\\res\\menu\\bottom_navigation_main.xml"
+    }
+]

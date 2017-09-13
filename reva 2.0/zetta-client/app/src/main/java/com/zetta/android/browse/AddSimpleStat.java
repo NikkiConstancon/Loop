@@ -42,11 +42,9 @@ public class AddSimpleStat extends AppCompatActivity {
     ScrollView scroll;
     Spinner spin;
 
+    //The input values
     Long startDate, endDate;
     String vital, statistic, interval;
-
-    //The input values
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +131,7 @@ public class AddSimpleStat extends AppCompatActivity {
             public void onClick(View view)
             {
 
-                int day, month, year, hour, minute;
+                int day, month, year;
 
                 Spinner checker = (Spinner) findViewById(R.id.spin_choose_vital);
                 vital = checker.getSelectedItem().toString();
@@ -171,7 +169,7 @@ public class AddSimpleStat extends AppCompatActivity {
 
                 Toast.makeText(myCont, vital + " " + statistic + " " + interval + startDate.toString() + " " + endDate.toString(),Toast.LENGTH_SHORT).show();
 
-                //Do whatever you want with the data
+                //Do whatever you want with the data here (Database stuff)
             }
         });
     }

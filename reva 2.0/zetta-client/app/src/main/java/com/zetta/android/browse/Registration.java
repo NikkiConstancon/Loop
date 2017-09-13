@@ -105,7 +105,7 @@ public class Registration extends AppCompatActivity
 
 
     /**
-     * Method that continues registration for patients (not for subscribers, validation and intent change)
+     * Method that continues registration for patients (not for subscribers. Validation and intent change)
      */
     public void contReg()
     {
@@ -174,11 +174,11 @@ public class Registration extends AppCompatActivity
         }
         else
         {
-            ////////////////////////////////////////change intent to Registration_Sub
-            Intent toSub = new Intent(context, Registration_Sub.class);
-            toSub.putExtra("regEmail", regEmail);
-            toSub.putExtra("regPass", regPass);
-            startActivityForResult(toSub, 0);
+            ////////////////////////////////////////change intent to Login (Since it's a subscriber registering)
+            Intent toLogin = new Intent(context, login_activity.class);
+            toLogin.putExtra("regEmail", regEmail);
+            toLogin.putExtra("regPass", regPass);
+            startActivityForResult(toLogin, 0);
         }
     }
 }
