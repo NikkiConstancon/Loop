@@ -24,7 +24,7 @@
     <string name="title_notifications">Notifications</string>
     <string name="webSocketServerPort">8080</string>
 
-    <string name="serverURL">iomt.dedicated.co.za</string>
+    <string name="serverURL">192.168.1.101</string>
     <string name="vitals_prompt">Choose a vital to view</string>
     <string name="simp_stat_prompt">Choose a statistic to view</string>
     <string name="stat_interval_prompt">Choose an interval</string>
@@ -49,5 +49,12 @@
         <item>Average</item>
         <item>Median</item>
         <item>Mode</item>
+    </string-array>
+
+    <string-array name="planets_array">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
     </string-array>
 </resources>
