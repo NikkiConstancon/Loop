@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +22,8 @@ import android.widget.RadioGroup;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
+import com.zetta.android.revawebsocketservice.ChannelPublisher;
+import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
@@ -35,8 +39,6 @@ public class Registration extends AppCompatActivity {
      *
      * @param savedInstanceState used to save instance
      */
-    ProgressDialog connectToCloudWaitDialog;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,47 +169,27 @@ public class Registration extends AppCompatActivity {
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
         } else {
-            //NOTE! Moved the startActivityForResult execute after confirmation of available email
-            //TODO what if no connection? -> override onConnect/Disconnect etc.
-            userManagerEndpoint.getPublisher().send(KEY_EMAIL_AVAILABLE, regEmail);
-
-            connectToCloudWaitDialog = new ProgressDialog(this){
+            final EditText emailText = (EditText) findViewById(R.id.input_emailReg);
+            emailText.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void onBackPressed() {
-                    connectToCloudWaitDialog.dismiss();
-                    builder1.setMessage("We could not connect to the cloud.\nPlease try again later.");
-                    AlertDialog alertWarning = builder1.create();
-                    alertWarning.show();
-
-                    connectToCloudWaitDialog = null;
-                    super.onBackPressed();
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
                 }
-            };
-            connectToCloudWaitDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            connectToCloudWaitDialog.setMessage("...connecting to the cloud...");
-            connectToCloudWaitDialog.setIndeterminate(true);
-            connectToCloudWaitDialog.setCanceledOnTouchOutside(false);
-            connectToCloudWaitDialog.show();
-        }
-    }
-
-    private static final String KEY_EMAIL_AVAILABLE = "TEST_EMAIL_AVAILABLE";
-    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
-
-    class UserManagerEndpoint extends RevaWebsocketEndpoint {
-        private final String TAG = this.getClass().getName();
-
-        @Override
-        public void onMessage(final LinkedTreeMap obj) {
-            Log.d(TAG, obj.toString());
-            GsonBuilder builder = new GsonBuilder();
-
-            if (obj.containsKey(KEY_EMAIL_AVAILABLE)) {
-                if (connectToCloudWaitDialog != null) {
-                    connectToCloudWaitDialog.dismiss();
-                    try {
-                        final String emailFieldError = (String) obj.get(KEY_EMAIL_AVAILABLE);
-                        if (emailFieldError.length() == 0) {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                    emailText.setError(null);
+                }
+            });
+            userManagerEndpoint.attachCloudAwaitObject(true, new CloudAwaitObject("REGISTER") {
+                @Override
+                public Object get(Object obj, ChannelPublisher pub) {
+                    Object ret = null;
+                    try{
+                        final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>)obj;
+                        if((boolean)got.get("PASS")) {
+                            ret = true;
                             if (patient) {
                                 /////////////////////////////////////////change intent to Registration_cont
                                 Intent toReg = new Intent(Registration.this, Registration_Cont.class);
@@ -221,26 +203,26 @@ public class Registration extends AppCompatActivity {
                                 toSub.putExtra("regPass", regPass);
                                 startActivityForResult(toSub, 0);
                             }
-                        } else {
+                        }else {
                             runOnUiThread(new Runnable() {
+                                @Override
                                 public void run() {
                                     EditText text = (EditText) findViewById(R.id.input_emailReg);
-                                    text.setError(emailFieldError);
+                                    emailText.setError((String) got.get("ERROR"));
                                 }
                             });
                         }
-                    }catch (ClassCastException e){}
+                    }catch (Exception e){Log.e(this.getClass().getName(), e.toString());}
+                    return ret;
                 }
-            }
+            }).send(this, "VALIDATE_EMAIL", regEmail);
         }
-
+    }
+    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
+    class UserManagerEndpoint extends RevaWebsocketEndpoint {
         @Override
         public String key() {
             return "UserManager";
-        }
-
-        @Override
-        public void onServiceConnect(RevaWebSocketService service) {
         }
     }
 }

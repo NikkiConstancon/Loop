@@ -82,7 +82,7 @@ public class login_activity extends AppCompatActivity {
         final EditText user = (EditText) findViewById(R.id.input_emailLogin);
         final EditText passw = (EditText) findViewById(R.id.input_passwordLogin);
 
-        /*user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
@@ -91,7 +91,7 @@ public class login_activity extends AppCompatActivity {
                     user.setHint("");
                 }
             }
-        });*/
+        });
 
 
         /* Setting an OnClickListener allows us to do something when this button is clicked. */
@@ -151,16 +151,10 @@ public class login_activity extends AppCompatActivity {
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         });
-        userManagerEndpoint.bind(this);
-        //pulseEndpoint.bind(this);
-
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
-        userManagerEndpoint.unbind(this);
-        //pulseEndpoint.unbind(this);
-
     }
 
     /**
@@ -221,51 +215,5 @@ public class login_activity extends AppCompatActivity {
             }
         }
         return false;
-    }
-
-
-
-
-
-
-
-
-    /*PulseEndpoint pulseEndpoint = new PulseEndpoint();
-    class PulseEndpoint extends RevaWebsocketEndpoint {
-        private final String TAG = this.getClass().getName();
-        @Override
-        public String key() {
-            return "Pulse";
-        }
-
-        public void onMessage(String message){
-            Log.i("STUFF", message );
-        }
-        public void onMessage(LinkedTreeMap obj){
-            Log.i("STUFF", obj.toString() );
-        }
-    }*/
-
-
-    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
-    class UserManagerEndpoint extends RevaWebsocketEndpoint {
-        private final String TAG = this.getClass().getName();
-        @Override
-        public String key() {
-            return RevaWebSocketService.SERVICE_USER_MANAGER_NAME;
-        }
-        @Override
-        public void onServiceConnect(RevaWebSocketService service) {
-            String authId = service.getAuthId();
-            boolean f = service.isLoggedIn();
-            /*
-            if(authId != null && authId.compareTo("--ANONYMOUS--") != 0) {
-                Toast.makeText(login_activity.this, "Welcome " + authId, Toast.LENGTH_SHORT).show();
-                Intent intent =  new Intent(login_activity.this, MainActivity.class);
-                intent.putExtra("Username", service.getAuthId().toString());
-                startActivity(intent);
-            }
-            */
-        }
     }
 }

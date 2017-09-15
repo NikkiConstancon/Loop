@@ -123,24 +123,6 @@ public class MainActivity extends AppCompatActivity
             }
         });*/
 
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
-
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.action_vitals:
-
-                            case R.id.action_advice:
-
-                            case R.id.action_settings:
-
-                        }
-                        return true;
-                    }
-                });
-
 
     }
 

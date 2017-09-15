@@ -333,24 +333,32 @@ public class RevaWebSocketService extends Service {
         }
 
         @Override
-        public void onOpen(ServerHandshake handshakedata) {
+        public void onOpen(final ServerHandshake handshakedata) {
             Log.d(TAG, "--OPENED--");
             if (revaWebSocket != null) {
                 revaWebSocket.close();
             }
             revaWebSocket = RevaWebSocket.this;
-            rccPublishServiceBindings();
-
             flagForceReconnect = false;
 
-            Bundle bundle = new Bundle();
-            bundle.putString(IPC_SOCKET_OPENED, gson.toJson(handshakedata));
-            for (Map.Entry<String, List<ResultReceiver>> entry : subscriberReceiverMap.entrySet()) {
-                for(ResultReceiver rr : entry.getValue()) {
-                    rr.send(0, bundle);
+            new Thread(){
+                @Override public void run(){
+                    try {
+                        Thread.sleep(256);
+                    }catch (Exception e){
+                        Log.i(TAG, "@connection did not sleep full length");
+                    }
+                    Bundle bundle = new Bundle();
+                    bundle.putString(IPC_SOCKET_OPENED, gson.toJson(handshakedata));
+                    for (Map.Entry<String, List<ResultReceiver>> entry : subscriberReceiverMap.entrySet()) {
+                        for(ResultReceiver rr : entry.getValue()) {
+                            rr.send(0, bundle);
+                        }
+                    }
+                    rccPublishServiceBindings();
+                    scoutThread.interrupt();
                 }
-            }
-            scoutThread.interrupt();
+            }.start();
         }
 
         @Override
@@ -398,6 +406,7 @@ public class RevaWebSocketService extends Service {
                 }
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
+                Log.e(TAG, "--ON--" + message);
             }
         }
 
