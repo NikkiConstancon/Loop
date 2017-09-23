@@ -3,7 +3,7 @@ var SubscriberManager = require('../subscriberManager');
 
 var query = module.exports.query ={
     Username: 'nikki',
-    Password: 'password',
+    Password: 'Password',
     Email: "COS332.Marthinus@gmail.com",
     Address: '42 Dale Avenue Hempton 1765',
     Age: 42,
