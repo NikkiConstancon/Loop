@@ -310,7 +310,36 @@ var patientManager = module.exports = {
             })
         })
     },
+    bindSubscriberListInofHook: function (userInfo, cb) {
+        var userUid = userInfo.Username || userInfo.Email
+        if (SubscriberListInofHookMap[userUid]) {
+            try {
+                throw "@PatientManager.bindSubscriberListInofHook: already hooked for " + JSON.stringify(userInfo)
+            } catch (e) {
+                logger.warn(e)
+            }
+        }
+        SubscriberListInofHookMap[userUid] = cb
+
+        patientManager.getPatient(userInfo).then(function (pat) {
+            SubscriberListInofHookMap[pat.Username](pat.getSubscriberList())
+        }).catch(() => { })
+    },
+    unbindSubscriberListInofHook: function (userInfo, cb) {
+        var userUid = userInfo.Username || userInfo.Email
+        if (SubscriberListInofHookMap[userUid]) {
+            delete SubscriberListInofHookMap[userUid]
+        }
+    },
     getModelInfo: function () {
         return 'keyspace ' + dbMan.getKeyspcaeName() + ', tabel patient';
     }
 }
+
+
+var SubscriberListInofHookMap = {}
+
+
+
+
+
