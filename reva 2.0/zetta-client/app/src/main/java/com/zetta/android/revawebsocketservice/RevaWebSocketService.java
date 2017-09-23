@@ -34,6 +34,7 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -137,6 +138,8 @@ public class RevaWebSocketService extends Service {
     private static final String RCC_KEY_SERVICE_BINDING_KEY_STATE = "ENABLEMENT";
     private static final String RCC_KEY_SERVICE_BINDING_KEY_NAME = "SERVICE_KEY";
     private static final String RCC_KEY_SERVICE_BINDING = "SERVICE_BINDING";
+    private static final String RCC_KEY_ERROR_DUP_DEVICE_UID = "DUP_DEVICE_UID";
+
 
     private SharedPreferences prefs = null;
 
@@ -196,8 +199,12 @@ public class RevaWebSocketService extends Service {
                 JsonElement e = jsonObject.get("ERROR");
                 JsonObject jsonError = e.getAsJsonObject();
                 if (jsonError.has("AUTH")){
-                    //TODO send to UserManager
+                    //TODO send to UserManager ??
                     clearAuthBasicToNull();
+                }if(jsonError.has(RCC_KEY_ERROR_DUP_DEVICE_UID)){
+                    if(revaWebSocket != null){
+                        revaWebSocket.close();
+                    }
                 }
             }catch (Exception e){
                 Log.e(TAG, "Error at onMessage with: " + obj.toString());
@@ -326,12 +333,6 @@ public class RevaWebSocketService extends Service {
             super(serverUri, draft, httpHeaders, timeout);
             Log.d(TAG, "--NEW-- RevaWebSocket");
         }
-
-        private RevaWebSocket(URI serverURI) {
-            super(serverURI);
-            Log.d(TAG, "--NEW-- RevaWebSocket");
-        }
-
         @Override
         public void onOpen(final ServerHandshake handshakedata) {
             Log.d(TAG, "--OPENED--");
@@ -357,12 +358,14 @@ public class RevaWebSocketService extends Service {
                     }
                     rccPublishServiceBindings();
                     scoutThread.interrupt();
+                    connectSemaphore.release();//acquire on new
                 }
             }.start();
         }
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
+            connectThrashingGuardLastClose = (new Date()).getTime();
             Log.d(TAG, "--CLOSED--  code: " + code + "  info: " + reason);
 
             Bundle bundle = new Bundle();
@@ -376,7 +379,7 @@ public class RevaWebSocketService extends Service {
 
         @Override
         public void onMessage(String message) {
-            Log.d(TAG, "--msg--" + message);
+            //Log.d(TAG, "--msg--" + message);
 
             GsonBuilder builder = new GsonBuilder();
             LinkedTreeMap msgObj = (LinkedTreeMap) builder.create().fromJson(message, Object.class);
@@ -479,8 +482,12 @@ public class RevaWebSocketService extends Service {
                     String send = gson.toJson(publisherMessagePoolMap);
                     Log.d(TAG, "#runBroker: sending! " + send);
                     if (getAuthForHeader() != "" && isConnected()) {
-                        revaWebSocket.send(send);
-                        publisherMessagePoolMap.clear();
+                        try {
+                            revaWebSocket.send(send);
+                            publisherMessagePoolMap.clear();
+                        }catch (Exception e){
+                            revaWebSocket = null;
+                        }
                     }
                 }
             }
@@ -489,7 +496,27 @@ public class RevaWebSocketService extends Service {
 
     private void buildAndConnect() {
         try {
-            trustAllHosts(buildRevaWebSocket()).connect();
+            try {
+                connectSemaphore.acquire();//release on open
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if(shouldReconnect()) {
+                long delta = Math.abs(connectThrashingGuardLastClose - (new Date()).getTime());
+                delta = (delta / 100)  + 1;
+                double threshhold = 30000;
+                double expRatio = 0.75 * Math.abs((threshhold) / (threshhold + delta));
+                connectThrashingGuardLastDelay = (long)(expRatio * connectThrashingGuardLastDelay)
+                        + (long)((1-expRatio)*(threshhold / delta));
+                Log.d("TMP",  Long.toString(connectThrashingGuardLastDelay));
+                try {
+                    if(connectThrashingGuardLastDelay > 1) {
+                        Thread.sleep(connectThrashingGuardLastDelay);
+                    }
+                } catch (InterruptedException e) {
+                }
+                trustAllHosts(buildRevaWebSocket()).connect();
+            }
         } catch (Exception e) {
         }
     }
@@ -557,5 +584,9 @@ public class RevaWebSocketService extends Service {
     private static Thread scoutThread = null;
     private static RevaWebSocket revaWebSocket = null;
     private boolean runSouct = true;
+    private Semaphore connectSemaphore = new Semaphore(1);
+    private static long connectThrashingGuardLastOpen = new Date().getTime();
+    private static long connectThrashingGuardLastClose = new Date().getTime();
+    private static long connectThrashingGuardLastDelay = 0;
     // ----------------------------------- END socket Management ------------------------------
 }

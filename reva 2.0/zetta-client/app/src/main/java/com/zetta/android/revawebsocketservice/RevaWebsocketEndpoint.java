@@ -28,28 +28,50 @@ import java.util.concurrent.Callable;
  */
 public abstract class RevaWebsocketEndpoint {
     public static final String CHANNEL_KEY = "|^|";
+    public static final String META_KEY = "|#|";
     private static final String TAG = "RevaWebsocketEndpoint";
+
     public abstract String key();
 
 
     // ----------------------------- BEGIN OVERRIDEABLE ----------------------------
     //TODO Pass correct values (e.g. code, reason etc)
-    public void onClose(String message){}
-    public void onOpen(String headerJson){}
-    public void onMessage(String message){}
-    public void onMessage(LinkedTreeMap obj){}
-    public void onServiceConnect(RevaWebSocketService service){}
-    public void onServiceDisconnect(){}
+    public void onClose(String message) {
+    }
+
+    public void onOpen(String headerJson) {
+    }
+
+    public void onMessage(String message) {
+    }
+
+    public void onMessage(LinkedTreeMap obj) {
+    }
+
+    public void onServiceConnect(RevaWebSocketService service) {
+    }
+
+    public void onServiceDisconnect() {
+    }
+
+    public void onMeta(Object msg) {
+    }
     // ----------------------------- END OVERRIDEABLE ----------------------------
 
 
     //NOTE! may return null;
-    public final RevaWebSocketService getService(){return mService;}
+    public final RevaWebSocketService getService() {
+        return mService;
+    }
+
     //NOTE! may return null;
-    public final RevaWebSocketService.Publisher getPublisher(){return mPublisher;}
-    public final RevaWebSocketService.Publisher bind (Context context_) {
+    public final RevaWebSocketService.Publisher getPublisher() {
+        return mPublisher;
+    }
+
+    public final RevaWebSocketService.Publisher bind(Context context_) {
         context = context_;
-        if(mPublisher != null){
+        if (mPublisher != null) {
             return mPublisher;
         }
         Intent subscriberIntent = new Intent(context, RevaWebSocketService.class);
@@ -66,8 +88,9 @@ public abstract class RevaWebsocketEndpoint {
         RevaWebSocketService.notifyServiceBind(key(), subscriberResultReceiver);
         return (mPublisher = RevaWebSocketService.localStartService(context, subscriberIntent, key()));
     }
-    public final void unbind(Context context){
-        if(mPublisher != null) {
+
+    public final void unbind(Context context) {
+        if (mPublisher != null) {
             mPublisher = null;
             context.unbindService(mConnection);
             RevaWebSocketService.notifyServiceUnbind(key(), subscriberResultReceiver);
@@ -75,99 +98,119 @@ public abstract class RevaWebsocketEndpoint {
     }
 
     private Boolean flagResumeService = null;
-    public final void autoService(){
+
+    public final void autoService() {
         flagResumeService = null;
         resumeOrPause();
     }
-    public final void pauseService(){
+
+    public final void pauseService() {
         flagResumeService = false;
         resumeOrPause();
     }
-    public final void resumeService(){
+
+    public final void resumeService() {
         flagResumeService = true;
         resumeOrPause();
     }
 
-    public PushChainer getPushChainer(){return new PushChainer();}
-    public PushChainer getPushChainer(String tag){return new PushChainer(tag);}
+    public PushChainer getPushChainer() {
+        return new PushChainer();
+    }
+
+    public PushChainer getPushChainer(String tag) {
+        return new PushChainer(tag);
+    }
 
 
-    public class PushChainer{
+    public class PushChainer {
         Map<String, Object> map = new TreeMap<>();
         Map<String, Object> sendMap;
         String tag;
+
         public PushChainer put(String token, Object value) {
-            map.put(token,value);
+            map.put(token, value);
             return this;
         }
+
         public PushChainer send() {
-            if(mPublisher == null){
+            if (mPublisher == null) {
                 Log.e(TAG, "using the endpoint without binding first");
                 return null;
             }
             mPublisher.send(sendMap);
             //NOTE! do not just clear map, as this object will be sent asynchronously
             map = new TreeMap<>();
-            map.put(tag,new TreeMap<>());
+            map.put(tag, new TreeMap<>());
             return this;
         }
-        protected PushChainer(){
+
+        protected PushChainer() {
             sendMap = map;
         }
-        protected PushChainer(String tag_){
+
+        protected PushChainer(String tag_) {
             tag = tag_;
             sendMap = new TreeMap<>();
             sendMap.put(tag, map);
         }
     }
 
-    public Context getContext(){return context;}
+    public Context getContext() {
+        return context;
+    }
+
     private Context context;
     private static GsonBuilder builder = new GsonBuilder();
     SubscriberResultReceiver subscriberResultReceiver = new SubscriberResultReceiver(null);
+
     class SubscriberResultReceiver extends ResultReceiver {
         public SubscriberResultReceiver(Handler handler) {
             super(handler);
         }
+
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
 
             String got = resultData.getString(RevaWebSocketService.IPC_SOCKET_MESSAGE_PULLED);
-            if(got != null) {
+            if (got != null) {
                 GsonBuilder builder = new GsonBuilder();
-                try{
-                    LinkedTreeMap obj = (LinkedTreeMap)builder.create().fromJson(got, Object.class);
-                    if(obj.containsKey(CHANNEL_KEY)){
+                try {
+                    LinkedTreeMap obj = (LinkedTreeMap) builder.create().fromJson(got, Object.class);
+                    if (obj.containsKey(META_KEY)) {
+                        onMeta(obj.get(META_KEY));
+                    } else if (obj.containsKey(CHANNEL_KEY)) {
                         Log.d(TAG, "Got channel: " + obj.toString());
-                        for (Object entry : ((LinkedTreeMap)obj.get(CHANNEL_KEY)).entrySet()) {
-                            try{
+                        for (Object entry : ((LinkedTreeMap) obj.get(CHANNEL_KEY)).entrySet()) {
+                            try {
                                 Map.Entry<Object, Object> pair = (Map.Entry<Object, Object>) entry;
                                 CloudAwaitObject cao = cloudAwaitObjectMap.get(pair.getKey());
-                                if(cao != null){cao.gotFrom(pair.getValue());}
-                            }catch (Exception e){
+                                if (cao != null) {
+                                    cao.gotFrom(pair.getValue());
+                                }
+                            } catch (Exception e) {
                                 e.printStackTrace();
                                 Log.d(TAG, "--GOT--" + got);
                             }
                         }
-                    }else {
+                    } else {
                         onMessage(obj);
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     onMessage(got);
                 }
             }
             got = resultData.getString(RevaWebSocketService.IPC_SOCKET_CLOSED);
-            if(got != null) {
+            if (got != null) {
                 onClose(got);
             }
             got = resultData.getString(RevaWebSocketService.IPC_SOCKET_OPENED);
-            if(got != null) {
+            if (got != null) {
                 resumeOrPause();
                 onOpen(got);
             }
         }
     }
-
 
 
     private RevaWebSocketService.Publisher mPublisher;
@@ -180,6 +223,7 @@ public abstract class RevaWebsocketEndpoint {
             resumeOrPause();
             onServiceConnect(mService);
         }
+
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             mService = null;
@@ -198,18 +242,17 @@ public abstract class RevaWebsocketEndpoint {
     }
 
 
-
-
     protected Map<String, CloudAwaitObject> cloudAwaitObjectMap = new TreeMap<>();
 
-    public CloudAwaitObject attachCloudAwaitObject(CloudAwaitObject cao){
+    public CloudAwaitObject attachCloudAwaitObject(CloudAwaitObject cao) {
         cloudAwaitObjectMap.put(cao.getKey(), cao);
         cao.setServicePublisher(this);
         return cao;
     }
-    public CloudAwaitObject attachCloudAwaitObject(boolean once, CloudAwaitObject cao){
-        if(once){
-            if(cloudAwaitObjectMap.containsKey(cao.getKey())){
+
+    public CloudAwaitObject attachCloudAwaitObject(boolean once, CloudAwaitObject cao) {
+        if (once) {
+            if (cloudAwaitObjectMap.containsKey(cao.getKey())) {
                 return cloudAwaitObjectMap.get(cao.getKey());
             }
         }
@@ -217,7 +260,6 @@ public abstract class RevaWebsocketEndpoint {
         cao.setServicePublisher(this);
         return cao;
     }
-
 
 
 }
