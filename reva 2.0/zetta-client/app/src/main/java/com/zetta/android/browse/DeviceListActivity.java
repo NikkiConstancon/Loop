@@ -130,12 +130,14 @@ public class DeviceListActivity extends Fragment {
         String name;
         Map<String,Map<String,String>> deviceInfoMap;
         Set<String> deviceSet = new TreeSet<>();
+        Map<Integer, String> deviceTransportIdMap = new TreeMap<>();
         RealTimeUserMeta(String name, Map<String,Map<String,String>> deviceInfoMap){
             this.name = name;
             this.deviceInfoMap = deviceInfoMap;
 
             for(Map.Entry<String,Map<String,String>> entry : deviceInfoMap.entrySet()){
                 deviceSet.add(entry.getKey());
+                deviceTransportIdMap.put(Integer.parseInt(entry.getValue().get("id")), entry.getKey());
             }
         }
         @Override public String toString(){
@@ -177,49 +179,27 @@ public class DeviceListActivity extends Fragment {
             android.util.Log.i("STUFF", message );
         }
         public void onMessage(LinkedTreeMap obj){
-            List<ListItem> list = adapter.getListItems();
             try {
-                for (Map.Entry<String, List> entry : ((Map<String, List>) obj).entrySet()){
-                    String patientName = entry.getKey();
-
-
-                    if (list.get(0) instanceof ServerListItem) {
-                        ServerListItem temp = (ServerListItem) list.get(0); // first item in list is server name
-                        Log.i("NAME", temp.getName());
-                    }
+                for(Map.Entry<String, Map<String, String>> userDeviceValue :  ((Map<String, Map<String, String>>)obj).entrySet()) {
+                    String patientName = userDeviceValue.getKey();
+                    Map<String, String> deviceValueMap = userDeviceValue.getValue();
+                    //TODO: Get adapter by name perhaps ?? Dont know how this is set up
+                    List<ListItem> list = adapter.getListItems();
+                    Iterator<ListItem> iter = list.iterator();
                     List<ListItem> toBeAdded = new ArrayList<ListItem>();
-                    for(Map row : (List<Map<String, Double>>)entry.getValue()){
-
-                        android.util.Log.i(TAG, patientName + " " + row.toString());
-                        //TODO: this is SOOOOOOO inefficient, must fix!!
-
-                        Iterator<ListItem> iter = list.iterator();
-
-                        while (iter.hasNext()) {
-                            ListItem item = iter.next();
-                            if (item instanceof DeviceListItem) {
-                                DeviceListItem temp = (DeviceListItem)item;
-                                String title = row.toString();     // full file name
-
-                                String[] parts = title.split("\\=");
-
-                                title = parts[0].substring(1);
-                                String state = parts[1].substring(0, parts[1].length()-1);
-
-                                if (temp.getName().equals(title)) {
-                                    Log.d("ISEQ", title + " FOUND");
-                                    temp.setState(state);
-                                    toBeAdded.add(temp);
-                                }
+                    while (iter.hasNext()) {
+                        ListItem item = iter.next();
+                        if (item instanceof DeviceListItem) {
+                            DeviceListItem temp = (DeviceListItem) item;
+                            if (deviceValueMap.containsKey(temp.getName())) {
+                                temp.setState(deviceValueMap.get(temp.getName()));
+                                toBeAdded.add(temp);
                             }
-
                         }
-
                     }
-                    
                     adapter.update(toBeAdded);
-
                 }
+
             }catch (Exception e){
                 android.util.Log.e(TAG, e.toString());
             }
