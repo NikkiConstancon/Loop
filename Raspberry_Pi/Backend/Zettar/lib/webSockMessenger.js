@@ -25,6 +25,7 @@ const wss = module.exports.wss = server.wss
 
 
 const CHANNEL_KEY = "|^|"
+const META_KEY = "|#|"
 var USER_ANONYMOUS = '--ANONYMOUS--'
 
 
@@ -57,13 +58,79 @@ const webSockMessenger = module.exports = {
             }
         }
         subServiceOptionsMap[key] = options
+        return MetaHandlerMap[key] = new MetaHandler;
     },
     getUserSocketContextMap: function () { return userSocketContextMap },
     getUserSocketContext: function (user) { return userSocketContextMap[user] }
 }
 var userSocketContextMap = {}
+var MetaHandlerMap = {}
+function MetaHandler() {
+    this.metaMap = {}
+    this.publisherMap = {}
+}
+MetaHandler.prototype.newMeta = function (metaKey) {
+    if (this.metaMap[metaKey]) {
+        return this.metaMap[metaKey]
+    }
+    this.metaMap[metaKey] = new Meta(metaKey, this)
+    return this.metaMap[metaKey]
+}
+MetaHandler.prototype.bindPublisher = function (metaKey, pub) {
+    this.newMeta(metaKey).bindPublisher(pub)
+}
+MetaHandler.prototype.unbindPublisher = function (metaKey, pub) {
+    this.metaMap[metaKey].unbindPublisher(pub)
+}
 
-
+function Meta(metaKey, metaHandler) {
+    this.metaKey = metaKey
+    this.publisherMap = {}
+    this.meta = {}
+    this.metaHandler = metaHandler
+}
+Meta.prototype.bindPublisher = function (pub) {
+    this.publisherMap[pub.context.userUid] = { publisher: pub, timeout: undefined };
+    this.pullMeta(pub.context.userUid)
+}
+Meta.prototype.unbindPublisher = function (pub) {
+    delete this.publisherMap[pub.context.userUid]
+}
+Meta.prototype.getMeta = function () {
+    return this.meta
+}
+Meta.prototype.setMeta = function (obj) {
+    this.meta = obj
+    this.pushMeta()
+}
+Meta.prototype.updateMeta = function (obj) {
+    this.meta = Object.assign(obj, this.meta)
+    this.pushMeta()
+}
+Meta.prototype.pushMeta = function () {
+    for (var pupUserUid in this.publisherMap) {
+        this.pullMeta(pupUserUid)
+    }
+}
+Meta.prototype.pullMeta = function (pupUserUid) {
+    try {
+        var map = this.publisherMap[pupUserUid]
+        if (map) {
+            if (!map.timeout) {
+                map.timeout = setTimeout(() => {
+                    try {
+                        var publisher = this.publisherMap[pupUserUid].publisher
+                        publisher.publish({ [META_KEY]: { [this.metaKey]: this.meta } }, null, true)
+                        map.timeout = undefined
+                    } catch (e) { }
+                }, 128)
+            }
+        }
+    } catch (e) { logger.debug(e) }
+}
+Meta.prototype.free = function () {
+    this.setMeta({})
+}
 
 
 function getGreeting() {
@@ -128,9 +195,10 @@ function ServicePublisher(context, key, options) {
     this.serviceBound = options.requirePersistentLink//deprected!! (for now)
     this.queue = []
     this.key = key
+    this.metaKeys = []
 }
-ServicePublisher.prototype.publish = function (msg, errcb) {
-    if (!this.enabled) {
+ServicePublisher.prototype.publish = function (msg, errcb, force) {
+    if (!force && !this.enabled) {
         return
     }
     this.queue.push(msg)
@@ -141,6 +209,18 @@ ServicePublisher.prototype.publish = function (msg, errcb) {
             this.timeOut = null
         }, 16)//for accumalting data befor sending
     }
+}
+ServicePublisher.prototype.registerMeta = function (metaKey) {
+    MetaHandlerMap[this.key] && MetaHandlerMap[this.key].bindPublisher(metaKey, this)
+    this.metaKeys.push(metaKey)
+}
+
+ServicePublisher.prototype.deregisterMeta = function () {
+    for (var i in this.metaKeys) {
+        metaKey = this.metaKeys[i]
+        MetaHandlerMap[this.key] && MetaHandlerMap[this.key].unbindPublisher(metaKey, this)
+    }
+    this.metaKeys = []
 }
 
 function pushMessage (ws, key, msg, errcb, context) {
@@ -167,8 +247,18 @@ function UserSocketContext(clientBindingInfo) {
     this.deviceUid = clientBindingInfo.serviceInstanceUuid
     this.subServiceMap = {}
     if (userSocketContextMap[this.userUid] && userSocketContextMap[this.userUid][this.deviceUid]) {
+
+        var subServiceMap = userSocketContextMap[this.userUid][this.deviceUid].subServiceMap
+        for (var key in subServiceMap) {
+            subServiceOptionsMap[key].close(userSocketContextMap[this.userUid][this.deviceUid].publishers[key])
+        }
+       // userSocketContextMap[this.userUid][this.deviceUid].ws.close()
+       // delete userSocketContextMap[this.userUid][this.deviceUid]
+        userSocketContextMap[this.userUid][this.deviceUid].ws.terminate()
+        clientBindingInfo.ws = null
         c = logger.warn('@WebSocketMessenger$userSocketContext:userSocketContextMap duplicate keys', clientBindingInfo)
-        ws.send(JSON.stringify({ RCC: { ERROR: 'device already in use. Close the current connection first' } }))
+        clientBindingInfo.ws = ws
+        ws.send(JSON.stringify({ RCC: { ERROR: 'DUP_DEVICE_UID' } }))
         ws.close()
         return
     }
@@ -207,16 +297,29 @@ function UserSocketContext(clientBindingInfo) {
         }
     });
     ws.on('close', param => {
-        this.deleteContext()
-        logger.debug('@WebSockMessenger#close: context= ', this.userUid)
-        var subServiceMap = this.subServiceMap
-        for (var key in subServiceMap) {
-            subServiceOptionsMap[key].close(this)
+        try {
+            this.deleteContext()
+            logger.debug('@WebSockMessenger#close: context= ', this.userUid)
+            var subServiceMap = this.subServiceMap
+            for (var key in subServiceMap) {
+                try {
+                    if (!ws.REVA_PREMATURE_CLOSE) {
+                        subServiceOptionsMap[key].close(this)
+                    }
+                } catch (e) {
+                    logger.debug(e)
+                }
+            }
+        } catch (e) { logger.error(e) } finally {
+            delete userSocketContextMap[this.userUid][this.deviceUid]
         }
     });
 }
 UserSocketContext.prototype.deleteContext = function () {
     try {
+        for (var key in subServiceOptionsMap) {
+            this.subServiceMap[key].deregisterMeta()
+        }
         delete userSocketContextMap[this.userUid][this.deviceUid]
     } catch (e) { }
 }
@@ -228,6 +331,7 @@ wss.on('connection', function connection(ws) {
             if (e.clientSafe) {
                 pushMessage(ws, 'RCC', buildError('AUTH', e.clientSafe))
             }
+            ws.REVA_PREMATURE_CLOSE  = true
             ws.close()
             e && logger.error('@webSockMessenger#on.connect:', e)
         }).catch(function (e) {
@@ -267,7 +371,13 @@ webSockMessenger.attach('RCC', {
                 try {
                     var key = obj.PAUSE_RESUME.SERVICE_KEY
                     if (!RCC_EXCLUDE_PAUS_RESUME_MAP[key]) {
-                        publisher.context.subServiceMap[key].enabled = Boolean(obj.PAUSE_RESUME.ENABLEMENT).valueOf()
+                        var servicePlisher = publisher.context.subServiceMap[key]
+                        servicePlisher.enabled = Boolean(obj.PAUSE_RESUME.ENABLEMENT).valueOf()
+                        for (var i in servicePlisher.metaKeys) {
+                            var metaKey = servicePlisher.metaKeys[i]
+                            var metaObj = MetaHandlerMap[servicePlisher.key].metaMap[metaKey]
+                            metaObj && metaObj.pullMeta(servicePlisher)
+                        }
                     }
                 } catch (e) {
                     logger.error('WebSocketMessenger$RCC#obj.PAUS_RESUME: ', e)
@@ -435,25 +545,6 @@ webSockMessenger.attach('UserManager', {
         }
         logger.info(obj);
         */
-    },
-    requirePersistentLink: true,
-    defaultEnabled: true
-})
-
-webSockMessenger.attach('Pulse', {
-    connect: function (publisher) {
-        var count = 0;
-        publisher.ival = setInterval(function () {
-            publisher.publish({ "|^|": { A: "a", B: "b", email:"email" } }, function (err) {
-                err && clearInterval(publisher.ival)
-            })
-        }, 300000)
-    },
-    close: function (publisher) {
-        clearInterval(publisher.ival)
-    },
-    sub: function (publisher, obj) {
-        //publisher.publish(obj)
     },
     requirePersistentLink: true,
     defaultEnabled: true

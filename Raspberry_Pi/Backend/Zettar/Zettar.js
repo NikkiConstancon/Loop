@@ -30,6 +30,7 @@ const realtimeDataService = require('./lib/realtimeDataService')
 var initializedZetta = zetta('peers').name('Zettar')
 
 
+
 //pass the initialized zetta var to a new hook
 var hook = new Hook(initializedZetta)
     //call listen as you wold on zetta
@@ -40,38 +41,29 @@ var hook = new Hook(initializedZetta)
             console.log('Zettar is running');
         }
     })
-    //here you hook the streams
-    .registerStreamListener({
-        connect: function (peer) {
-            patientManager.bindZettalet(peer.name, encodeURI(peer.name))
-                .then(function (pat) {
-
-                    //do it this way, else field is out of date
-                    patientManager.getPatient(pat).then(function (pat) {
-                        logger.info('user [' + pat.Username + "]'s device connected with api uri: " + pat.ZettaletUuid)
-                    })
-                }).catch(function (err) {
-                    logger.warn('no user bound for device with uuid ' + peer.name)
-                    //peer.ws.close()
-                })
-        },
-        disconnect: function (peer) {
-            patientManager.bindZettalet(peer.name, '-')
-                .then(function (pat) {
-                    //do it this way, else field is out of date
-                    patientManager.getPatient(pat).then(function (pat) {
-                        logger.info('user [' + pat.Username + "]'s device disconnected and api uri set to: " + pat.ZettaletUuid)
-                    })
-                })
-        }
-    })
     .registerStreamListener({
         topicName: 'vitals',
         cb: function (info, response) {
             realtimeDataService.publish(info, response);
-            patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.type, TimeStamp: response.timestamp, Value: parseFloat(response.data) });
+            //patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.type, TimeStamp: response.timestamp, Value: parseFloat(response.data) });
         },
         errcb: function (e) {
             console.log(e)
+        },
+        connect: function (peer) {
+            realtimeDataService.connectHopper(peer.name)
+        },
+        disconnect: function (peer) {
+            realtimeDataService.disconnectHopper(peer.name)
+            patientManager.getPatient({ Username: peer.name }).then(function (pat) {
+                pat.disconnectAllDevices();
+            })
+        },
+        deviceConnect: function (info) {
+            realtimeDataService.informDeviceConnect(info.from, info)
+            patientManager.getPatient({ Username: info.from }).then(function (pat) {
+                pat.connectDevice(info.name);
+            })
         }
     })
+

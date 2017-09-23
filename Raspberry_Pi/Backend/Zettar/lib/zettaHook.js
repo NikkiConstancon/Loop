@@ -65,28 +65,28 @@ Hook.prototype.dataHandeler = function (key, obj) {
     }
     return this
 }
+
+var zettaletConnectedMap = {}//this is used to fixe a memory leak
 //function manifold map used by: Hook.prototype.dataHandeler
 //all functions will(must) be called with the this context set to an instance of Hook
 var dataHandelerMap = {
     '_peer/connect': function (obj) {
-        //console.log(obj)
-        //console.log('connect')
-
         for (var i in this.streamListenerArr) {
             var params = this.streamListenerArr[i]
             params.server = this.server
             params.from = obj.peer.name
             params.connect && params.connect(obj.peer)
-            params.cb && listenZettaUpdates(params)
+            if (!zettaletConnectedMap[obj.peer.name]) {
+                params.cb && listenZettaUpdates(params)
+            }
         }
+        zettaletConnectedMap[obj.peer.name] = true;
     },
     '_peer/disconnect': function (obj) {
         for (var i in this.streamListenerArr) {
             var params = this.streamListenerArr[i]
             params.disconnect && params.disconnect(obj.peer)
         }
-        //console.log('disconnect')
-        //console.log(obj)
     }
 }
 
@@ -121,20 +121,25 @@ var listenZettaUpdates = function (args) {
         var where = args.where || {}
         var cb = args.cb
         var errcb = args.errcb
-        server.observe([server.from(from).where(where)], function (thing) {
-            try {
-                //capture info
-                var info = { from: from, type: thing.type, name:thing.name, topicName: topicName}
-                var key = buildObserveKeyForHook(thing, topicName)
-                logger.debug('#listenZettaStream: key:', key)
-                hookObserveEmiter(thing, key, function (response) {
-                    cb(info, response)
-                })
-            } catch (e) {
-                logger.debug('#listenZettaStream', e)
-                errcb && errcb(e)
-            }
-        })
+        //call with new to capture vars
+        new function () {
+            var deviceConnect = args.deviceConnect || function () { }
+            server.observe([server.from(from).where(where)], function (thing) {
+                try {
+                    //capture info
+                    var info = { from: from, type: thing.type, name: thing.name, topicName: topicName }
+                    deviceConnect(info)
+                    var key = buildObserveKeyForHook(thing, topicName)
+                    logger.debug('#listenZettaStream: key:', key)
+                    hookObserveEmiter(thing, key, function (response) {
+                        cb(info, response)
+                    })
+                } catch (e) {
+                    logger.debug('#listenZettaStream', e)
+                    errcb && errcb(e)
+                }
+            })
+        }()
     } catch (e) {
         logger.debug('#listenZettaStream', e)
         throw e
