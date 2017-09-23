@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,6 +48,13 @@ import java.util.List;
  */
 public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+
+    public MyAdapterListener onClickListener;
+
+    public interface MyAdapterListener {
+        void moreInfoOnClick(View v, int position);
+    }
+
     private static final String TAG = StatListAdapter.class.getSimpleName();
 
     private List<StatItem> cards;
@@ -56,8 +64,9 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      *
      * @param cards, the cards to display in a list.
      */
-    public StatListAdapter(List<StatItem> cards) {
+    public StatListAdapter(List<StatItem> cards, MyAdapterListener listener ) {
         this.cards = cards;
+        this.onClickListener = listener;
     }
 
     @Override
@@ -203,6 +212,15 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             stat_subtitle = (TextView) itemView.findViewById(R.id.stat_subtitle);
             stat_title = (TextView) itemView.findViewById(R.id.stat_title);
             stateImageWidget = (ImageView) itemView.findViewById(R.id.list_item_device_state_image);
+
+            Button moreInfo = (Button) itemView.findViewById(R.id.more_stats);
+
+            moreInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickListener.moreInfoOnClick(v, getAdapterPosition());
+                }
+            });
         }
 
         void bind(GraphStatItem item) {

@@ -3,6 +3,7 @@ package com.zetta.android.browse;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,15 +17,18 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.zetta.android.GraphEntry;
+import com.zetta.android.MoreGraph;
 import com.zetta.android.R;
 import com.zetta.android.StatItem;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
+import static com.zetta.android.R.layout.more_graph;
 
 /**
  * Created by Hristian Vitrychenko on 11/08/2017.
@@ -33,7 +37,6 @@ import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 public class StatFragment extends android.support.v4.app.Fragment
 {
-    private static final int NUM_LIST_ITEMS = 100;
     public static final String Tag = "StatFragment";
     private RecyclerView statList;
     private StatListAdapter statListAdapter;
@@ -85,7 +88,20 @@ public class StatFragment extends android.support.v4.app.Fragment
         statList.setLayoutManager(layoutManager);
 
         statList.setHasFixedSize(true);
-        statListAdapter = new StatListAdapter(cards);
+        statListAdapter = new StatListAdapter(cards, new StatListAdapter.MyAdapterListener() {
+            @Override
+            public void moreInfoOnClick(View v, int position) {
+                GraphStatItem card = (GraphStatItem) cards.get(position);
+                ArrayList<GraphEntry> aray = new ArrayList<GraphEntry>();
+                for (int i = 0; i < card.getEntries().size(); i++) {
+                    aray.add(card.getEntries().get(i));
+                }
+                Intent intent = new Intent(getContext(), MoreGraph.class);
+                intent.putExtra("title", card.getDeviceName() + " " + card.getStatName());
+                intent.putExtra("entries",  aray);
+                startActivity(intent);
+            }
+        });
 
         statList.setAdapter(statListAdapter);
         return view;

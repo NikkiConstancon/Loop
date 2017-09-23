@@ -5,11 +5,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.novoda.notils.logger.simple.Log;
 import com.zetta.android.BuildConfig;
 import com.zetta.android.ImageLoader;
@@ -25,11 +26,17 @@ import com.zetta.android.R;
 import com.zetta.android.ZettaDeviceId;
 import com.zetta.android.device.DeviceDetailsActivity;
 import com.zetta.android.device.actions.OnActionClickListener;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
+import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.SdkProperties;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * This class creates the main screen putting all elements together, toolbar, quickactions etc.
@@ -41,9 +48,6 @@ public class DeviceListActivity extends Fragment {
     static {
         Log.setShowLogs(BuildConfig.DEBUG);
     }
-    public static void onBackgroundTaskDataObtained(String URL) {
-
-    }
 
     private DeviceListService deviceListService;
     private DeviceListAdapter adapter;
@@ -51,7 +55,6 @@ public class DeviceListActivity extends Fragment {
     private EmptyLoadingView emptyLoadingWidget;
     private BottomSheetBehavior<? extends View> bottomSheetBehavior;
     private QuickActionsAdapter quickActionsAdapter;
-    private SwipeRefreshLayout pullRefreshWidget;
     private static SdkProperties sdkProperties;
 
     @Nullable
@@ -90,10 +93,121 @@ public class DeviceListActivity extends Fragment {
         deviceListWidget.setItemAnimator(null);
 
         bottomSheetBehavior = BottomSheetBehavior.from(deviceQuickActionsWidget);
-        pullRefreshWidget = (SwipeRefreshLayout) view.findViewById(R.id.pull_refresh);
-        pullRefreshWidget.setOnRefreshListener(onPullRefreshListener);
 
+
+        // real time data streaming NEW AND SHINY WEBSOCKET BIZ
+        realTimeDataEndpoint.bind(this.getContext());
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        //pulseEndpoint.unbind(this);
+        realTimeDataEndpoint.unbind(this.getContext());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+
+        updateState();
+        if (deviceListService.hasRootUrl()) {
+            deviceListService.getDeviceList(onDeviceListLoaded);
+        }
+
+        realTimeDataEndpoint.resumeService();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+        realTimeDataEndpoint.pauseService();
+    }
+
+    static class RealTimeUserMeta{
+        String name;
+        Map<String,Map<String,String>> deviceInfoMap;
+        Set<String> deviceSet = new TreeSet<>();
+        Map<Integer, String> deviceTransportIdMap = new TreeMap<>();
+        RealTimeUserMeta(String name, Map<String,Map<String,String>> deviceInfoMap){
+            this.name = name;
+            this.deviceInfoMap = deviceInfoMap;
+
+            for(Map.Entry<String,Map<String,String>> entry : deviceInfoMap.entrySet()){
+                deviceSet.add(entry.getKey());
+                deviceTransportIdMap.put(Integer.parseInt(entry.getValue().get("id")), entry.getKey());
+            }
+        }
+        @Override public String toString(){
+            return "{Name: " + name + ", deviceInfoMap: " + deviceInfoMap.toString() + "}";
+
+        }
+    }
+    static class RealTimeMeta{
+        void parseMeta(Object map){
+            Map<String, Map<String,Map<String,String>>> userDeviceList;
+            userDeviceList = (Map<String, Map<String,Map<String,String>>>)map;
+            for(Map.Entry<String, Map<String,Map<String,String>>> entry : userDeviceList.entrySet() ){
+                if(entry.getValue().size() == 0){
+                    userMetaMap.remove(entry.getKey());
+                    Log.d("--REALTIME-METTA--", " !! DROPED -> " + entry.getKey());
+                }else if( entry.getValue() != null) {
+                    userMetaMap.put(entry.getKey(), new RealTimeUserMeta(entry.getKey(), entry.getValue()));
+                }
+            }
+        }
+        Map<String, RealTimeUserMeta> userMetaMap = new TreeMap<>();
+    };
+    RealTimeMeta realTimeMeta = new RealTimeMeta();
+    RealTimeDataEndpoint realTimeDataEndpoint = new RealTimeDataEndpoint();
+    class RealTimeDataEndpoint extends RevaWebsocketEndpoint {
+        private final String TAG = this.getClass().getName();
+        @Override
+        public String key() {
+            return "RTDS";
+        }
+
+
+        @Override
+        public void onMeta(Object info) {
+            realTimeMeta.parseMeta(info);
+            Log.d("--REALTIME-METTA--", realTimeMeta.userMetaMap.toString());
+        }
+        public void onMessage(String message){
+            android.util.Log.i("STUFF", message );
+        }
+        public void onMessage(LinkedTreeMap obj){
+            try {
+                for(Map.Entry<String, Map<String, String>> userDeviceValue :  ((Map<String, Map<String, String>>)obj).entrySet()) {
+                    String patientName = userDeviceValue.getKey();
+                    Map<String, String> deviceValueMap = userDeviceValue.getValue();
+                    //TODO: Get adapter by name perhaps ?? Dont know how this is set up
+                    List<ListItem> list = adapter.getListItems();
+                    Iterator<ListItem> iter = list.iterator();
+                    List<ListItem> toBeAdded = new ArrayList<ListItem>();
+                    while (iter.hasNext()) {
+                        ListItem item = iter.next();
+                        if (item instanceof DeviceListItem) {
+                            DeviceListItem temp = (DeviceListItem) item;
+                            if (deviceValueMap.containsKey(temp.getName())) {
+                                temp.setState(deviceValueMap.get(temp.getName()));
+                                toBeAdded.add(temp);
+                            }
+                        }
+                    }
+                    adapter.update(toBeAdded);
+                }
+
+            }catch (Exception e){
+                android.util.Log.e(TAG, e.toString());
+            }
+        }
+        @Override
+        public void onServiceConnect(RevaWebSocketService service) {
+            resumeService();
+        }
     }
 
     @Override
@@ -139,15 +253,6 @@ public class DeviceListActivity extends Fragment {
         }
     };
 
-    @NonNull private final SwipeRefreshLayout.OnRefreshListener onPullRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            Toast.makeText(getActivity(), "Refreshing...", Toast.LENGTH_SHORT).show();
-            deviceListService.getDeviceList(onDeviceListLoaded);
-            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
-        }
-    };
-
     @NonNull private final DeviceListService.Callback onQuickActionsCallback = new DeviceListService.Callback() {
         @Override
         public void on(@NonNull List<ListItem> listItems) {
@@ -155,16 +260,7 @@ public class DeviceListActivity extends Fragment {
         }
     };
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        updateState();
-        if (deviceListService.hasRootUrl()) {
-            deviceListService.getDeviceList(onDeviceListLoaded);
-            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate); //starts listening for stream updates
-        }
-    }
-
+    /*
     @NonNull private final DeviceListService.DevicesUpdateListener onStreamedUpdate = new DeviceListService.DevicesUpdateListener() {
         @Override
         public void onUpdated(@NonNull List<ListItem> listItems) {
@@ -174,14 +270,15 @@ public class DeviceListActivity extends Fragment {
             adapter.update(listItems); //when there is an update the list adapter is updated
         }
     };
+    */
+
 
     @NonNull private final DeviceListService.Callback onDeviceListLoaded = new DeviceListService.Callback() {
         @Override
         public void on(@NonNull List<ListItem> listItems) {
             adapter.replaceAll(listItems);
-            pullRefreshWidget.setRefreshing(false);
             updateState();
-            deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
+            //deviceListService.startMonitoringAllDeviceUpdates(onStreamedUpdate);
         }
     };
 
@@ -198,12 +295,5 @@ public class DeviceListActivity extends Fragment {
             emptyLoadingWidget.setVisibility(View.VISIBLE);
             deviceListWidget.setVisibility(View.GONE);
         }
-    }
-
-
-    @Override
-    public void onPause() {
-        deviceListService.stopMonitoringStreamedUpdates();
-        super.onPause();
     }
 }

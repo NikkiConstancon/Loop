@@ -6,18 +6,29 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
+import com.zetta.android.revawebsocketservice.ChannelPublisher;
+import com.zetta.android.revawebsocketservice.CloudAwaitObject;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
+import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Hristian Vitrychenko on 22/08/2017.
  */
 
-public class Registration_Patient extends AppCompatActivity{
+public class Registration_Patient extends AppCompatActivity {
 
     RadioGroup rg2;
     RadioGroup rg3;
@@ -26,6 +37,7 @@ public class Registration_Patient extends AppCompatActivity{
 
     /**
      * Overridden on create method to load activity_register_continue_patient view
+     *
      * @param savedInstanceState saved instance of view state
      */
     @Override
@@ -52,13 +64,21 @@ public class Registration_Patient extends AppCompatActivity{
         rg3.setOnCheckedChangeListener(listener2);
 
         Button btnContPat2 = (Button) findViewById(R.id.btn_patRegDone);
-        btnContPat2.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v)
-            {
+        btnContPat2.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 registerPatient();
             }
         });
+
+        userManagerEndpoint.bind(this);
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        userManagerEndpoint.unbind(this);
+    }
+
     /**
      * Private radio group listener that simulates larger radio group
      */
@@ -75,14 +95,14 @@ public class Registration_Patient extends AppCompatActivity{
                 rg3.clearCheck();
                 rg3.setOnCheckedChangeListener(listener2);
 
-                if(checkedId == R.id.rad_age) {
+                if (checkedId == R.id.rad_age) {
                     checkedRad = true;
                     age = true;
                     illness = false;
                     accident = false;
                     disability = false;
 
-                } else if(checkedId == R.id.rad_illness) {
+                } else if (checkedId == R.id.rad_illness) {
                     checkedRad = true;
                     illness = true;
                     age = false;
@@ -111,14 +131,14 @@ public class Registration_Patient extends AppCompatActivity{
                 rg2.clearCheck();
                 rg2.setOnCheckedChangeListener(listener1);
 
-                if(checkedId == R.id.rad_accident) {
+                if (checkedId == R.id.rad_accident) {
                     checkedRad = true;
                     age = false;
                     illness = false;
                     accident = true;
                     disability = false;
 
-                } else if(checkedId == R.id.rad_disability) {
+                } else if (checkedId == R.id.rad_disability) {
                     checkedRad = true;
                     illness = false;
                     age = false;
@@ -132,14 +152,16 @@ public class Registration_Patient extends AppCompatActivity{
     /**
      * Method that completes the patient registration process (Validation and intent change)
      */
-    public void registerPatient()
-    {
+    AlertDialog.Builder builder1;
+
+    public void registerPatient() {
 
         int ageVal = 0;//Values for user data
         double weight = 0, height = 0;
 
         final Context context = this;
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+       /*AlertDialog.Builder*/
+        builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please fill in all details.");
         builder1.setCancelable(true);
 
@@ -160,62 +182,97 @@ public class Registration_Patient extends AppCompatActivity{
             weight = Double.parseDouble(text.getText().toString());
             text = (EditText) findViewById(R.id.input_height);
             height = Double.parseDouble(text.getText().toString());
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             builder1.setMessage("Please make sure you provided an appropriate number for the appropriate details.");
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
             return;
         }
 
-        if(ageVal == 0 || weight == 0 || height == 0 || checkedRad == false)
-        {
+        if (ageVal == 0 || weight == 0 || height == 0 || checkedRad == false) {
             builder1.setMessage("Please fill in all details.");
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
-        }
-        else if(ageVal < 1 || ageVal > 130)
-        {
+        } else if (ageVal < 1 || ageVal > 130) {
             builder1.setMessage("Age is out of bounds, please input an appropriate age.");
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
-        }
-        else if(weight < 1 || weight > 600)
-        {
+        } else if (weight < 1 || weight > 600) {
             builder1.setMessage("Weight is out of bounds, please input an appropriate weight.");
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
-        }
-        else if(height < 1 || height > 3)
-        {
+        } else if (height < 1 || height > 3) {
             builder1.setMessage("Height is out of bounds, please input an appropriate height.");
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
-        }
-        else
-        {
+        } else {
             String regEmail = getIntent().getStringExtra("regEmail");
             String regPass = getIntent().getStringExtra("regPass");
             String address = getIntent().getStringExtra("address");
-            String username = getIntent().getStringExtra("username");
-            String subPass = getIntent().getStringExtra("subPass");
+            final String username = getIntent().getStringExtra("username");
+            final String subPass = getIntent().getStringExtra("subPass");
 
-            builder1.setPositiveButton(
-                    "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                            Intent toLogin = new Intent(context, login_activity.class);
-                            toLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            toLogin.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivityForResult(toLogin, 0);
+            /*
+                Username: username,
+                Password: 'Password',
+                AccessPassword: 'adsfasdf',
+                Email: 'COS332.Marthinus@gmail.com',
+                Address: '42 Dale Avenue Hempton 1765',
+                Age: 42,
+                Weight: 23,
+                Height: 32,
+                Reason: 'Disability'
+             */
+
+            Map<String,String> sendMap = new TreeMap<>();
+            sendMap.put("Email", regEmail);
+            sendMap.put("Password", regPass);
+            sendMap.put("Address", address);
+            sendMap.put("Username", username);
+            sendMap.put("AccessPassword", subPass);
+
+            userManagerEndpoint.attachCloudAwaitObject(true, new CloudAwaitObject("REGISTER") {
+                @Override
+                public Object get(Object obj, ChannelPublisher pub) {
+                    Object ret = null;
+                    try{
+                        final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>)obj;
+                        if((boolean)got.get("PATIENT_PASS")) {
+                            ret = true;
+                            userManagerEndpoint.getService().setLogin(username, subPass);
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(Registration_Patient.this, "Welcome " + username, Toast.LENGTH_LONG).show();
+                                    Intent intent = new Intent(Registration_Patient.this, MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    intent.putExtra("Username", username.toString());
+                                    startActivity(intent);
+                                }
+                            });
+                        }else {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    try {
+                                        builder1.setMessage((String)got.get("PATIENT_ERROR"));
+                                        AlertDialog alertWarning = builder1.create();
+                                        alertWarning.show();
+                                    }catch (Exception e){}
+                                }
+                            });
                         }
-                    });
-            builder1.setMessage("You have been registered!");
-            AlertDialog alertWarning = builder1.create();
-            alertWarning.show();
+                    }catch (Exception e){Log.e(this.getClass().getName(), e.toString());}
+                    return ret;
+                }
+            }).send(this, "REGISTER_PATIENT", sendMap);
+
+            //NOTE! Moved the startActivityForResult execute after confirmation from server
+        }
+    }
+    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
+    class UserManagerEndpoint extends RevaWebsocketEndpoint {
+        @Override
+        public String key() {
+            return "UserManager";
         }
     }
 }

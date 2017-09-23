@@ -7,17 +7,24 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
+import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
 import android.os.Handler;
 
 import org.json.JSONException;
 
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,7 +82,7 @@ public class login_activity extends AppCompatActivity {
         final EditText user = (EditText) findViewById(R.id.input_emailLogin);
         final EditText passw = (EditText) findViewById(R.id.input_passwordLogin);
 
-        /*user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        user.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
@@ -84,7 +91,7 @@ public class login_activity extends AppCompatActivity {
                     user.setHint("");
                 }
             }
-        });*/
+        });
 
 
         /* Setting an OnClickListener allows us to do something when this button is clicked. */
@@ -103,6 +110,7 @@ public class login_activity extends AppCompatActivity {
                  * wanted to demonstrate what parameter we were using "MainActivity.this" for as
                  * clear as possible.
                  */
+                userManagerEndpoint.getService().setLogin(user.getText().toString(), passw.getText().toString());
 
                 ServerComms server = new ServerComms(login_activity.this);
                 String serverURI = "http://" + getString(R.string.serverURL) + ":8080/login";
@@ -142,9 +150,14 @@ public class login_activity extends AppCompatActivity {
                 startActivity(intent);
                 String message = "Register clicked!";
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-
             }
         });
+        userManagerEndpoint.bind(this);
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        userManagerEndpoint.unbind(this);
     }
 
     /**
@@ -205,5 +218,14 @@ public class login_activity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+
+    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
+    class UserManagerEndpoint extends RevaWebsocketEndpoint {
+        @Override
+        public String key() {
+            return "UserManager";
+        }
     }
 }
