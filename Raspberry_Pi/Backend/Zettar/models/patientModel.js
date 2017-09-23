@@ -147,6 +147,14 @@ class PatientModel extends Model {
                         logger.error("@PateintModel$connectDevice: " + err)
                     }
                 })
+            },
+            getSubscriberList: function () {
+                var ret = [this.Username]
+                //concat not working?
+                for (var i in this.SubscriberList) {
+                    ret.push(this.SubscriberList[i])
+                }
+                return ret
             }
         }
         this.after_save = function (instance, options, next) {
