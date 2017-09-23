@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="C:\Users\Hristian Vitrychenko\AndroidStudioProjects\zetta-client\libs\zetta-sdk-android-master\zettakit\build\intermediates\bundles\default\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4664c419017d1b8a07f152a2c219c386f329e8a9">
+        <dex dex="C:\Users\Hristian Vitrychenko\AndroidStudioProjects\zetta-client\app\build\intermediates\pre-dexed\debug\classes_1c367adf84c89b3bcc4b286fc97ee7b7f88367f4.jar" />
+    </item>
+
+</items>

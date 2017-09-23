@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+<LinearLayout
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:gravity="center_vertical"
+  android:orientation="horizontal"
+  android:padding="@dimen/spacing_double"
+    >
+
+  <ImageView
+    android:id="@+id/list_item_device_state_image"
+    android:layout_width="50dip"
+    android:layout_height="50dip"
+    android:importantForAccessibility="no"
+    tools:src="@mipmap/ic_launcher" />
+
+  <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/spacing_double">
+
+    <TextView
+        android:textColor="@color/colorPrimaryText"
+      android:id="@+id/list_item_device_name"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+        android:textSize="16dp"
+      tools:text="Door" />
+
+  </LinearLayout>
+
+  <View
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      android:layout_weight="1" />
+
+  <TextView
+      android:gravity="right"
+      android:textSize="28dp"
+      android:textColor="@color/colorPrimaryText"
+      android:id="@+id/list_item_device_state"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      tools:text="closed" />
+
+  <TextView
+      android:layout_gravity="bottom"
+      android:layout_marginLeft="5dp"
+      android:layout_marginBottom="5dp"
+      android:textSize="16dp"
+      android:id="@+id/units_of_measure"
+      android:textColor="@color/colorSecondaryText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="BPM"
+      tools:text="BPM"/>
+
+
+
+
+
+</LinearLayout>
+  <TextView
+      android:layout_width="match_parent"
+      android:layout_height="0.5dp"
+      android:background="@color/colorDivider"/>
+</LinearLayout>

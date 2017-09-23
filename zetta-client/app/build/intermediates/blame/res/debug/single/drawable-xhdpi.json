@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi\\ic_back_arrow.png",
+        "source": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\src\\main\\res\\drawable-xhdpi\\ic_back_arrow.png"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi\\ic_heart.png",
+        "source": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\src\\main\\res\\drawable-xhdpi\\ic_heart.png"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi\\device_placeholder.png",
+        "source": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\app\\src\\main\\res\\drawable-xhdpi\\device_placeholder.png"
+    }
+]
