@@ -172,7 +172,7 @@ var subscriberManager = module.exports = {
                     if (err || !found) {
                         err = err || 'could not find ' + _subscriber.Email
                         logger.error(err)
-                        resolve(null)
+                        reject(err)
                     } else {
                         logger.debug('Found subscriber: ' + found.Email)
                         resolve(found)
