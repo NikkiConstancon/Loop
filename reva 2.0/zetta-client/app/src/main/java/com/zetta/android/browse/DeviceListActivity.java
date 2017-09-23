@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -33,6 +34,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * This class creates the main screen putting all elements together, toolbar, quickactions etc.
@@ -122,8 +126,40 @@ public class DeviceListActivity extends Fragment {
         realTimeDataEndpoint.pauseService();
     }
 
-    RealTimeDataEndpoint realTimeDataEndpoint = new RealTimeDataEndpoint();
+    static class RealTimeUserMeta{
+        String name;
+        Map<String,Map<String,String>> deviceInfoMap;
+        Set<String> deviceSet = new TreeSet<>();
+        RealTimeUserMeta(String name, Map<String,Map<String,String>> deviceInfoMap){
+            this.name = name;
+            this.deviceInfoMap = deviceInfoMap;
 
+            for(Map.Entry<String,Map<String,String>> entry : deviceInfoMap.entrySet()){
+                deviceSet.add(entry.getKey());
+            }
+        }
+        @Override public String toString(){
+            return "{Name: " + name + ", deviceInfoMap: " + deviceInfoMap.toString() + "}";
+
+        }
+    }
+    static class RealTimeMeta{
+        void parseMeta(Object map){
+            Map<String, Map<String,Map<String,String>>> userDeviceList;
+            userDeviceList = (Map<String, Map<String,Map<String,String>>>)map;
+            for(Map.Entry<String, Map<String,Map<String,String>>> entry : userDeviceList.entrySet() ){
+                if(entry.getValue().size() == 0){
+                    userMetaMap.remove(entry.getKey());
+                    Log.d("--REALTIME-METTA--", " !! DROPED -> " + entry.getKey());
+                }else if( entry.getValue() != null) {
+                    userMetaMap.put(entry.getKey(), new RealTimeUserMeta(entry.getKey(), entry.getValue()));
+                }
+            }
+        }
+        Map<String, RealTimeUserMeta> userMetaMap = new TreeMap<>();
+    };
+    RealTimeMeta realTimeMeta = new RealTimeMeta();
+    RealTimeDataEndpoint realTimeDataEndpoint = new RealTimeDataEndpoint();
     class RealTimeDataEndpoint extends RevaWebsocketEndpoint {
         private final String TAG = this.getClass().getName();
         @Override
@@ -131,6 +167,12 @@ public class DeviceListActivity extends Fragment {
             return "RTDS";
         }
 
+
+        @Override
+        public void onMeta(Object info) {
+            realTimeMeta.parseMeta(info);
+            Log.d("--REALTIME-METTA--", realTimeMeta.userMetaMap.toString());
+        }
         public void onMessage(String message){
             android.util.Log.i("STUFF", message );
         }
