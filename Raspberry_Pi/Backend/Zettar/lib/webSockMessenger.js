@@ -58,7 +58,8 @@ const webSockMessenger = module.exports = {
             }
         }
         subServiceOptionsMap[key] = options
-        return MetaHandlerMap[key] = new MetaHandler;
+        MetaHandlerMap[key] = new MetaHandler
+        return MetaHandlerMap[key];
     },
     getUserSocketContextMap: function () { return userSocketContextMap },
     getUserSocketContext: function (user) { return userSocketContextMap[user] }
@@ -120,7 +121,7 @@ Meta.prototype.pullMeta = function (pupUserUid) {
                 map.timeout = setTimeout(() => {
                     try {
                         var publisher = this.publisherMap[pupUserUid].publisher
-                        publisher.publish({ [META_KEY]: { [this.metaKey]: this.meta } }, null, true)
+                        publisher.publish({ [META_KEY]: { [this.metaKey]: this.meta } })//, null, true)
                         map.timeout = undefined
                     } catch (e) { }
                 }, 128)
@@ -376,7 +377,9 @@ webSockMessenger.attach('RCC', {
                         for (var i in servicePlisher.metaKeys) {
                             var metaKey = servicePlisher.metaKeys[i]
                             var metaObj = MetaHandlerMap[servicePlisher.key].metaMap[metaKey]
-                            metaObj && metaObj.pullMeta(servicePlisher)
+                            for (var i in servicePlisher.metaKeys) {
+                                metaObj && metaObj.pullMeta(servicePlisher.metaKeys[i])
+                            }
                         }
                     }
                 } catch (e) {

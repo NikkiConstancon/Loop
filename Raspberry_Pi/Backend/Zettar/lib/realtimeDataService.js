@@ -12,6 +12,9 @@ var relatimeHopperMap = {}
 function RelatimeHopper(zettaletName) {
     this.name = zettaletName
     this.meta = metaHandler.newMeta(zettaletName)
+    this.realTimePublisher = new RealTimePublisher(this)
+    this.realTimeCollectorMap = {}//use map to only send newest data when collecting
+    this.flagRealTimeTimeoutSet = false
 }
 RelatimeHopper.prototype.informDeviceConnect = function (info) {
     var meta = this.meta.getMeta() || {}
@@ -20,8 +23,44 @@ RelatimeHopper.prototype.informDeviceConnect = function (info) {
 }
 RelatimeHopper.prototype.informDisonnect = function () {
     this.meta.free()
+    this.realTimePublisher.free()
+}
+RelatimeHopper.prototype.pushRealTime = function (info, response) {   
+    //TODO !!! average by some function instesd of overwriting old value  !!!
+    this.realTimeCollectorMap[info.name] = response.data.toPrecision(3)
+
+    if (!this.flagRealTimeTimeoutSet) {
+        this.flagRealTimeTimeoutSet = true
+        setTimeout(() => {
+            this.realTimePublisher.push({ [this.name]: this.realTimeCollectorMap })
+            this.realTimeCollectorMap = {}
+            this.flagRealTimeTimeoutSet = false
+        }, 750)
+    }
+
 }
 
+function RealTimePublisher(relatimeHopper) {
+    this.relatimeHopper = relatimeHopper
+    this.subscriberList = []
+    patientManager.bindSubscriberListInofHook({ Username: this.relatimeHopper.name },(argObj) => {
+        this.subscriberList = argObj
+    })
+}
+RealTimePublisher.prototype.free = function () {
+    patientManager.unbindSubscriberListInofHook({ Username: this.relatimeHopper.name })
+}
+RealTimePublisher.prototype.push = function (msgObj) {
+    var userSocketContextMap = webSockMessenger.getUserSocketContextMap()
+    for (var i in this.subscriberList) {
+        var userUid = this.subscriberList[i]
+        for (var context in userSocketContextMap[userUid]) {
+            var usc = userSocketContextMap[userUid][context]
+            var service = usc.subServiceMap[serviceName]
+            service.publish(msgObj)
+        }
+    }
+}
 
 function pushData(msg) {
     var userSocketContextMap = webSockMessenger.getUserSocketContextMap()
@@ -36,14 +75,7 @@ function pushData(msg) {
 
 var sevice = module.exports = {
     publish: function (info, response) {
-        if (!fromQueueMap[info.from]) {
-            fromQueueMap[info.from] = []
-            setTimeout(function () {
-                pushData({ [info.from]: fromQueueMap[info.from] })
-                fromQueueMap[info.from] = null
-            }, 8)
-        }
-        fromQueueMap[info.from].push({ [info.name]: response.data.toPrecision(3) })
+        relatimeHopperMap[info.from] && relatimeHopperMap[info.from].pushRealTime(info, response)
     },
     connectHopper: function (zettaletName) {
         relatimeHopperMap[zettaletName] = new RelatimeHopper(zettaletName)
@@ -70,7 +102,12 @@ var metaHandler = webSockMessenger.attach(serviceName, {
             for (var i in userUids) {
                 publisher.registerMeta(userUids[i])
             }
-        }).catch((e) => { logger.debug(e)})
+        }).catch(function () {
+            return patientManager.getPatient({ Username: publisher.context.userUid }).then(function (pat) {
+                //TODO: get list of patients this patient is subscriber to and regester them on the publisher
+                publisher.registerMeta(publisher.context.userUid)
+            })
+        })
 
         publisher.publish(count++, function (err) {
         })
