@@ -190,7 +190,7 @@ var subscriberManager = module.exports = {
                 console.log("validating")
                 var re = /\S+@\S+\.\S+/;
                 if (!re.test(_newPatient)) {
-                    resolve(null); //need to test if this is right
+                   // resolve(null); //need to test if this is right
                 }
                 console.log("valid " )
 
