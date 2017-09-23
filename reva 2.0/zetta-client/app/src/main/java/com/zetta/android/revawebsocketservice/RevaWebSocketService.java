@@ -358,7 +358,6 @@ public class RevaWebSocketService extends Service {
                     }
                     rccPublishServiceBindings();
                     scoutThread.interrupt();
-                    connectSemaphore.release();//acquire on new
                 }
             }.start();
         }
@@ -375,6 +374,7 @@ public class RevaWebSocketService extends Service {
                     rr.send(0, bundle);
                 }
             }
+            connectSemaphore.release();
         }
 
         @Override
