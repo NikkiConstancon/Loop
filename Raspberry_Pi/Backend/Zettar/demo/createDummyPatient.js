@@ -1,4 +1,5 @@
 ﻿var PatientManager = require('../patientManager');
+var SubscriberManager = require('../subscriberManager');
 
 var query = module.exports.query ={
     Username: 'nikki',
@@ -75,5 +76,68 @@ PatientManager
         })
     }).catch(function (e) {
 
-    })
+        })
+
+
+SubscriberManager
+    .addSubscriber({
+        Email: 'what@sub.com',
+        Password: 'Password',
+        Relation: "doctor",
+        PatientList: ['nikki', 'greg', 'rinus']
+    }).then(function (sub) {
+        PatientManager.addToSubscriberList({ Username: 'nikki' }, 'what@sub.com')
+        PatientManager.addToSubscriberList({ Username: 'greg' }, 'what@sub.com')
+        PatientManager.addToSubscriberList({ Username: 'rinus' }, 'what@sub.com')
+        /*
+        SubscriberManager.addToPatientList({ Email: sub.Email }, 'nikki')
+        SubscriberManager.addToPatientList({ Email: sub.Email }, 'greg')
+        SubscriberManager.addToPatientList({ Email: sub.Email }, 'rinus')*/
+    }).catch(function () { })
+
+SubscriberManager
+    .addSubscriber({
+        Email: 'q@q.q',
+        Password: 'Password',
+        Relation: "doctor",
+        PatientList: ['nikki', 'greg', 'rinus']
+    }).then(function (sub) {
+        PatientManager.addToSubscriberList({ Username: 'nikki' }, 'q@q.q')
+        PatientManager.addToSubscriberList({ Username: 'greg' }, 'q@q.q')
+        PatientManager.addToSubscriberList({ Username: 'rinus' }, 'q@q.q')
+    }).catch(function () { })
+
+SubscriberManager
+    .addSubscriber({
+        Email: 'what2@sub.com',
+        Password: 'Password',
+        Relation: "doctor",
+        PatientList: []
+    }).then(function (sub) {
+        PatientManager.addToSubscriberList({ Username: 'nikki' }, 'what2@sub.com')
+        PatientManager.addToSubscriberList({ Username: 'greg' }, 'what2@sub.com')
+        PatientManager.addToSubscriberList({ Username: 'rinus' }, 'what2@sub.com')
+
+        SubscriberManager.addToPatientList({ Email: sub.Email }, 'nikki')
+        SubscriberManager.addToPatientList({ Email: sub.Email }, 'greg')
+        SubscriberManager.addToPatientList({ Email: sub.Email }, 'rinus')
+    }).catch(function () { })
+
+SubscriberManager
+    .addSubscriber({
+        Email: 'a@a.a',
+        Password: 'Password',
+        Relation: "doctor",
+        PatientList: []
+    }).then(function (sub) {
+        PatientManager.addToSubscriberList({ Username: 'nikki' }, 'a@a.a')
+        PatientManager.addToSubscriberList({ Username: 'greg' }, 'a@a.a')
+        PatientManager.addToSubscriberList({ Username: 'rinus' }, 'a@a.a')
+
+        SubscriberManager.addToPatientList({ Email: sub.Email }, 'nikki')
+        SubscriberManager.addToPatientList({ Email: sub.Email }, 'greg')
+        SubscriberManager.addToPatientList({ Email: sub.Email }, 'rinus')
+    }).catch(function () { })
+
+
 
