@@ -110,6 +110,7 @@ public class login_activity extends AppCompatActivity {
                  * wanted to demonstrate what parameter we were using "MainActivity.this" for as
                  * clear as possible.
                  */
+                userManagerEndpoint.getService().setLogin(user.getText().toString(), passw.getText().toString());
 
                 ServerComms server = new ServerComms(login_activity.this);
                 String serverURI = "http://" + getString(R.string.serverURL) + ":8080/login";
@@ -151,10 +152,12 @@ public class login_activity extends AppCompatActivity {
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         });
+        userManagerEndpoint.bind(this);
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
+        userManagerEndpoint.unbind(this);
     }
 
     /**
@@ -215,5 +218,14 @@ public class login_activity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+
+    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
+    class UserManagerEndpoint extends RevaWebsocketEndpoint {
+        @Override
+        public String key() {
+            return "UserManager";
+        }
     }
 }
