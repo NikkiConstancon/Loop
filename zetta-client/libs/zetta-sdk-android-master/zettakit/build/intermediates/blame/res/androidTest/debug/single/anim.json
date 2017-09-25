@@ -1,0 +1,42 @@
+[
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\libs\\zetta-sdk-android-master\\zettakit\\build\\intermediates\\res\\merged\\androidTest\\debug\\anim\\abc_fade_out.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\.android\\build-cache\\7554a2f0fdc28e5838d84d0f86f71a2a7148a96e\\output\\res\\anim\\abc_fade_out.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\libs\\zetta-sdk-android-master\\zettakit\\build\\intermediates\\res\\merged\\androidTest\\debug\\anim\\abc_shrink_fade_out_from_bottom.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\.android\\build-cache\\7554a2f0fdc28e5838d84d0f86f71a2a7148a96e\\output\\res\\anim\\abc_shrink_fade_out_from_bottom.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\libs\\zetta-sdk-android-master\\zettakit\\build\\intermediates\\res\\merged\\androidTest\\debug\\anim\\abc_slide_out_bottom.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\.android\\build-cache\\7554a2f0fdc28e5838d84d0f86f71a2a7148a96e\\output\\res\\anim\\abc_slide_out_bottom.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\libs\\zetta-sdk-android-master\\zettakit\\build\\intermediates\\res\\merged\\androidTest\\debug\\anim\\abc_slide_out_top.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\.android\\build-cache\\7554a2f0fdc28e5838d84d0f86f71a2a7148a96e\\output\\res\\anim\\abc_slide_out_top.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\libs\\zetta-sdk-android-master\\zettakit\\build\\intermediates\\res\\merged\\androidTest\\debug\\anim\\abc_popup_enter.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\.android\\build-cache\\7554a2f0fdc28e5838d84d0f86f71a2a7148a96e\\output\\res\\anim\\abc_popup_enter.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\libs\\zetta-sdk-android-master\\zettakit\\build\\intermediates\\res\\merged\\androidTest\\debug\\anim\\abc_grow_fade_in_from_bottom.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\.android\\build-cache\\7554a2f0fdc28e5838d84d0f86f71a2a7148a96e\\output\\res\\anim\\abc_grow_fade_in_from_bottom.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\libs\\zetta-sdk-android-master\\zettakit\\build\\intermediates\\res\\merged\\androidTest\\debug\\anim\\abc_slide_in_top.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\.android\\build-cache\\7554a2f0fdc28e5838d84d0f86f71a2a7148a96e\\output\\res\\anim\\abc_slide_in_top.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\libs\\zetta-sdk-android-master\\zettakit\\build\\intermediates\\res\\merged\\androidTest\\debug\\anim\\abc_fade_in.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\.android\\build-cache\\7554a2f0fdc28e5838d84d0f86f71a2a7148a96e\\output\\res\\anim\\abc_fade_in.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\libs\\zetta-sdk-android-master\\zettakit\\build\\intermediates\\res\\merged\\androidTest\\debug\\anim\\abc_slide_in_bottom.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\.android\\build-cache\\7554a2f0fdc28e5838d84d0f86f71a2a7148a96e\\output\\res\\anim\\abc_slide_in_bottom.xml"
+    },
+    {
+        "merged": "C:\\Users\\Hristian Vitrychenko\\AndroidStudioProjects\\zetta-client\\libs\\zetta-sdk-android-master\\zettakit\\build\\intermediates\\res\\merged\\androidTest\\debug\\anim\\abc_popup_exit.xml",
+        "source": "C:\\Users\\Hristian Vitrychenko\\.android\\build-cache\\7554a2f0fdc28e5838d84d0f86f71a2a7148a96e\\output\\res\\anim\\abc_popup_exit.xml"
+    }
+]

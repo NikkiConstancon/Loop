@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:custom="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:fitsSystemWindows="true"
+  tools:context=".browse.DeviceListActivity"
+    android:elevation="0dp"
+    >
+
+
+
+  <android.support.v4.widget.SwipeRefreshLayout
+    android:id="@+id/pull_refresh"
+    android:layout_marginBottom="16dp"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    custom:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <android.support.v7.widget.RecyclerView
+      android:id="@+id/device_list"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+
+  </android.support.v4.widget.SwipeRefreshLayout>
+
+     <android.support.v7.widget.RecyclerView
+    android:id="@+id/device_list_bottom_sheet_quick_actions"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffffff"
+    custom:layout_behavior="@string/bottom_sheet_behavior" />
+
+
+  <com.zetta.android.browse.EmptyLoadingView
+    android:id="@+id/device_list_empty_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone" />
+
+  <android.support.design.widget.BottomNavigationView
+
+      android:id="@+id/bottom_navigation"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_gravity="bottom"
+      android:background="@color/colorPrimary"
+
+      app:background="@color/white"
+
+      android:outlineProvider="bounds"
+      app:elevation="16dp"
+      app:itemIconTint="@drawable/selector"
+      app:itemTextColor="@color/white"
+      app:menu="@menu/bottom_navigation_main"
+      />
+
+</android.support.design.widget.CoordinatorLayout>

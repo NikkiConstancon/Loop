@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.zetta.android">
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="ReVA"
+        android:supportsRtl="false"
+        android:theme="@style/AppThemeLight">
+        <activity
+            android:name=".browse.MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".device.DeviceDetailsActivity"
+            android:parentActivityName=".browse.MainActivity" />
+        <activity
+            android:name=".device.events.EventsActivity"
+            android:parentActivityName=".device.DeviceDetailsActivity" />
+        <activity
+            android:name=".browse.login_activity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/Form">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".advice_page" />
+        <activity
+            android:name=".browse.Registration"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/Form" />
+        <activity
+            android:name=".browse.Registration_Cont"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeLight" />
+        <activity
+            android:name=".browse.Registration_Patient"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeLight" />
+        <activity
+            android:name=".browse.Registration_Sub"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+>>>>>>> origin/app_dev_stream
+            android:theme="@style/AppThemeLight"></activity>
+        <activity android:name=".browse.AddSimpleStat"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeLight"></activity>
+
+        <service android:name=".revawebsocketservice.RevaWebSocketService" />
+
+        <receiver
+            android:name=".revawebsocketservice.RevaBootCompletedReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".MoreGraph"></activity>
+    </application>
+
+</manifest>

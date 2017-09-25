@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:gravity="center_vertical"
+  android:orientation="horizontal"
+  android:paddingBottom="@dimen/spacing_single"
+  android:paddingLeft="@dimen/spacing_double"
+  android:paddingRight="@dimen/spacing_double"
+  android:paddingTop="@dimen/spacing_single">
+
+  <android.support.design.widget.TextInputLayout
+    android:id="@+id/list_item_action_input_layout"
+    android:layout_width="0dip"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:labelFor="@+id/list_item_action_input">
+
+    <android.support.design.widget.TextInputEditText
+      android:id="@id/list_item_action_input"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:inputType="textShortMessage"
+      android:maxLines="1"
+      android:paddingLeft="0dip"
+      tools:text="brightness" />
+
+  </android.support.design.widget.TextInputLayout>
+
+  <android.support.v7.widget.AppCompatButton
+    android:id="@+id/list_item_action_button"
+    style="@android:style/TextAppearance.Small"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:text="set-brightness" />
+
+</LinearLayout>

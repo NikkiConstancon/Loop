@@ -2,7 +2,7 @@ var Device = require('zetta-device');
 var util = require('util');
 var extend = require('node.extend');
 
-var icon = 'http://www.promedsupply.biz/wp-content/uploads/2015/11/OneTouch-Verio-FLEX-Glucose-Monitoring-System-1-0.jpg';
+var icon = 'http://i.imgur.com/R9xBixo.png';
 
 
 function degToRad(x) {
@@ -12,23 +12,19 @@ function degToRad(x) {
 var Thermometer = module.exports = function(opts) {
   Device.call(this);
   this.vitals = 0;
+  this.units = "°C";
   this._opts = opts || {};
   this._increment = this._opts['increment'] || 15;
   this._timeOut = null;
   this._counter = 0;
 
-  /*this.style = extend(true, this.style, {properties: {
-    state: 'none'
+
+  this.style = extend(true, this.style, {properties: {
     stateImage: {
       url: icon,
       tintMode: 'original'
-    },
-    vitals: {
-      display: 'billboard',
-      significantDigits: 2,
-      symbol: '°C'
     }
-  }});*/
+  }});
 
 };
 util.inherits(Thermometer, Device);
@@ -36,7 +32,7 @@ util.inherits(Thermometer, Device);
 Thermometer.prototype.init = function(config) {
   config
     .type('thermometer')
-    .name('Thermometer')
+    .name('Body Temperature')
 
 
     .monitor('vitals');
@@ -48,7 +44,7 @@ Thermometer.prototype.init = function(config) {
 Thermometer.prototype._startMockData = function(cb) {
   var self = this;
   this._timeOut = setInterval(function() {
-    self.vitals = (Math.sin(degToRad(self._counter)) + 1.0) * 37 - 2;
+    self.vitals = 37 + (Math.sin(degToRad(self._counter)) + 1.0) * 1;
     self._counter += self._increment;
   }, 100);
 }

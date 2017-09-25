@@ -1,0 +1,60 @@
+<resources>
+    <string name="app_name">Zetta</string>
+    <string name="Settings">Settings</string>
+    <string name="API_History">API History</string>
+
+    <string name="key_api_url_with_history" translatable="false">pref_api_url</string>
+    <string name="key_app_version" translatable="false">pref_app_version</string>
+    <string name="key_mock_responses" translatable="false">pref_mock_responses</string>
+
+    <string name="Build_Version">Build Version</string>
+    <string name="Support">Support</string>
+    <string name="Zetta_Discuss">Zetta Discuss</string>
+    <string name="Software_Licenses">Software Licenses</string>
+    <string name="Head_nod_to_the_open_source_libraries">Head nod to the open source libraries we have used</string>
+    <string name="waiting_for_devices_to_connect_to_x">waiting for devices to connect to %1$s</string>
+    <string name="no_server_url_has_been_set">no server url has been set</string>
+    <string name="open_source_licenses">Software Licenses</string>
+    <string name="library_author">© %1$s</string>
+    <string name="Events">Events</string>
+    <string name="querying_device">querying device</string>
+    <string name="title_activity_bottom_nav_activity">bottom_nav_activity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="webSocketServerPort">8080</string>
+    <string name="serverURL">192.168.56.1</string>
+    <!--string name="serverURL">192.168.1.101</string-->
+    <string name="vitals_prompt">Choose a vital to view</string>
+    <string name="simp_stat_prompt">Choose a statistic to view</string>
+    <string name="stat_interval_prompt">Choose an interval</string>
+
+    <string-array name="intervals_array">
+        <item>Minutes</item>
+        <item>Hours</item>
+        <item>Days</item>
+        <item>Weeks</item>
+    </string-array>
+
+    <string-array name="vitals_array">
+        <item>Heart Rate</item>
+        <item>Temperature</item>
+        <item>Glucose Levels</item>
+        <item>Blood Pressure</item>
+    </string-array>
+
+    <string-array name="stat_array">
+        <item>Minimum</item>
+        <item>Maximum</item>
+        <item>Average</item>
+        <item>Median</item>
+        <item>Mode</item>
+    </string-array>
+
+    <string-array name="planets_array">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+    </string-array>
+</resources>

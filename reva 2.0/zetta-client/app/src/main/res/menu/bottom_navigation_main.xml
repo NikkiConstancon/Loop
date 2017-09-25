@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_vitals"
+        android:enabled="true"
+        android:icon="@drawable/ic_assessment_black_24dp"
+        android:title="Vitals"
+         />
+    <item
+        android:id="@+id/action_advice"
+        android:enabled="true"
+        android:icon="@drawable/ic_help_black_24dp"
+        android:title="Advice"
+         />
+    <item
+        android:id="@+id/action_settings"
+        android:enabled="true"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/Settings"
+        />
+
+</menu>
