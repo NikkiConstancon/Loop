@@ -81,7 +81,10 @@ TimeStamp*/
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
 
-
+                var minimum = Number.POSITIVE_INFINITY;
+                var maximum = Number.NEGATIVE_INFINITY;
+                var avg = 0.0;
+                var count = 0;
                 var result = []
 
                 var query = {
@@ -94,9 +97,19 @@ TimeStamp*/
                     //data is an array of plain objects satisfying the query conditions above
                     var row;
                     while (row = data.readRow()) {
+                         count ++;
+                        avg += row.Value;
+                        if(row.Value > maximum)
+                            maximum = row.Value;
+                        
+                        if(row.Value < minimum)
+                            minimum = row.Value;
+
                         result.push({ x: row.TimeStamp , y : row.Value})
                     }
 
+                    result.push({Min: minimum, Max: maximum, Avg: (avg/count) })
+                    
                     //need to sort it.
 
                     result.sort(function(first, second) {
@@ -104,7 +117,7 @@ TimeStamp*/
                     });
 
                     //need to find averages according to the interval
-                    console.log(result);
+                    // console.log(result);
 
 
                  /*   var endInterval = new Date(_info.StartTime) //marks the end of the current interval

@@ -28,8 +28,14 @@
 #Zetta
 *.peers
 *.devices
+*.data
 .DS_STORE
 node_modules
+.peers
+.devices
+.data
+.directory
+
 
 
 

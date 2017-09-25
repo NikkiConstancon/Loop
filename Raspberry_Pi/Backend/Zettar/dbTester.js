@@ -16,11 +16,10 @@ var CryptoJS = require("crypto-js");
 setTimeout(function() {
 	console.log("Testing");
     PatientDataManager.getGraphPoints({
-       Username: ''  ,
-       DeviceId: "thermometer/2f15a253-46c1-45c3-b940-291afe275537/vitals" ,
-       StartTime:  "2017-09-12 18:14:55.391000+0000",
-       EndTime:  "2017-09-12 18:14:57.503000+0000",
-       Interval: 1
+       Username: 'nikki'  ,
+       DeviceId: "thermometer" ,
+       StartTime:  "2017-09-25 15:16:10.051000+0000",
+       EndTime:  "2017-09-25 15:16:10.481000+0000",
     })
 
   }, 0);
