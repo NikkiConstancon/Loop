@@ -123,11 +123,21 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             @Override
             public void onClick(View view)
             {
-                notifs.remove(position);
+                int pos = position;
 
-                notifyItemRemoved(position);
+                if(position == notifs.size())
+                {
+                    while(pos >= notifs.size())
+                    {
+                        pos--;
+                    }
+                }
 
-                notifyItemRangeChanged(position, notifs.size());
+                notifs.remove(pos);
+
+                notifyItemRemoved(pos);
+
+                notifyItemRangeChanged(pos, notifs.size());
 
                 Toast.makeText(myCont,"Notification has been removed" ,Toast.LENGTH_SHORT).show();
             }
