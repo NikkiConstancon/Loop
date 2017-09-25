@@ -6,6 +6,8 @@ import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,6 +23,8 @@ import com.zetta.android.R;
 import java.util.List;
 
 import static android.graphics.Color.BLACK;
+import static android.graphics.Color.GREEN;
+import static android.graphics.Color.RED;
 import static android.graphics.Color.TRANSPARENT;
 
 /**
@@ -34,9 +38,9 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         CardView cardView;
         TextView notifTitle;
         TextView notifContent;
-        Button advice;
         Button close;
         ImageView img;
+        ImageView status;
         int severity;
 
         NotificationViewHolder(final View itemView)
@@ -47,7 +51,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             notifTitle = (TextView) itemView.findViewById((R.id.txt_noteTitle));
             notifContent = (TextView) itemView.findViewById(R.id.txt_noteContent);
             img = (ImageView) itemView.findViewById(R.id.notif_image);
-            advice = (Button) itemView.findViewById(R.id.btn_getAdvice);
+            status = (ImageView) itemView.findViewById(R.id.notif_status_image);
             close = (Button) itemView.findViewById(R.id.btn_closeNotification);
 
             Drawable col = cardView.getBackground();
@@ -86,44 +90,56 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     {
         notifViewHolder.notifTitle.setText(notifs.get(position).getNoteTitle());
         notifViewHolder.notifTitle.setTextColor(BLACK);
-        notifViewHolder.notifTitle.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
         notifViewHolder.notifContent.setText(notifs.get(position).getNoteContent());
+        notifViewHolder.notifContent.setTextColor(ContextCompat.getColor(myCont, R.color.colorSecondaryText));
         notifViewHolder.img.setImageResource(notifs.get(position).getImageSource());
 
-        GradientDrawable shape = new GradientDrawable();
-        shape.setCornerRadius(15);
-        shape.setColor(notifs.get(position).getSeverity());
-        shape.setStroke(2, Color.parseColor("#38ACEC"));
+        //GradientDrawable shape = new GradientDrawable();
+        //shape.setCornerRadius(15);
+        //shape.setStroke(2, notifs.get(position).getSeverity());
 
-        notifViewHolder.advice.setText("Get Advice");
-        notifViewHolder.advice.setTextColor(Color.parseColor("#FFFFFF"));
-
-        notifViewHolder.cardView.setBackground(shape);
+        //notifViewHolder.cardView.setBackground(shape);
 
         notifViewHolder.close.setText("X");
+        notifViewHolder.close.setTextSize(10);
         notifViewHolder.close.setBackgroundColor(TRANSPARENT);
 
-        notifViewHolder.advice.setOnClickListener(new View.OnClickListener()
+        if(notifs.get(position).getSeverity() == RED)
         {
-            @Override
-            public void onClick(View view)
-            {
-                Toast.makeText(myCont,"No advice for this notification" ,Toast.LENGTH_SHORT).show();
-            }
-        });
+            notifViewHolder.status.setBackgroundResource(R.drawable.notif_status_circle);
+        }
+        else if(notifs.get(position).getSeverity() == GREEN)
+        {
+            notifViewHolder.status.setBackgroundResource(R.drawable.notif_status_circle_green);
+        }
+        else
+        {
+            notifViewHolder.status.setBackgroundResource(R.drawable.notif_status_circle_yellow);
+        }
+
 
         notifViewHolder.close.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                notifs.remove(position);
+                int pos = position;
 
-                notifyItemRemoved(position);
+                if(position == notifs.size())
+                {
+                    while(pos >= notifs.size())
+                    {
+                        pos--;
+                    }
+                }
 
-                notifyItemRangeChanged(position, notifs.size());
+                notifs.remove(pos);
 
-                Toast.makeText(myCont,"Removed notification " + position + "size: " + notifs.size() ,Toast.LENGTH_SHORT).show();
+                notifyItemRemoved(pos);
+
+                notifyItemRangeChanged(pos, notifs.size());
+
+                Toast.makeText(myCont,"Notification has been removed" ,Toast.LENGTH_SHORT).show();
             }
         });
     }
