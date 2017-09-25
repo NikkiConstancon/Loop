@@ -13,7 +13,7 @@
         android:supportsRtl="false"
         android:theme="@style/AppThemeLight">
         <activity
-            android:name=".browse.MainActivity"
+            android:name=".browse.login_activity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
@@ -23,9 +23,10 @@
             android:name=".device.events.EventsActivity"
             android:parentActivityName=".device.DeviceDetailsActivity" />
         <activity
-            android:name=".browse.login_activity"
+            android:name=".browse.MainActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
+
             android:theme="@style/Form">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -53,7 +54,6 @@
             android:name=".browse.Registration_Sub"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
->>>>>>> origin/app_dev_stream
             android:theme="@style/AppThemeLight"></activity>
         <activity android:name=".browse.AddSimpleStat"
             android:configChanges="orientation"
