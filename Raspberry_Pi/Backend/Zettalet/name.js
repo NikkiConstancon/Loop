@@ -1,5 +1,5 @@
 ﻿uuidv1 = require('uuid/v1')
-keys = require('../shared/sharedKeys')
+keys = require('../Shared/sharedKeys')
 
 const arr = new Array(8)
 uuidv1(null, arr, 8)

@@ -11,7 +11,6 @@ var uuid1 = require('uuid/v1')
 var nodemailer = require('nodemailer')
 var logger = require('../revaLog')
 
-var server = require('../webServer')
 
 
 
@@ -40,9 +39,15 @@ var Mailer = module.exports = {
      *@param fullName the name of the user
      **/
     mailEmialConfirmationUrl: function (to, keyA, keyB, keyC, fullName) {
+        const server = require('../webServer')//moved here because of circular require
         pendingSends++
         
-        var html = require('fs').readFileSync('./resources/email.html', 'utf8').toString()
+        var html
+        try {
+            html = require('fs').readFileSync('../resources/email.html', 'utf8').toString()
+        } catch (e) {
+            html = require('fs').readFileSync('./resources/email.html', 'utf8').toString()
+        }
         html = html.replace('{{fullName}}', fullName)
         html = html.replace('{{endUserAgreement}}', server.whoAmI() + '/end-user-agreement')
         html = html.replace('{{date}}', (new Date()).toString())

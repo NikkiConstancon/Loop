@@ -91,6 +91,7 @@ var patientManager = module.exports = {
                         //WARNING USER NAME IS TAKEN code goes here
                         logger.debug('ERROR: ' + found.Username + " already exists")
                         reject( found.Username + ' already exists')
+                        //resolve(null);
                     }
                 });
             }).catch((err)=>{
@@ -109,7 +110,7 @@ var patientManager = module.exports = {
             dbMan.try().then(function () {
                 dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
                     if (err || !found) {
-                        err = err || 'invalid username'
+                        err = err || { clientSafe: 'Could not find ' + _patient.Username }
                         logger.error(err)
                         reject(err)
                     } else {
@@ -123,9 +124,34 @@ var patientManager = module.exports = {
         })
     },
 
+    /**
+     *This will replace getPatient.
+     *@brief checks if the username specified already exits.
+     *
+     *@return a promise passing a boolean value to the function called back
+     */
+    checkUsernameExists: function (_username) {
+        return new Promise((resolve, reject) => {
+            dbMan.try().then(function () {
+                dbMan.models.instance.patient.findOne({ Username: _username }, function (err, found) {
+                    if (err || !found) {
+                        err = err || 'no username exits'
+                        logger.debug(err)
+                        resolve(false)
+                    } else {
+                        logger.debug('Found username: ' + found.Username)
+                        resolve(true)
+                    }
+                })
+            }).catch((err) => {
+                reject(err)
+            })
+        })
+    },
+
 
     /**
-     *@brief adds a Subscriber to the database
+     *@brief adds a Subscriber to the Patients list of users subscribed to them.
      *
      *@return a promise passing the newly added user to the function called back
      */
@@ -162,6 +188,8 @@ var patientManager = module.exports = {
                         }
                         updateValue.push(_newSubscriber)
                     }
+
+
                     //store updated value
                     console.log(updateValue)
                     var query_object = {Username: _patient.Username};
@@ -231,7 +259,7 @@ var patientManager = module.exports = {
      **/
     bindZettalet: function (key, apiUri) {
         return new Promise(function (res, rej) {
-            var who = { Username: sharedKeys.decrypt(key) }
+            var who = { Username:  key}//sharedKeys.decrypt(key)
             patientManager.getPatient(who)
                 .then(function (pat) {
                     dbMan.models.instance.patient.update(who, { ZettaletUuid: apiUri}, function (err) {
@@ -282,7 +310,36 @@ var patientManager = module.exports = {
             })
         })
     },
+    bindSubscriberListInofHook: function (userInfo, cb) {
+        var userUid = userInfo.Username || userInfo.Email
+        if (SubscriberListInofHookMap[userUid]) {
+            try {
+                throw "@PatientManager.bindSubscriberListInofHook: already hooked for " + JSON.stringify(userInfo)
+            } catch (e) {
+                logger.warn(e)
+            }
+        }
+        SubscriberListInofHookMap[userUid] = cb
+
+        patientManager.getPatient(userInfo).then(function (pat) {
+            SubscriberListInofHookMap[pat.Username](pat.getSubscriberList())
+        }).catch(() => { })
+    },
+    unbindSubscriberListInofHook: function (userInfo, cb) {
+        var userUid = userInfo.Username || userInfo.Email
+        if (SubscriberListInofHookMap[userUid]) {
+            delete SubscriberListInofHookMap[userUid]
+        }
+    },
     getModelInfo: function () {
         return 'keyspace ' + dbMan.getKeyspcaeName() + ', tabel patient';
     }
 }
+
+
+var SubscriberListInofHookMap = {}
+
+
+
+
+

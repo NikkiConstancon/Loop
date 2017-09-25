@@ -113,6 +113,11 @@ class PatientModel extends Model {
                     })
                     return context
                 }
+            },
+            DeviceMap: {
+                type: 'map',
+                typeDef: '<text, boolean>',
+                default: function () { return {} }
             }
         }
 //-------------------------------End fields---------------------------------//
@@ -120,6 +125,36 @@ class PatientModel extends Model {
         this.methods = {
             verifyPassword: function (value) {
                 return decrypt(this.Password) === value
+            },
+            connectDevice: function (deviceKey) {
+                connectDeviceStore[this.Email] || (connectDeviceStore[this.Email] = {})
+                //concurrency problem fix
+                if (!connectDeviceStore[this.Email].timeout) {
+                    connectDeviceStore[this.Email].map = {}
+                    connectDeviceStore[this.Email].timeout = setTimeout(() => {
+                        dbMan.models.instance.patient.update({ Username: this.Username }, { DeviceMap: Object.assign(this.DeviceMap || {}, connectDeviceStore[this.Email].map) })
+                        delete connectDeviceStore[this.Email]
+                    }, 512)
+                }
+                connectDeviceStore[this.Email].map[deviceKey] = true
+            },
+            disconnectAllDevices: function () {
+                for (var key in this.DeviceMap) {
+                    this.DeviceMap[key] = false;
+                }
+                return dbMan.models.instance.patient.update({ Username: this.Username }, { DeviceMap: this.DeviceMap }, null, function (err) {
+                    if (err) {
+                        logger.error("@PateintModel$connectDevice: " + err)
+                    }
+                })
+            },
+            getSubscriberList: function () {
+                var ret = [this.Username]
+                //concat not working?
+                for (var i in this.SubscriberList) {
+                    ret.push(this.SubscriberList[i])
+                }
+                return ret
             }
         }
         this.after_save = function (instance, options, next) {
@@ -144,3 +179,8 @@ for (var k in thing) {
 }
 module.exports = obj
 module.exports.class = PatientModel
+
+
+var dbMan;
+setTimeout(function () { dbMan = require('../databaseManager') }, 0)
+var connectDeviceStore = {}//concurrency problem fix @ connectDevice()

@@ -76,26 +76,19 @@ module.exports = {
 */
  var validatePatient = function(_userName_Password){
                         
-
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
                 dbMan.models.instance.patient.findOne({ Username: _userName_Password.Username }, function (err, found) {
                     if (err || !found) {
-                        err = err || 'could not find ' + _patient.Username
+                        err = err || 'could not find ' + _userName_Password.Username
                         logger.error(err)
                         reject(err)
                     } else {
                         logger.debug('Found patient: ' + found.Username)
-                        //User exists.. is the password right though?
-
-
-                            console.log(_userName_Password.AccessPassword);
-
+                           // console.log(_userName_Password.AccessPassword);
 
                         if (_userName_Password.AccessPassword == decrypt(found.AccessPassword)) {
                             console.log("MATCH" );
-                            // console.log("Password: " + decrypt(found.AccessPassword));
-                            // console.log("Password: " + found.AccessPassword);
                             resolve(found)
                         }
                         resolve("Not Found")
@@ -106,53 +99,40 @@ module.exports = {
             })
         })
     }
+
+
+
 var subscriberManager = module.exports = {
+    /**
+     *@brief adds a Subscriber to the database
+     *
+     *@return a promise passing the newly added user to the function called back
+     */
     addSubscriber: function (_subscriber){
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
-                 dbMan.models.instance.subscriber.findOne({ Email: _subscriber.Email }, function (err, found) {
+                dbMan.models.instance.subscriber.findOne({ Email: _subscriber.Email }, function (err, found) {
                     if (err) {
                         reject(err)
                     }
-                    if (!found) {
-                        //Test if patient in patient list is correct
-                        //Initial patient should be sent as PatientList: {Username: patient username, AccessPassword: patient password}
-                        //Will be changed server side to be PatientList:[patient username]
-                        dbMan.models.instance.patient.findOne({ Username: _subscriber.PatientList.Username }, function (err, found) {
-                            if (err || !found) {
-                                err = err || 'could not find ' + _subscriber.PatientList.Username
+                    if(!found){
+                        var newSubscriber = new dbMan.models.instance.subscriber(_subscriber)
+                        newSubscriber.save(function (err) {
+                            if (err) {
                                 logger.error(err)
                                 reject(err)
                             } else {
-                                logger.debug('Found patient: ' + found.Username)
-                                //User exists.. is the password right though?
-
-                                if (_subscriber.PatientList.AccessPassword == decrypt(found.AccessPassword)) {
-                                    console.log("MATCH" );
-                                    _subscriber.PatientList = [_subscriber.PatientList.Username];
-                                    console.log(_subscriber);
-                                    var newsubscriber = new dbMan.models.instance.subscriber(_subscriber)
-                                    newsubscriber.save(function (err) {
-                                        if (err) {
-                                            logger.error(err)
-                                            reject(err)
-                                        } else {
-                                            logger.debug('Subscriber Added Successfully!')
-                                            resolve(newsubscriber)
-                                        }
-                                    })
-                                    // resolve(found);
-                                }
-                                resolve("Not Found")
+                                logger.debug('Subscriber Added Successfully!')
+                                resolve(newSubscriber)
                             }
                         })
-                        /*
-                        
-                        //resolve(found)*/
-                    } else {
+                        //resolve(found)
+
+                    }else{
                         //WARNING USER NAME IS TAKEN code goes here
                         logger.debug('ERROR: ' + found.Email + " already exists")
                         reject( found.Email + ' already exists')
+                        //resolve(null)
                     }
                 });
             }).catch((err)=>{
@@ -160,6 +140,31 @@ var subscriberManager = module.exports = {
             })
         })
     },
+
+    checkSubscriberExists: function (_email) {
+        return new Promise((resolve, reject) => {
+            dbMan.try().then(function () {
+                dbMan.models.instance.subscriber.findOne({ Email: _email }, function (err, found) {
+                    if (err || !found) {
+                        err = err || 'no email exits'
+                        logger.debug(err)
+                        resolve(false)
+                    } else {
+                        logger.debug('Found subscriber : ' + found.Username)
+                        resolve(true)
+                    }
+                })
+            }).catch((err) => {
+                reject(err)
+            })
+        })
+    },
+
+    /**
+     *@brief retrieves a subscriber from the database
+     *
+     *@return a promise passing the found subscriber back or a null object
+     */
     getsubscriber: function (_subscriber) {
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
@@ -178,14 +183,14 @@ var subscriberManager = module.exports = {
             })
         })
     },
-    addToPatientList: function(_subscriber,_newSubscriber){
+    addToPatientList: function(_subscriber,_newPatient){
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
                 //Validate email:
                 console.log("validating")
                 var re = /\S+@\S+\.\S+/;
-                if (!re.test(_newSubscriber)) {
-                    resolve(null); //need to test if this is right
+                if (!re.test(_newPatient)) {
+                   // resolve(null); //need to test if this is right
                 }
                 console.log("valid " )
 
@@ -201,18 +206,27 @@ var subscriberManager = module.exports = {
                     //is that subscriber already on the list?
                     var updateValue;
                     if (found.PatientList == null) {
-                        updateValue = [_newSubscriber]
+                        updateValue = [_newPatient]
                     } else {
                         updateValue = found.PatientList
-                        if (updateValue.indexOf(_newSubscriber) > -1) {
+                        if (updateValue.indexOf(_newPatient) > -1) {
                             //already on list
                             reject(null);
                             return null;
                         }
-                        updateValue.push(_newSubscriber)
+                        updateValue.push(_newPatient)
                     }
                     //store updated value
                     console.log(updateValue)
+
+
+                    //Check if password is correct:
+                    validatePatient(_newPatient);
+
+
+
+
+
                     var query_object = {Email: _subscriber.Email};
                     var update_values_object = {PatientList: updateValue};
                     dbMan.models.instance.subscriber.update(query_object, update_values_object, null, function(err) {

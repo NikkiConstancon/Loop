@@ -22,83 +22,48 @@ var dbManager1 = require("./userManager");
 var patientManager = require("./patientManager");
 var patientDataManager = require("./patientDataManager");
 
+const realtimeDataService = require('./lib/realtimeDataService')
+
 
 //init zetta as usual, but dont call link yet
 //  the listen call is deferred to the hook
 var initializedZetta = zetta('peers').name('Zettar')
 
-var callback = function (info, data) {
-    // patientDataManager.addInstance({PatientUsername : info.from, DeviceID : data[0].topic, TimeStamp : data[0].timestamp, Value : parseFloat(data[0].data)  });
 
-}
 
 //pass the initialized zetta var to a new hook
 var hook = new Hook(initializedZetta)
     //call listen as you wold on zetta
-    .listen(3009, function () {
-        console.log('Zettar is running : 3009');
+    .listen(3009, function (e) {
+        if (e) {
+            console.log("Zetta error:", e)
+        } else {
+            console.log('Zettar is running');
+        }
     })
-    //here you hook the streams
     .registerStreamListener({
+        topicName: 'vitals',
+        cb: function (info, response) {
+            realtimeDataService.publish(info, response);
+            //patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.type, TimeStamp: response.timestamp, Value: parseFloat(response.data) });
+        },
+        errcb: function (e) {
+            console.log(e)
+        },
         connect: function (peer) {
-            patientManager.bindZettalet(peer.name, encodeURI(peer.name))
-                .then(function (pat) {
-                    //do it this way, else field is out of date
-                    patientManager.getPatient(pat).then(function (pat) {
-                        logger.info('user [' + pat.Username + "]'s device connected with api uri: " + pat.ZettaletUuid)
-                    })
-                }).catch(function (err) {
-                    logger.warn('no user bound for device with uuid ' + peer.name)
-                    //peer.ws.close()
-                })
+            realtimeDataService.connectHopper(peer.name)
         },
         disconnect: function (peer) {
-            patientManager.bindZettalet(peer.name, '-')
-                .then(function (pat) {
-                    //do it this way, else field is out of date
-                    patientManager.getPatient(pat).then(function (pat) {
-                        logger.info('user [' + pat.Username + "]'s device disconnected and api uri set to: " + pat.ZettaletUuid)
-                    })
-                })
+            realtimeDataService.disconnectHopper(peer.name)
+            patientManager.getPatient({ Username: peer.name }).then(function (pat) {
+                pat.disconnectAllDevices();
+            })
+        },
+        deviceConnect: function (info) {
+            realtimeDataService.informDeviceConnect(info.from, info)
+            patientManager.getPatient({ Username: info.from }).then(function (pat) {
+                pat.connectDevice(info.name);
+            })
         }
     })
-    .registerStreamListener({
-        topicName: 'value',
-        where: { type: 'state_machine', name: 'heart_monitor' },
-        cb: callback,
-        errcb: function (e) {
-            console.log(e)
-        }
-    })
-    .registerStreamListener({
-        topicName: 'value',
-        where: { type: 'state_machine', name: 'temp_monitor' },
-        cb: callback,
-        errcb: function (e) {
-            console.log(e)
-        }
-    })
-    .registerStreamListener({
-        topicName: 'concentration',
-        where: { type: 'glucose-meter' },
-        cb: callback,
-        errcb: function (e) {
-            console.log(e)
-        }
-    })
-    .registerStreamListener({
-        topicName: 'concentration',
-        where: { type: 'insulin-pump' },
-        cb: callback,
-        errcb: function (e) {
-            console.log(e)
-        }
-    })
-    .registerStreamListener({
-        topicName: 'temperature',
-        where: { type: 'thermometer' },
-        cb: callback,
-        errcb: function (e) {
-            console.log(e)
-        }
-    })
+
