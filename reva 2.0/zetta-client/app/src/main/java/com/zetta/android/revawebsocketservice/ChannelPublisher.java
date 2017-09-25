@@ -23,14 +23,12 @@ public class ChannelPublisher{
     ChannelPublisher(String channelKey_){
         channelKey = channelKey_;
     }
-    public ChannelPublisher publish(Object obj){
-        endpoint.getPushChainer(RevaWebsocketEndpoint.CHANNEL_KEY).put(channelKey, obj).send();
-        return this;
-    }
-    public ChannelPublisher publish(String key, Object obj){
-        Map<String, Object> map = new TreeMap<>();
-        map.put(key,obj);
-        endpoint.getPushChainer(RevaWebsocketEndpoint.CHANNEL_KEY).put(channelKey, map).send();
+    public ChannelPublisher publish(String caoId, String key, Object obj){
+        Map<String, Map<String, Object>> map = new TreeMap<>();
+        map.put(caoId, new TreeMap<String, Object>());
+        map.get(caoId).put(key,obj);
+        endpoint.getPushChainer(RevaWebsocketEndpoint.CHANNEL_KEY).put(channelKey, map)
+                .send();
         return this;
     }
 }

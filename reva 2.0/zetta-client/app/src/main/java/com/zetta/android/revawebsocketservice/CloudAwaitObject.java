@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 
+import com.zetta.android.lib.DelayedUiAction;
+import com.zetta.android.lib.Interval;
+import com.zetta.android.lib.NotifyCloudAwait;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,109 +16,123 @@ import java.util.List;
  */
 
 
-public abstract class CloudAwaitObject{
-    abstract public Object get(Object got, ChannelPublisher pub);
+public abstract class CloudAwaitObject {
+    abstract public Object get(Object got, Object localMsg, CloudAwaitObject cao);
 
-    public CloudAwaitObject(String channelKey_){
-        channelKey = channelKey_;
-        publisher = new ChannelPublisher(channelKey);
-    }
-    CloudAwaitObject next = null;
-    CloudAwaitObject then(CloudAwaitObject cao, ChannelPublisher pub){
-        boolean isFirst = false;
-        if(next == null){next = cao; isFirst = true;}
-        CloudAwaitObject end = next;
-        while(end.next != null){end = end.next;}
-        if(isFirst){end.next = cao;}
-        return this;
-    }
-    public void send(Context context, Object obj){
-        startDialog(context);
-        publisher.publish(obj);
-    }
-    public void send(Context context, String key, Object obj){
-        startDialog(context);
-        publisher.publish(key, obj);
+    public void dismiss(){
+        open = true;
     }
 
-    protected final void setServicePublisher(RevaWebsocketEndpoint endpoint){
-        publisher.setServicePublisher(endpoint);
-    }
+    private static int idCounter = 0;
+    protected final String id = Integer.toHexString(idCounter++);
 
-    protected final void gotFrom(Object got){
-        tying = false;
-        if(!canceled) {
-            if(connectToCloudWaitDialog != null){
-                connectToCloudWaitDialog.dismiss();
-            }
-            Object ret = get(got, publisher);
-            if (ret != null) {
-                next.gotFrom(ret);
-            }
+
+    public static class Chain {
+        Context context;
+        String key;
+        Object obj, localMsg;
+
+        public Chain(Context context, String key, Object obj, Object localMsg) {
+            this.context = context;
+            this.key = key;
+            this.obj = obj;
+            this.localMsg = localMsg;
         }
     }
 
-    public String getKey(){return channelKey;}
+
+    public CloudAwaitObject(String channelKey_) {
+        channelKey = channelKey_;
+        publisher = new ChannelPublisher(channelKey);
+    }
+
+    CloudAwaitObject next = null;
+
+    public CloudAwaitObject then(Object localMsg, CloudAwaitObject cao) {
+        endpoint.attachCloudAwaitObject(localMsg, cao);
+        cao.publisher.setServicePublisher(endpoint);
+        cao.endpoint = endpoint;
+        next = cao;
+        return cao;
+    }
+
+    public CloudAwaitObject then(CloudAwaitObject cao) {
+        return then(null, cao);
+    }
+
+
+    public void setLocalMsg(Object obj) {
+        localMsg = obj;
+    }
+
+    RevaWebsocketEndpoint endpoint;
+
+    protected final void setServicePublisher(RevaWebsocketEndpoint endpoint_) {
+        endpoint = endpoint_;
+        publisher.setServicePublisher(endpoint);
+    }
+
+    public CloudAwaitObject send(final Context context,final String key,final Object obj) {
+        if (!awaiting && open) {
+            open = false;
+            awaiting = true;
+            publishInterval = new Interval(RESEND_INTERVAL, MAX_RESEND) {
+                @Override
+                public void work() {
+                    publisher.publish(id, key, obj);
+                }
+
+                @Override
+                public void end() {
+                    new Interval(1000, 1){
+                        @Override
+                        public void end() {
+                            open = true;
+                        }
+                    };
+                    awaiting = false;
+                    notifyWait.dismiss();
+                }
+                NotifyCloudAwait notifyWait = new NotifyCloudAwait(context, true,
+                        750, " ... connecting to the cloud ... ",
+                        Integer.MAX_VALUE//Users should cancel them self
+                );
+            };
+        }
+        return this;
+    }
+    boolean open = true;//the endpoint @get must re open the CAO
+    Interval publishInterval = null;
+    boolean awaiting = false;
+    protected final void remoteUpdate(Object remoteMsg) {
+        Object ret = get(remoteMsg, localMsg, this);
+        if(publishInterval != null) {
+            publishInterval.clearInterval();
+        }
+        if (ret instanceof Chain && next != null) {
+            Chain c = (Chain) ret;
+            if (c.localMsg != null) {
+                next.localMsg = c.localMsg;
+            }
+            next.send(c.context, c.key, c.obj);
+        }
+    }
+
+    public String getKey() {
+        return channelKey;
+    }
 
     private String channelKey;
     private ChannelPublisher publisher;
 
 
 
-    private void startDialog(final Context ct){
-        String waitMsg = "...connecting to the cloud...";
-        if(!tying) {
-            tying = true;
-            connectToCloudWaitDialog = new ProgressDialog(ct) {
-                @Override
-                public void onBackPressed() {
-                    canceled = true;
-                    connectToCloudWaitDialog.dismiss();
-                    tying = false;
-                    super.onBackPressed();
-                }
-            };
-        }
-        canceled = false;
-        connectToCloudWaitDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        connectToCloudWaitDialog.setMessage(waitMsg);
-        connectToCloudWaitDialog.setIndeterminate(true);
-        connectToCloudWaitDialog.setCanceledOnTouchOutside(false);
-
-        new DelayedAction(ct, 750){
-            @Override public void work(){
-                connectToCloudWaitDialog.show();
-            }
-        };
-    }
-
-    static abstract class DelayedAction{
-        DelayedAction(final Context ct, final int sleep){
-            new Thread(){
-                @Override public void run() {
-                    try {
-                        ((Activity)ct).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (Exception e) {
-                                } finally {
-                                    work();
-                                }
-                            }
-                        });
-                    } catch (ClassCastException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-        public abstract void work();
-    }
 
 
-    ProgressDialog connectToCloudWaitDialog;
-    private boolean canceled = false;
-    private boolean tying = false;
+    private Object localMsg;
+
+
+    final static int RESEND_INTERVAL = 3000;
+    final static int MAX_RESEND = 4;
+
 }
