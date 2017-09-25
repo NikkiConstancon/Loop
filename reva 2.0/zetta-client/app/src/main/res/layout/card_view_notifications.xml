@@ -9,29 +9,45 @@
     android:theme="@style/AppThemeLight"
     android:padding="5dp">
 
+
+
     <android.support.v7.widget.CardView
         android:id="@+id/card_view_notifications"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@android:color/holo_red_dark"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="5dp">
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="2dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp">
 
+            <ImageView
+                android:id="@+id/notif_status_image"
+                android:layout_width="17dip"
+                android:layout_height="17dip"
+                android:layout_marginTop="30dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/notif_status_circle"
+                android:importantForAccessibility="no"
+                tools:ignore="RtlHardcoded" />
 
             <TextView
                 android:id="@+id/txt_noteTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                android:layout_alignBottom="@+id/btn_closeNotification"
-                android:layout_alignStart="@+id/txt_noteContent"
+                android:layout_alignBottom="@id/notif_status_image"
+                android:layout_toEndOf="@+id/notif_status_image"
                 android:text="Heart Rate"
-                android:textSize="25sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 tools:ignore="HardcodedText,RtlHardcoded"
                 tools:text="Heart Rate"
@@ -41,14 +57,14 @@
             <ImageView
 
                 android:id="@+id/notif_image"
-                android:layout_width="32dip"
-                android:layout_height="32dip"
+                android:layout_width="15dip"
+                android:layout_height="15dip"
+                android:layout_alignBottom="@id/txt_noteTitle"
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@id/txt_noteTitle"
                 android:background="@color/cardview_light_background"
                 android:importantForAccessibility="no"
-                android:src="@drawable/ic_heart"
-                android:layout_alignTop="@id/txt_noteTitle"/>
+                android:src="@drawable/ic_heart" />
 
             <Button
                 android:id="@+id/btn_closeNotification"
@@ -62,7 +78,7 @@
                 tools:layout_constraintLeft_creator="1"
                 tools:layout_constraintRight_creator="1"
                 tools:text="X"
-                tools:textSize="12sp" />
+                tools:textSize="8sp" />
 
             <TextView
                 android:id="@+id/txt_noteContent"
@@ -75,24 +91,8 @@
                 android:maxLines="10"
                 android:text="Heart rate sensor has reported strong deviations from the norm, please seek medical assistance immediately."
                 android:textColor="@color/colorPrimaryText"
-                android:textSize="20sp"
+                android:textSize="13sp"
                 tools:ignore="HardcodedText,RtlHardcoded" />
-
-            <Button
-                android:id="@+id/btn_getAdvice"
-                android:layout_width="200dp"
-                android:layout_height="40dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignStart="@+id/txt_noteContent"
-                android:layout_below="@+id/txt_noteContent"
-                android:layout_marginTop="11dp"
-                android:gravity="center"
-                tools:ignore="HardcodedText,RtlHardcoded"
-                tools:layout_constraintBottom_creator="1"
-                tools:layout_constraintLeft_creator="1"
-                tools:layout_constraintRight_creator="1"
-                tools:text="Get Advice"
-                tools:textSize="12sp" />
 
         </RelativeLayout>
 
