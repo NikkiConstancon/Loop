@@ -22,7 +22,7 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @NonNull
     public List<ListItem> getListItems() {
         return listItems;
-    }
+    } // TODO: Change this to accept name parameter
 
     @NonNull private final List<ListItem> listItems = new ArrayList<>();
 

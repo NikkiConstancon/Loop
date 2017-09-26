@@ -129,7 +129,7 @@ public class Registration extends AppCompatActivity {
         text = (EditText) findViewById(R.id.input_confirmPassReg);
         confPass = text.getText().toString();
         Context context = this;
-        final AlertDialog.Builder builder1 = new AlertDialog.Builder(context);\
+        final AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please double check kiss your details");
         builder1.setCancelable(true);
 
@@ -198,10 +198,10 @@ public class Registration extends AppCompatActivity {
                                 startActivityForResult(toReg, 0);
                             } else {
                                 ////////////////////////////////////////change intent to Registration_Sub
-                                Intent toSub = new Intent(Registration.this, Registration_Sub.class);
-                                toSub.putExtra("regEmail", regEmail);
-                                toSub.putExtra("regPass", regPass);
-                                startActivityForResult(toSub, 0);
+//                                Intent toSub = new Intent(Registration.this, Registration_Sub.class);
+//                                toSub.putExtra("regEmail", regEmail);
+//                                toSub.putExtra("regPass", regPass);
+//                                startActivityForResult(toSub, 0);
                             }
                         }else {
                             runOnUiThread(new Runnable() {
@@ -217,42 +217,13 @@ public class Registration extends AppCompatActivity {
                 }
             }).send(this, "VALIDATE_EMAIL", regEmail);
         }
-<<<<<<< HEAD
-        else if(patient)
-        {
-            /////////////////////////////////////////change intent to Registration_cont
-            Intent toReg = new Intent(context, Registration_Cont.class);
-            toReg.putExtra("regEmail", regEmail);
-            toReg.putExtra("regPass", regPass);
-            startActivityForResult(toReg, 0);
-        }
-        else
-        {
-            ////////////////////////////////////////change intent to Login (Since it's a subscriber registering)
 
-            builder1.setPositiveButton(
-                    "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                            Intent toLogin = new Intent(context, login_activity.class);
-                            toLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            toLogin.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivityForResult(toLogin, 0);
-                        }
-                    });
-            builder1.setMessage("You have been registered!");
-            AlertDialog alertWarning = builder1.create();
-            alertWarning.show();
-=======
     }
     UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
     class UserManagerEndpoint extends RevaWebsocketEndpoint {
         @Override
         public String key() {
             return "UserManager";
->>>>>>> origin/app_dev_stream
         }
     }
 }

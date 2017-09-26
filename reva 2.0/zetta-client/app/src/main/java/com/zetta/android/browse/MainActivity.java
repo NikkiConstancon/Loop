@@ -51,8 +51,6 @@ public class MainActivity extends AppCompatActivity
 
     private ViewPager mViewPager;
 
-    private String zettaUser;
-
     /**
      * Main activity that allows for tab functionality and switching of views
      * @param savedInstanceState
@@ -64,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: Starting.");
 
-        zettaUser = getIntent().getStringExtra("Username");
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarMain);
         setSupportActionBar(toolbar);
@@ -126,13 +124,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    /**
-     * Function to get user from server
-     * @return a user from the server
-     */
-    public String getUser() {
-        return zettaUser;
-    }
 
     /**
      * Method that sets up tab titles

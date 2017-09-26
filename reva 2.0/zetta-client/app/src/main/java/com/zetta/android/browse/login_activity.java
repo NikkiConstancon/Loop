@@ -117,7 +117,7 @@ public class login_activity extends AppCompatActivity {
                 //if (attemptLogin()) {
                         //HOTFIX FROM HERE
                     Intent intent =  new Intent(login_activity.this, MainActivity.class);
-                    intent.putExtra("Username", user.getText().toString());
+
                     startActivity(intent);
 //                        HOTFIX FROM HERE
                 //}

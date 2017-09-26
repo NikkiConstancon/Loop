@@ -65,7 +65,9 @@ public class DeviceListActivity extends Fragment {
         sdkProperties = SdkProperties.newInstance(getActivity());
 
         MainActivity activity = (MainActivity) getActivity();
-        String myDataFromActivity = activity.getUser();
+        String myDataFromActivity = "nikki"; // TODO: get name from server
+
+        //TODO: get name of user from server, figure out how to refresh devicelistactivity with a new changed user
 
         String serverURI = getString(R.string.serverURL) + ":3009";
         sdkProperties.setUrl(serverURI);
@@ -180,7 +182,7 @@ public class DeviceListActivity extends Fragment {
         }
         public void onMessage(LinkedTreeMap obj){
             try {
-                for(Map.Entry<String, Map<String, String>> userDeviceValue :  ((Map<String, Map<String, String>>)obj).entrySet()) {
+                /*for(Map.Entry<String, Map<String, String>> userDeviceValue :  ((Map<String, Map<String, String>>)obj).entrySet()) {
                     String patientName = userDeviceValue.getKey();
                     Map<String, String> deviceValueMap = userDeviceValue.getValue();
                     //TODO: Get adapter by name perhaps ?? Dont know how this is set up
@@ -188,7 +190,9 @@ public class DeviceListActivity extends Fragment {
                     Iterator<ListItem> iter = list.iterator();
                     List<ListItem> toBeAdded = new ArrayList<ListItem>();
                     while (iter.hasNext()) {
+
                         ListItem item = iter.next();
+                        Log.d(item);
                         if (item instanceof DeviceListItem) {
                             DeviceListItem temp = (DeviceListItem) item;
                             if (deviceValueMap.containsKey(temp.getName())) {
@@ -198,7 +202,7 @@ public class DeviceListActivity extends Fragment {
                         }
                     }
                     adapter.update(toBeAdded);
-                }
+                }*/
 
             }catch (Exception e){
                 android.util.Log.e(TAG, e.toString());
