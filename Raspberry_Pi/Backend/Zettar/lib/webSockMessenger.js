@@ -151,7 +151,7 @@ function parseAuthorizationHeader(header) {
             var strs = str.split(':')
             return res({ Username: strs[0], Password: strs[1], serviceInstanceUuid: header.serviceinstanceuuid })
         } catch (e) {
-            res({ Username: USER_ANONYMOUS, Password: '', serviceInstanceUuid: header.serviceinstanceuuid })
+            res({ Username: USER_ANONYMOUS, Password: '', serviceInstanceUuid: header.serviceinstanceuuid, error: e })
         }
     })
 }
@@ -159,8 +159,9 @@ function parseAuthorizationHeader(header) {
 function authorize(ws) {
     return new Promise(function (res, rej) {
         return parseAuthorizationHeader(ws.upgradeReq.headers).then(function (auth) {
+            var userUid = auth.Username;
             var ret = { ws: ws, user: auth.Username, serviceInstanceUuid: auth.serviceInstanceUuid }
-            if (auth.Username === '') {
+            if (auth.Username === '' || auth.Username == USER_ANONYMOUS) {
                 ret.user = USER_ANONYMOUS
                 res(ret)
             } else {
@@ -168,18 +169,27 @@ function authorize(ws) {
                     if (pat.verifyPassword(auth.Password)) {
                         res(ret)
                     } else {
-                        rej(('webSockMessenger$authorizeAsync --- TODO ---  invalid password'))
+                        ret.user = USER_ANONYMOUS
+                        ret.tmpAuthError = { text: "Incorrect passord", field: "password" }
+                        res(ret)
                     }
                 }).catch(function (e) {
-    //THIS IS NOT HOW USER MANAGEMENT SHOULD WORK !! WE NEED TO RETHINK THE USER'S LAYOUT
-    //THIS WILL ONLY CAUSE ERRORS AND GRIEF DOWN THE ROAD
-    //HONESTLY DON'T KNOW WHY THE INITIAL DESIGN WAS NOT FOLLOWED (MAYBE IT IS JUST ME THAT IS INCAPABLE TO COMPREHEND THE CURRENT LAYOUT)
+                    //THIS IS NOT HOW USER MANAGEMENT SHOULD WORK !! WE NEED TO RETHINK THE USER'S LAYOUT
+                    //THIS WILL ONLY CAUSE ERRORS AND GRIEF DOWN THE ROAD
+                    //HONESTLY DON'T KNOW WHY THE INITIAL DESIGN WAS NOT FOLLOWED (MAYBE IT IS JUST ME THAT IS INCAPABLE TO COMPREHEND THE CURRENT LAYOUT)
                     auth.Email = auth.Username
                     return SubscriberManager.getsubscriber(auth).then(function (thisIsSoWrong) {
                         //todo validate password
-                        res(ret)
+                        if (thisIsSoWrong.verifyPassword(auth.Password)) {
+                            res(ret)
+                        } else {
+                            ret.user = USER_ANONYMOUS
+                            ret.tmpAuthError = { text: "Incorrect passord", field: "password" }
+                            res(ret)
+                        }
                     }).catch(function (e) {
                         ret.user = USER_ANONYMOUS
+                        ret.tmpAuthError = { text: "No such account", field: "userUid" }
                         res(ret)
                     })
                 })
@@ -227,7 +237,7 @@ ServicePublisher.prototype.deregisterMeta = function () {
 function pushMessage (ws, key, msg, errcb, context) {
     msgObj = { [key]: msg }
     msg = JSON.stringify(msgObj)
-    logger.debug('on-publish', key, msg)
+    logger.silly('on-publish', key, msg)
     if (errcb) {
         ws.send(msg, errcb)
     } else {
@@ -243,10 +253,13 @@ function pushMessage (ws, key, msg, errcb, context) {
 }
 
 function UserSocketContext(clientBindingInfo) {
+    logger.info("--connected--  userUid=" + this.userUi + ", deviceUid=", this.deviceUid); 
     var ws = clientBindingInfo.ws
     this.userUid = clientBindingInfo.user
     this.deviceUid = clientBindingInfo.serviceInstanceUuid
     this.subServiceMap = {}
+    var tmpAuthError = clientBindingInfo.tmpAuthError
+    tmpAuthError && (this.tmpAuthError = tmpAuthError)
     if (userSocketContextMap[this.userUid] && userSocketContextMap[this.userUid][this.deviceUid]) {
 
         var subServiceMap = userSocketContextMap[this.userUid][this.deviceUid].subServiceMap
@@ -353,7 +366,8 @@ function buildError(key, errObject) {
 var RCC_EXCLUDE_PAUS_RESUME_MAP = { RCC: true, UserManager: true }
 webSockMessenger.attach('RCC', {
     connect: function (publisher) {
-        publisher.publish({ CONNECTED: { USER_UID: publisher.context.userUid } })
+        publisher.publish({ CONNECTED: { USER_UID: publisher.context.userUid, ERROR: publisher.context.tmpAuthError }, RCC_REDIRECT: ["UserManager"] })
+        delete publisher.context.tmpAuthError;
     },
     close: function (publisher) {
     },
@@ -414,11 +428,14 @@ function DispatchChannels(handlers, publisher, rootMsg, channeler) {
     if (obj) {
         try {
             for (var key in obj) {
-                function channeler(msg, errcb) {
-                    publisher.publish({ [CHANNEL_KEY]: { [key]: msg } }, errcb)
+                for (var id in obj[key]) {
+
+                    function channeler(msg, errcb) {
+                        publisher.publish({ [CHANNEL_KEY]: { [id]: msg } }, errcb)
+                    }
+                    var msg = obj[key][id]
+                    handlers[key](publisher, msg, key, channeler)
                 }
-                var msg = obj[key]
-                handlers[key](publisher, msg, key, channeler)
             }
         } catch (e) {
             logger.debug(e, obj)
@@ -442,6 +459,7 @@ function DispatchMessages(handlers, publisher, rootMsg, channeler) {
 var userManagerChannels = {
     REGISTER: function (publisher, msg, key, channeler) {
         DispatchMessages({
+
             VALIDATE_EMAIL: function (publisher, msg, key) {
                 channeler({ PASS: true })
                 //channeler({ PASS: false, ERROR: "This email address is not available" })

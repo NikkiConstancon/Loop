@@ -108,6 +108,12 @@ var patientManager = module.exports = {
     getPatient: function (_patient) {
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
+                var q = {}
+                if (_patient.Email) {
+                    q.Email = _patient.Emai
+                } else {
+                    q.Username = _patient.Username
+                }
                 dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
                     if (err || !found) {
                         err = err || { clientSafe: 'Could not find ' + _patient.Username }
