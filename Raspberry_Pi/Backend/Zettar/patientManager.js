@@ -100,6 +100,45 @@ var patientManager = module.exports = {
         })
     },
 
+    addToDeviceMap: function(_patient, deviceName, On){
+        return new Promise((resolve, reject) => {
+            dbMan.try().then(function () {
+                //Find 
+                dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
+                    if (err) {
+                        logger.error(err)
+                        reject(err)
+                    }
+                    //if user does not exist
+                    if(!found){
+                        resolve("NotFound");
+                    }
+
+                    var updateValue ;
+                    if(found.DeviceMap == null){
+                        //if list does not exist
+                        console.log("inner")
+                        updateValue = {};
+                        updateValue[deviceName] =  On;
+                    }else{
+                        updateValue = found.DeviceMap;
+                        //toggle value to on or off
+                        updateValue[deviceName] = On;
+                    }
+                    
+                    console.log(updateValue);
+                    var query_object = {Username: _patient.Username};
+                    var update_values_object = {DeviceMap: updateValue};
+                    dbMan.models.instance.patient.update(query_object, update_values_object, null, function(err){
+                        if(err) console.log(err);
+                        else console.log('Yuppiie!');
+                    });
+                    resolve(found)
+                })
+            })
+        })
+
+    },
     /**
      *@brief gets a user from the database
      *
@@ -108,6 +147,12 @@ var patientManager = module.exports = {
     getPatient: function (_patient) {
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
+                var q = {}
+                if (_patient.Email) {
+                    q.Email = _patient.Emai
+                } else {
+                    q.Username = _patient.Username
+                }
                 dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
                     if (err || !found) {
                         err = err || { clientSafe: 'Could not find ' + _patient.Username }

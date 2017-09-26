@@ -15,12 +15,19 @@ var CryptoJS = require("crypto-js");
 
 setTimeout(function() {
 	console.log("Testing");
-    PatientDataManager.getGraphPoints({
-       Username: 'nikki'  ,
-       DeviceId: "thermometer" ,
-       StartTime:  "2017-09-25 15:16:10.051000+0000",
-       EndTime:  "2017-09-25 15:16:10.481000+0000",
-    })
+
+
+    // PatientDataManager.getGraphPoints({
+    //    Username: 'nikki'  ,
+    //    DeviceId: "thermometer" ,
+    //    StartTime:  "2017-09-25 15:16:10.051000+0000",
+    //    EndTime:  "2017-09-25 15:16:10.481000+0000",
+    // })
+    PatientManager.addToDeviceMap(
+        {'Username': 'greg'},
+        "Kicks", true
+    )
+
 
   }, 0);
  /*   subscriberManager.addSubscriber({
