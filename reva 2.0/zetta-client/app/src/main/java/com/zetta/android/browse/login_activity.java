@@ -52,6 +52,8 @@ public class login_activity extends AppCompatActivity {
     public void onBackPressed() {
         if (exit) {
             finish();
+            userManagerEndpoint.unbind(this);
+            this.finishAffinity();
         } else {
             Toast.makeText(this, "Press back again to exit ReVA", Toast.LENGTH_SHORT).show();
             exit = true;

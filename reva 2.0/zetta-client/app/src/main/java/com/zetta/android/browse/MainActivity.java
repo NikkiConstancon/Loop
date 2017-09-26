@@ -55,7 +55,11 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
 
     private String zettaUser;
-    private static Interval validateUserUidInterval = null;
+
+    private Interval validateUserUidInterval = null;
+
+
+
 
     /**
      * Main activity that allows for tab functionality and switching of views
@@ -75,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void work() {
                 if (webService != null) {
-                    //webService.signOut();
                     self.clearInterval();
                 }
             }
@@ -87,8 +90,7 @@ public class MainActivity extends AppCompatActivity {
                         if (webService.isLoggedIn()) {
                             bootstrap(webService.getAuthId());
                         } else {
-                            Intent intent = new Intent(MainActivity.this, login_activity.class);
-                            startActivity(intent);
+                            triggerLoginIntent();
                         }
                     }
                 });
@@ -111,10 +113,16 @@ public class MainActivity extends AppCompatActivity {
             if (webService.isLoggedIn()) {
                 bootstrap(webService.getAuthId());
             } else {
-                Intent intent = new Intent(MainActivity.this, login_activity.class);
-                startActivity(intent);
+                triggerLoginIntent();
             }
         }
+    }
+
+    void triggerLoginIntent(){
+        webService.signOut();
+        Intent intent = new Intent(MainActivity.this, login_activity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     void bootstrap(String zettaUser_) {
@@ -133,8 +141,10 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("THese aare words");
+        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.DrawerNameSignOut);
         SecondaryDrawerItem item2 = new SecondaryDrawerItem().withIdentifier(2).withName("These are also words");
+
+        item1.withTag(R.string.DrawerNameSignOut);
 
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -164,6 +174,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         // do something with the clicked item :D
+                        Object tag = drawerItem.getTag();
+                        if(tag != null && tag instanceof Integer){
+                            Integer value = (Integer)tag;
+                            if(value == R.string.DrawerNameSignOut){
+                                triggerLoginIntent();
+                            }
+                        }
                         return true;
                     }
                 })

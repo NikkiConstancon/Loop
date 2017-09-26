@@ -546,7 +546,6 @@ public class RevaWebSocketService extends Service {
                 public void run() {
                     Integer cout = 0;
                     while (runSouct) {
-                        Log.d("!! THRED THST !!", (cout++).toString());
                         if (shouldReconnect()) {
                             try {
                                 Thread.sleep(sleepMs);
@@ -599,7 +598,6 @@ public class RevaWebSocketService extends Service {
                 double expRatio = 0.95 * Math.abs((threshhold) / (threshhold + delta * 0.2 * threshhold) );
                 connectThrashingGuardLastDelay = (long) (expRatio * connectThrashingGuardLastDelay)
                         + (long) ((1 - expRatio) * (threshhold / delta));
-                Log.d("TMP", Long.toString(connectThrashingGuardLastDelay));
                 try {
                     if (connectThrashingGuardLastDelay > 1) {
                         Thread.sleep(connectThrashingGuardLastDelay);
