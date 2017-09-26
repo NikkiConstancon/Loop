@@ -233,7 +233,7 @@ public class Registration_Patient extends AppCompatActivity {
 
             userManagerEndpoint.attachCloudAwaitObject(true, new CloudAwaitObject("REGISTER") {
                 @Override
-                public Object get(Object obj, ChannelPublisher pub) {
+                public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
                     Object ret = null;
                     try{
                         final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>)obj;

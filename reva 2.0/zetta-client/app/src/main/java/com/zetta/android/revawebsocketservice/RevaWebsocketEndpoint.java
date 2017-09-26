@@ -1,27 +1,20 @@
 package com.zetta.android.revawebsocketservice;
 
-import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.UUID;
-import java.util.concurrent.Callable;
 
 /**
  * Created by ME on 2017/09/02.
@@ -58,6 +51,8 @@ public abstract class RevaWebsocketEndpoint {
     }
     // ----------------------------- END OVERRIDEABLE ----------------------------
 
+
+    public final String key = key();
 
     //NOTE! may return null;
     public final RevaWebSocketService getService() {
@@ -171,7 +166,6 @@ public abstract class RevaWebsocketEndpoint {
 
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
-
             String got = resultData.getString(RevaWebSocketService.IPC_SOCKET_MESSAGE_PULLED);
             if (got != null) {
                 GsonBuilder builder = new GsonBuilder();
@@ -181,12 +175,11 @@ public abstract class RevaWebsocketEndpoint {
                         onMeta(obj.get(META_KEY));
                     } else if (obj.containsKey(CHANNEL_KEY)) {
                         Log.d(TAG, "Got channel: " + obj.toString());
-                        for (Object entry : ((LinkedTreeMap) obj.get(CHANNEL_KEY)).entrySet()) {
+                        for (Map.Entry<String, Object> entry : ((Map<String, Object>) obj.get(CHANNEL_KEY)).entrySet()) {
                             try {
-                                Map.Entry<Object, Object> pair = (Map.Entry<Object, Object>) entry;
-                                CloudAwaitObject cao = cloudAwaitObjectMap.get(pair.getKey());
-                                if (cao != null) {
-                                    cao.gotFrom(pair.getValue());
+                                CloudAwaitObject cao = cloudAwaitObjectMap.get(entry.getKey());
+                                if(cao != null) {
+                                    cao.remoteUpdate(entry.getValue());
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -243,21 +236,10 @@ public abstract class RevaWebsocketEndpoint {
 
 
     protected Map<String, CloudAwaitObject> cloudAwaitObjectMap = new TreeMap<>();
-
-    public CloudAwaitObject attachCloudAwaitObject(CloudAwaitObject cao) {
-        cloudAwaitObjectMap.put(cao.getKey(), cao);
+    public CloudAwaitObject attachCloudAwaitObject(Object localMsg, CloudAwaitObject cao) {
+        cloudAwaitObjectMap.put(cao.id, cao);
         cao.setServicePublisher(this);
-        return cao;
-    }
-
-    public CloudAwaitObject attachCloudAwaitObject(boolean once, CloudAwaitObject cao) {
-        if (once) {
-            if (cloudAwaitObjectMap.containsKey(cao.getKey())) {
-                return cloudAwaitObjectMap.get(cao.getKey());
-            }
-        }
-        cloudAwaitObjectMap.put(cao.getKey(), cao);
-        cao.setServicePublisher(this);
+        cao.setLocalMsg(localMsg);
         return cao;
     }
 

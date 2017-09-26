@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
+import com.zetta.android.lib.NotifyCloudAwait;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
@@ -48,27 +49,24 @@ public class login_activity extends AppCompatActivity {
      * Overridden back button press to allow for accidental back presses
      */
     @Override
-    public void onBackPressed()
-    {
-        if(exit)
-        {
+    public void onBackPressed() {
+        if (exit) {
             finish();
-        }
-        else {
+        } else {
             Toast.makeText(this, "Press back again to exit ReVA", Toast.LENGTH_SHORT).show();
             exit = true;
             new Handler().postDelayed(new Runnable() {
-               @Override
-                public void run()
-               {
-                   exit = false;
-               }
-            }, 3*1000);
+                @Override
+                public void run() {
+                    exit = false;
+                }
+            }, 3 * 1000);
         }
     }
 
     /**
      * Overridden onCreate for starting with the login_activity class
+     *
      * @param savedInstanceState used to start a new instance
      */
     @Override
@@ -104,29 +102,11 @@ public class login_activity extends AppCompatActivity {
              */
             @Override
             public void onClick(View v) {
-                /*
-                 * Storing the Context in a variable in this case is redundant since we could have
-                 * just used "this" or "MainActivity.this" in the method call below. However, we
-                 * wanted to demonstrate what parameter we were using "MainActivity.this" for as
-                 * clear as possible.
-                 */
                 userManagerEndpoint.getService().setLogin(user.getText().toString(), passw.getText().toString());
-
-                ServerComms server = new ServerComms(login_activity.this);
-                String serverURI = "http://" + getString(R.string.serverURL) + ":8080/login";
-                //if (attemptLogin()) {
-                        //HOTFIX FROM HERE
-                    Intent intent =  new Intent(login_activity.this, MainActivity.class);
-                    intent.putExtra("Username", user.getText().toString());
-                    startActivity(intent);
-//                        HOTFIX FROM HERE
-                //}
-
-                //TODO: do this thing
-                //server.execute(serverURI, "Username", user.getText().toString(), "Password", passw.getText().toString());
-
+                buildLoginAwaitObject();
             }
         });
+
 
         registerButton.setOnClickListener(new View.OnClickListener() {
 
@@ -154,6 +134,43 @@ public class login_activity extends AppCompatActivity {
         });
         userManagerEndpoint.bind(this);
     }
+
+    void buildLoginAwaitObject(){
+        if (notifyWait == null) {
+            notifyWait = new NotifyCloudAwait(login_activity.this, false,
+                    750, " ... validating your input ... ", 5000) {
+                @Override
+                public void end(NotifyCloudAwait.DISMISS_TYPE type) {
+                    if (type == DISMISS_TYPE.TIMEOUT) {
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(login_activity.this);
+                        builder1.setTitle("Could not connect to the cloud");
+                        builder1.setMessage("try again ?");
+                        builder1.setCancelable(true);
+                        builder1.setPositiveButton("YES",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        notifyWait = null;
+                                        buildLoginAwaitObject();
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builder1.setNegativeButton("NO",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        notifyWait = null;
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builder1.show();
+                    }
+                }
+            };
+            ((EditText) findViewById(R.id.input_emailLogin)).setError(null);
+            ((EditText) findViewById(R.id.input_passwordLogin)).setError(null);
+        }
+    }
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -163,13 +180,11 @@ public class login_activity extends AppCompatActivity {
     /**
      * Validation of login details and attempt to continue to main
      */
-    public Boolean attemptLogin()
-    {
+    public Boolean attemptLogin() {
         Context context = this;
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please fill in all details.");
         builder1.setCancelable(true);
-
 
 
         builder1.setPositiveButton(
@@ -183,14 +198,11 @@ public class login_activity extends AppCompatActivity {
         String pass = findViewById(R.id.input_passwordLogin).toString();
         String email = findViewById(R.id.input_emailLogin).toString();
 
-        if(email.length() < 1 || pass.length() < 1)
-        {
-            TextInputLayout til = (TextInputLayout)    findViewById(R.id.login_email_label);
+        if (email.length() < 1 || pass.length() < 1) {
+            TextInputLayout til = (TextInputLayout) findViewById(R.id.login_email_label);
             til.setErrorEnabled(true);
             til.setError("You need to enter a name");
-        }
-        else
-        {
+        } else {
             Pattern p = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z.]{2,63}$");
             Matcher m = p.matcher(email);
 
@@ -204,13 +216,12 @@ public class login_activity extends AppCompatActivity {
                 til.setErrorEnabled(true);
                 til.setError("Type in your email address");
             }*/
-            if(!m2.find())
-            {
-                til = (TextInputLayout)    findViewById(R.id.login_pass_label);
+            if (!m2.find()) {
+                til = (TextInputLayout) findViewById(R.id.login_pass_label);
                 til.setErrorEnabled(true);
                 til.setError("Type in your password");
             }
-            if (m2.find() )//&& m.find() hotfix
+            if (m2.find())//&& m.find() hotfix
             {
                 //validation happens here
                 return true;
@@ -221,11 +232,49 @@ public class login_activity extends AppCompatActivity {
     }
 
 
+    NotifyCloudAwait notifyWait = null;
     UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
+
     class UserManagerEndpoint extends RevaWebsocketEndpoint {
         @Override
         public String key() {
             return "UserManager";
+        }
+
+        public void onMessage(LinkedTreeMap obj) {
+            //TODO move this to
+            final String USER_MANAGER_KEY_CONNECTED = "CONNECTED";
+            if (obj.containsKey(USER_MANAGER_KEY_CONNECTED)) {
+                notifyWait.dismiss();
+                notifyWait = null;
+                Map<String, Object> info = (Map<String, Object>) obj.get(USER_MANAGER_KEY_CONNECTED);
+                String userUid = (String) info.get("USER_UID");
+                if (userUid.compareTo(RevaWebSocketService.SPECIAL_USER_ANONYMOUS) != 0) {
+                    Intent intent = new Intent(login_activity.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("Username", userUid.toString());
+                    startActivity(intent);
+                } else {
+                    final Map<String, String> errorMap = (Map<String, String>) info.get("ERROR");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (errorMap != null) {
+                                String error = errorMap.get("text");
+                                EditText text = null;
+                                if (errorMap.get("field").compareTo("password") == 0) {
+                                    text = findViewById(R.id.input_passwordLogin);
+                                } else {
+                                    text = findViewById(R.id.input_emailLogin);
+                                }
+                                text.setError(error);
+                            } else {
+                                ((EditText) findViewById(R.id.input_emailLogin)).setError("You must specify a username");
+                            }
+                        }
+                    });
+                }
+            }
         }
     }
 }

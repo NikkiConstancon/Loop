@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
@@ -27,6 +28,8 @@ import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -122,6 +125,8 @@ public class Registration extends AppCompatActivity {
      * Method that continues registration for patients (not for subscribers. Validation and intent change)
      */
     public void contReg() {
+
+
         EditText text = (EditText) findViewById(R.id.input_emailReg);
         regEmail = text.getText().toString();
         text = (EditText) findViewById(R.id.input_passwordReg);
@@ -129,9 +134,14 @@ public class Registration extends AppCompatActivity {
         text = (EditText) findViewById(R.id.input_confirmPassReg);
         confPass = text.getText().toString();
         Context context = this;
-        final AlertDialog.Builder builder1 = new AlertDialog.Builder(context);\
+        final AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please double check kiss your details");
         builder1.setCancelable(true);
+
+        //regEmail = "Aa@a.com";
+        //regPass = "Aa12345";
+        //confPass = "Aa12345";
+
 
         builder1.setPositiveButton(
                 "OK",
@@ -182,77 +192,91 @@ public class Registration extends AppCompatActivity {
                     emailText.setError(null);
                 }
             });
-            userManagerEndpoint.attachCloudAwaitObject(true, new CloudAwaitObject("REGISTER") {
-                @Override
-                public Object get(Object obj, ChannelPublisher pub) {
-                    Object ret = null;
-                    try{
-                        final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>)obj;
-                        if((boolean)got.get("PASS")) {
-                            ret = true;
-                            if (patient) {
-                                /////////////////////////////////////////change intent to Registration_cont
-                                Intent toReg = new Intent(Registration.this, Registration_Cont.class);
-                                toReg.putExtra("regEmail", regEmail);
-                                toReg.putExtra("regPass", regPass);
-                                startActivityForResult(toReg, 0);
-                            } else {
-                                ////////////////////////////////////////change intent to Registration_Sub
-                                Intent toSub = new Intent(Registration.this, Registration_Sub.class);
-                                toSub.putExtra("regEmail", regEmail);
-                                toSub.putExtra("regPass", regPass);
-                                startActivityForResult(toSub, 0);
-                            }
-                        }else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    EditText text = (EditText) findViewById(R.id.input_emailReg);
-                                    emailText.setError((String) got.get("ERROR"));
-                                }
-                            });
-                        }
-                    }catch (Exception e){Log.e(this.getClass().getName(), e.toString());}
-                    return ret;
-                }
-            }).send(this, "VALIDATE_EMAIL", regEmail);
-        }
-<<<<<<< HEAD
-        else if(patient)
-        {
-            /////////////////////////////////////////change intent to Registration_cont
-            Intent toReg = new Intent(context, Registration_Cont.class);
-            toReg.putExtra("regEmail", regEmail);
-            toReg.putExtra("regPass", regPass);
-            startActivityForResult(toReg, 0);
-        }
-        else
-        {
-            ////////////////////////////////////////change intent to Login (Since it's a subscriber registering)
 
-            builder1.setPositiveButton(
-                    "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                            Intent toLogin = new Intent(context, login_activity.class);
-                            toLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            toLogin.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivityForResult(toLogin, 0);
+            userManagerEndpoint.attachCloudAwaitObject(builder1, validateEmailCAO)
+                    .send(this, "VALIDATE_EMAIL", regEmail)
+                    .then(registerNonPatientCAO);
+        }
+    }
+
+    CloudAwaitObject validateEmailCAO = new CloudAwaitObject("REGISTER") {
+        @Override
+        public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
+            Object ret = null;
+            try{
+                final AlertDialog.Builder builder1 = (AlertDialog.Builder)localMsg;
+                final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>)obj;
+                if((boolean)got.get("PASS")) {
+                    if (patient) {
+                        /////////////////////////////////////////change intent to Registration_cont
+                        Intent toReg = new Intent(Registration.this, Registration_Cont.class);
+                        toReg.putExtra("regEmail", regEmail);
+                        toReg.putExtra("regPass", regPass);
+                        startActivityForResult(toReg, 0);
+                        return true;
+                    } else {
+                        //pass the builder
+                        Map<String, Object> sendMap = new TreeMap<>();
+                        sendMap.put("Email", regEmail);
+                        sendMap.put("Password", regPass);
+                        return new CloudAwaitObject.Chain(Registration.this, "REGISTER_NON_PATIENT", sendMap, builder1);
+                    }
+                }else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            EditText emailText = (EditText) findViewById(R.id.input_emailReg);
+                            emailText.setError((String) got.get("ERROR"));
                         }
                     });
-            builder1.setMessage("You have been registered!");
-            AlertDialog alertWarning = builder1.create();
-            alertWarning.show();
-=======
-    }
+                }
+            }catch (Exception e){Log.e(this.getClass().getName(), e.toString());}
+            return ret;
+        }
+    };
+    CloudAwaitObject registerNonPatientCAO = new CloudAwaitObject("REGISTER") {
+        @Override
+        public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
+            Object ret = null;
+            final AlertDialog.Builder builder1 = (AlertDialog.Builder)localMsg;
+            try {
+                final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>) obj;
+                if ((boolean) got.get("NON_PATIENT_PASS")) {
+                    ret = true;
+                    userManagerEndpoint.getService().setLogin(regEmail, regPass);
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(Registration.this, "Welcome " + regEmail, Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(Registration.this, MainActivity.class);
+                            intent.putExtra("Username", regEmail.toString());
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        }
+                    });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            try {
+                                builder1.setMessage((String) got.get("NON_PATIENT_ERROR"));
+                                AlertDialog alertWarning = builder1.create();
+                                alertWarning.show();
+                            } catch (Exception e) {
+                            }
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                Log.e(this.getClass().getName(), e.toString());
+            }
+            return ret;
+        }
+    };
+
     UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
     class UserManagerEndpoint extends RevaWebsocketEndpoint {
         @Override
         public String key() {
             return "UserManager";
->>>>>>> origin/app_dev_stream
         }
     }
 }

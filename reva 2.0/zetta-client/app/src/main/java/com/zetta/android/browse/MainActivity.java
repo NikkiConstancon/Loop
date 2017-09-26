@@ -37,13 +37,16 @@ import com.zetta.android.R;
 import com.zetta.android.ZettaDeviceId;
 import com.zetta.android.device.DeviceDetailsActivity;
 import com.zetta.android.device.actions.OnActionClickListener;
+import com.zetta.android.lib.Interval;
+import com.zetta.android.revawebsocketservice.CloudAwaitObject;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
+import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity
-{
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
@@ -52,19 +55,71 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mViewPager;
 
     private String zettaUser;
+    private static Interval validateUserUidInterval = null;
 
     /**
      * Main activity that allows for tab functionality and switching of views
+     *
      * @param savedInstanceState
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: Starting.");
+        userManagerEndpoint.bind(this);
+        if (validateUserUidInterval != null) {
+            validateUserUidInterval.clearInterval();
+        }
+        validateUserUidInterval = new Interval(100, Integer.MAX_VALUE) {
+            @Override
+            public void work() {
+                if (webService != null) {
+                    //webService.signOut();
+                    self.clearInterval();
+                }
+            }
+            @Override
+            public void end() {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (webService.isLoggedIn()) {
+                            bootstrap(webService.getAuthId());
+                        } else {
+                            Intent intent = new Intent(MainActivity.this, login_activity.class);
+                            startActivity(intent);
+                        }
+                    }
+                });
+            }
+            Interval self = this;
+        };
+    }
 
-        zettaUser = getIntent().getStringExtra("Username");
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        userManagerEndpoint.unbind(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (webService != null) {
+            //Note: do nothing and wait for onCreate to build the webService
+            if (webService.isLoggedIn()) {
+                bootstrap(webService.getAuthId());
+            } else {
+                Intent intent = new Intent(MainActivity.this, login_activity.class);
+                startActivity(intent);
+            }
+        }
+    }
+
+    void bootstrap(String zettaUser_) {
+        zettaUser = zettaUser_;//getIntent().getStringExtra("Username");
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarMain);
         setSupportActionBar(toolbar);
@@ -122,12 +177,11 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });*/
-
-
     }
 
     /**
      * Function to get user from server
+     *
      * @return a user from the server
      */
     public String getUser() {
@@ -136,14 +190,30 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Method that sets up tab titles
+     *
      * @param viewPager the pager of the views to be tabbed
      */
-    private void setupViewPager(ViewPager viewPager)
-    {
+    private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
         adapter.addFragment(new DeviceListActivity(), "Vitals");
         adapter.addFragment(new StatFragment(), "Stats");
         adapter.addFragment(new notifications(), "Alerts");
         viewPager.setAdapter(adapter);
+    }
+
+
+    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
+    RevaWebSocketService webService = null;
+
+    class UserManagerEndpoint extends RevaWebsocketEndpoint {
+        @Override
+        public String key() {
+            return "UserManager";
+        }
+
+        @Override
+        public void onServiceConnect(RevaWebSocketService service) {
+            webService = service;
+        }
     }
 }
