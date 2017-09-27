@@ -52,16 +52,16 @@ var hook = new Hook(initializedZetta)
             console.log(e)
         },
         connect: function (peer) {
-            realtimeDataService.connectHopper(peer.name)
+            realtimeDataService.connectZettalet(peer.name)
         },
         disconnect: function (peer) {
-            realtimeDataService.disconnectHopper(peer.name)
+            realtimeDataService.disconnectZettalet(peer.name)
             patientManager.getPatient({ Username: peer.name }).then(function (pat) {
                 pat.disconnectAllDevices();
             })
         },
         deviceConnect: function (info) {
-            realtimeDataService.informDeviceConnect(info.from, info)
+            realtimeDataService.connectDevice(info.from, info)
             patientManager.getPatient({ Username: info.from }).then(function (pat) {
                 pat.connectDevice(info.name);
             })

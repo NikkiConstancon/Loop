@@ -415,7 +415,6 @@ public class RevaWebSocketService extends Service {
                     try {
                         Thread.sleep(256);
                     } catch (Exception e) {
-                        Log.i(TAG, "@connection did not sleep full length");
                     }
                     Bundle bundle = new Bundle();
                     bundle.putString(IPC_SOCKET_OPENED, gson.toJson(handshakedata));
