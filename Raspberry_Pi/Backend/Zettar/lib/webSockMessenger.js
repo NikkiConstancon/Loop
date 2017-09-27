@@ -136,8 +136,15 @@ Meta.prototype.setMeta = function (obj) {
 }
 Meta.prototype.setFiled = function (key, value) {
     this.metaSetId++
-    this.obj[META_KEY] || (this.obj[META_KEY] = {})
-    this.obj[META_KEY][key] = value
+    var map = this.obj
+    if (!map[META_KEY]) {
+        map[META_KEY] = {}
+        map = this.obj[META_KEY]
+        if (!map[this.publisher.getUsername()]) {
+            map[this.publisher.getUsername()] = {}
+        }
+    }
+    this.obj[META_KEY][this.publisher.getUsername()][key] = value
     this.publisher.publish(this.obj)
 }
 
