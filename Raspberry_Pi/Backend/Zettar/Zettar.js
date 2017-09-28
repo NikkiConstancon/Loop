@@ -7,7 +7,7 @@
  * @arg --test-keepAlive is a stdin argument that will prevent the server from killing itestlf after execution
  * @arg --test-drop is a stdin argument that will cause the database to be automatically dropped after execution
  **/
-
+require('./services/LoadServices')
 
 var zetta = require('zetta');
 var url = require('url');
@@ -23,7 +23,7 @@ var dbManager1 = require("./userManager");
 var patientManager = require("./patientManager");
 var patientDataManager = require("./patientDataManager");
 
-const realtimeDataService = require('./lib/realtimeDataService')
+const realtimeDataService = require('./Services/realtimeDataService')
 
 
 //init zetta as usual, but dont call link yet

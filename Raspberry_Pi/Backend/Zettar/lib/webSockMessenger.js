@@ -295,9 +295,14 @@ function UserSocketContext(clientBindingInfo) {
                     var transmitter = this.subServiceMap[key]
                     if (json[key] instanceof Array) {
                         for (var msgNum = 0; msgNum < json[key].length; msgNum++) {
-                            subscriber(this.subServiceMap[key], json[key][msgNum]);
+                            if (subServiceOptionsMap[key].channels instanceof Object && json[key][msgNum][CHANNEL_KEY]) {
+                                DispatchChannels(subServiceOptionsMap[key].channels, this.subServiceMap[key], json[key][msgNum])
+                            } else {
+                                subscriber(this.subServiceMap[key], json[key][msgNum]);
+                            }
                         }
                     } else {
+                        throw("Server cannot prase outterm essage ojects that is not in an array on: " + message)
                         subscriber(this.subServiceMap[key], json[key]);
                     }
                 } else {
@@ -353,6 +358,36 @@ function buildError(key, errObject) {
     return { ERROR: { [key]: errObject } }
 }
 
+function DispatchChannels(channel, transmitter, rootMsg, channeler) {
+    var obj = rootMsg[CHANNEL_KEY]
+    if (obj) {
+        try {
+            for (var key in obj) {
+                for (var id in obj[key]) {
+
+                    function channeler(msg, errcb) {
+                        transmitter.transmit({ [CHANNEL_KEY]: { [id]: msg } }, errcb)
+                    }
+                    var msg = obj[key][id]
+                    DispatchChannelKeys(channel[key],transmitter, msg, channeler)
+                }
+            }
+        } catch (e) {
+            logger.debug(e, obj)
+        }
+    }
+}
+
+function DispatchChannelKeys(handlers, transmitter, rootMsg, channeler) {
+    try {
+        for (var key in rootMsg) {
+            var msg = rootMsg[key]
+            handlers[key](transmitter, msg, key, channeler)
+        }
+    } catch (e) {
+        logger.debug(e, rootMsg)
+    }
+}
 
 
 
@@ -389,9 +424,10 @@ webSockMessenger.attach('RCC', {
                     logger.error('WebSocketMessenger$RCC#obj.PAUS_RESUME: ', e)
                 }
             }
+            var key
             if (obj.SERVICE_BINDING) {
                 try {
-                    var key = obj.SERVICE_BINDING.SERVICE_KEY
+                    key = obj.SERVICE_BINDING.SERVICE_KEY
 
                     if (subServiceOptionsMap[transmitter.key].requirePersistentLink) {
                         transmitter.context.subServiceMap[key].serviceBound = true
@@ -399,7 +435,7 @@ webSockMessenger.attach('RCC', {
                         transmitter.context.subServiceMap[key].serviceBound = Boolean(obj.PAUSE_RESUME.ENABLEMENT).valueOf()
                     }
                 } catch (e) {
-                    logger.error('WebSocketMessenger$RCC#obj.SERVICE_BINDING: ', e)
+                    logger.error('WebSocketMessenger$RCC#obj.SERVICE_BINDING: on key: ' + key + '\n', e)
                 }
             }
         } catch (e) {
@@ -412,150 +448,4 @@ webSockMessenger.attach('RCC', {
 
 
 
-function DispatchChannels(handlers, transmitter, rootMsg, channeler) {
-    var obj = rootMsg[CHANNEL_KEY]
-    if (obj) {
-        try {
-            for (var key in obj) {
-                for (var id in obj[key]) {
 
-                    function channeler(msg, errcb) {
-                        transmitter.transmit({ [CHANNEL_KEY]: { [id]: msg } }, errcb)
-                    }
-                    var msg = obj[key][id]
-                    handlers[key](transmitter, msg, key, channeler)
-                }
-            }
-        } catch (e) {
-            logger.debug(e, obj)
-        }
-    }
-}
-
-function DispatchMessages(handlers, transmitter, rootMsg, channeler) {
-    try {
-        for (var key in rootMsg) {
-            var msg = rootMsg[key]
-            handlers[key](transmitter, msg, key, channeler)
-        }
-    } catch (e) {
-        logger.debug(e, rootMsg)
-    }
-}
-
-
-
-var userManagerChannels = {
-    REGISTER: function (transmitter, msg, key, channeler) {
-        DispatchMessages({
-
-            VALIDATE_EMAIL: function (transmitter, msg, key) {
-                channeler({ PASS: true })
-                //channeler({ PASS: false, ERROR: "This email address is not available" })
-            },
-            REGISTER_PATIENT: function (transmitter, msg, key) {
-                var obj = msg;
-                //TODO: Move to patiantManager
-                function deserialize(obj) {
-                    var test = require('../models/patientModel').fields
-                    for (var key in test) {
-                        switch (test[key].type) {
-                            case 'int': { obj[key] && (obj[key] = parseInt(obj[key])) } break
-                            case 'float': { obj[key] && (obj[key] = parseFloat(obj[key])) } break
-                        }
-                    }
-                }
-                deserialize(obj)
-                PatientManager.getPatient(obj)
-                    .then(function () {
-                        channeler({ PATIENT_ERROR: 'This username has been taken', PATIENT_PASS: false })
-                    }).catch(function () {
-                        return PatientManager.addPatient(obj).then(function (pat) {
-                            channeler({ PATIENT_PASS: true })
-                        }).catch(function (e) {
-                            channeler({ PATIENT_ERROR: e.message || e, PATIENT_PASS: false })
-                        })
-                    }).catch(function (e) {
-                        logger.error('@webSockMessenger$UserManager#receiver:KEY_REGISTER_USER', e)
-                        channeler({ PATIENT_ERROR: 'something went wrong', PATIENT_PASS: false })
-                    })
-            },
-            REGISTER_NON_PATIENT: function (transmitter, msg, key) {
-                var obj = msg;
-                //TODO: Move to patiantManager
-                function deserialize(obj) {
-                    var test = require('../models/patientModel').fields
-                    for (var key in test) {
-                        switch (test[key].type) {
-                            case 'int': { obj[key] && (obj[key] = parseInt(obj[key])) } break
-                            case 'float': { obj[key] && (obj[key] = parseFloat(obj[key])) } break
-                        }
-                    }
-                }
-                deserialize(obj)
-                SubscriberManager.getsubscriber(obj)
-                    .then(function () {
-                        //ugly prot i.e. copy and paste mostly form patient
-                        channeler({ NON_PATIENT_ERROR: 'This email has been taken', NON_PATIENT_PASS: false })
-                    }).catch(function () {
-                        return SubscriberManager.addSubscriber(obj).then(function (pat) {
-                            channeler({ NON_PATIENT_PASS: true })
-                        }).catch(function (e) {
-                            channeler({ NON_PATIENT_ERROR: e.message || e, NON_PATIENT_PASS: false })
-                        })
-                    }).catch(function (e) {
-                        logger.error('@webSockMessenger$UserManager#receiver:KEY_REGISTER_USER', e)
-                        channeler({ NON_PATIENT_ERROR: 'something went wrong', NON_PATIENT_PASS: false })
-                    })
-            }
-        }, transmitter, msg)
-    }
-}
-
-webSockMessenger.attach('UserManager', {
-    connect: function (transmitter) {
-        //transmitter.transmit("--HELLO-- ");
-    },
-    close: function (transmitter) {
-    },
-    receiver: function (transmitter, obj) {
-        DispatchChannels(userManagerChannels, transmitter, obj)
-
-        /*
-        if (obj.TEST_EMAIL_AVAILABLE) {
-            //obj.TEST_EMAIL_AVAILABLE = 'This email address is not available'
-            obj.TEST_EMAIL_AVAILABLE = ''
-            transmitter.transmit(obj);
-        } else if (obj.KEY_REGISTER_USER) {
-            delete obj.KEY_REGISTER_USER
-            //TODO: Move to patiantManager
-            function deserialize(obj) {
-                var test = require('../models/patientModel').fields
-                for (var key in test) {
-                    switch (test[key].type) {
-                        case 'int': { obj[key] && (obj[key] = parseInt(obj[key])) } break
-                        case 'float': { obj[key] && (obj[key] = parseFloat(obj[key])) } break
-                    }
-                }
-            }
-            deserialize(obj)
-            PatientManager.getPatient(obj)
-                .then(function () {
-                    transmitter.transmit({ KEY_REGISTER_USER: { Username: 'This username has been taken' } })
-                }).catch(function () {
-                    return PatientManager.addPatient(obj).then(function (pat) {
-                        transmitter.transmit({ KEY_REGISTER_USER: true })
-                    }).catch(function (e) {
-                        transmitter.transmit({ KEY_REGISTER_USER: { ERROR: e.message || e } })
-                    })
-                }).catch(function (e) {
-                    logger.error('@webSockMessenger$UserManager#receiver:KEY_REGISTER_USER', e)
-                    transmitter.transmit({ KEY_REGISTER_USER: { ERROR: 'something went wrong' } })
-                })
-        }
-        logger.info(obj);
-        */
-    },
-    requirePersistentLink: true,
-    defaultEnabled: true
-})
