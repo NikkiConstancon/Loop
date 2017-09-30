@@ -55,7 +55,11 @@ class SubscriberModel extends Model {
 	        PatientList     : {
 	                type: "list",
 	                typeDef: "<text>"
-	            },
+            },
+            PublisherBindingConfirmationMap: {
+                type: 'map',
+                typeDef: '<text, text>'
+            },
             RegistrationObject: {
                 type: 'map',
                 typeDef: '<text, text>',

@@ -95,6 +95,10 @@ class PatientModel extends Model {
                     message: 'Reason is not included in the set of reasons.'
                 }
             },
+            SubscriberBindingConfirmationMap: {
+                type: 'map',
+                typeDef: '<text, text>'
+            },
             RegistrationObject: {
                 type: 'map',
                 typeDef: '<text, text>',
