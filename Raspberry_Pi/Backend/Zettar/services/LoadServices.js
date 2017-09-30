@@ -1,1 +1,2 @@
 ﻿require('./UserManagerService')
+require('./StatisticsService')

@@ -37,10 +37,9 @@ var publisherHandler = webSockMessenger.attach(serviceName, {
     close: function (context) {
     },
     receiver: function (transmiter, obj) {
-        transmiter.transmit(obj)
     },
     subListUpdater: function (pubName, next) {
-        patientManager.bindSubscriberListInofHook({ Username: pubName }, (list) => {
+        patientManager.bindSubscriberListInfoHook({ Username: pubName }, (list) => {
             next(list)
         })
     }

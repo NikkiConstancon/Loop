@@ -8,7 +8,15 @@ const serviceName = 'UserManager'
 
 webSockMessenger.attach(serviceName, {
     connect: function (transmitter) {
-        //transmitter.transmit("--HELLO-- ");
+        if (transmitter.getUserType() === 'patient') {
+            patientManager.getPatient({ Username: transmitter.getUserUid() }).then(function (pat) {
+                transmitter.transmit({ BINDING_CONFIRMATION_REQ_MAP: pat.SubscriberBindingConfirmationMap })
+            });
+        } else {
+            subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (pat) {
+                transmitter.transmit({ BINDING_CONFIRMATION_REQ_MAP: pat.publisherBindingConfirmationMap })
+            });
+        }
     },
     close: function (transmitter) {
     },
@@ -35,11 +43,11 @@ webSockMessenger.attach(serviceName, {
                     }
                 }
                 deserialize(obj)
-                PatientManager.getPatient(obj)
+                patientManager.getPatient(obj)
                     .then(function () {
                         channeler({ PATIENT_ERROR: 'This username has been taken', PATIENT_PASS: false })
                     }).catch(function () {
-                        return PatientManager.addPatient(obj).then(function (pat) {
+                        return patientManager.addPatient(obj).then(function (pat) {
                             channeler({ PATIENT_PASS: true })
                         }).catch(function (e) {
                             channeler({ PATIENT_ERROR: e.message || e, PATIENT_PASS: false })
@@ -62,12 +70,12 @@ webSockMessenger.attach(serviceName, {
                     }
                 }
                 deserialize(obj)
-                SubscriberManager.getsubscriber(obj)
+                subscriberManager.getsubscriber(obj)
                     .then(function () {
                         //ugly prot i.e. copy and paste mostly form patient
                         channeler({ NON_PATIENT_ERROR: 'This email has been taken', NON_PATIENT_PASS: false })
                     }).catch(function () {
-                        return SubscriberManager.addSubscriber(obj).then(function (pat) {
+                        return subscriberManager.addSubscriber(obj).then(function (pat) {
                             channeler({ NON_PATIENT_PASS: true })
                         }).catch(function (e) {
                             channeler({ NON_PATIENT_ERROR: e.message || e, NON_PATIENT_PASS: false })
@@ -76,6 +84,33 @@ webSockMessenger.attach(serviceName, {
                         logger.error('@webSockMessenger$UserManager#receiver:KEY_REGISTER_USER', e)
                         channeler({ NON_PATIENT_ERROR: 'something went wrong', NON_PATIENT_PASS: false })
                     })
+            }
+        },
+        BIND_PATIENT_AND_SUBSCRIBER: {
+            REQ_BIND: function (transmitter, msg, key, channeler) {
+                const successMsg = "Your request has been sent"
+                const newReqMsgObj = { NEW_PUBSUB_BINDING_REQ: transmitter.getUserUid() }
+                if (transmitter.getUserType() === 'patient') {
+                    patientManager.addSubscriberBindingRequest(transmitter.getUserUid(), msg, "subscriber").then(function () {
+                        channeler({ success: successMsg })
+                        webSockMessenger.transmitTo(serviceName, msg, newReqMsgObj)
+                    }).catch(function (e) {
+                        channeler({ error: e.clientSafe })
+                        if (e.systemError) {
+                            logger.error(e.systemError)
+                        }
+                    })
+                } else {
+                    patientManager.addSubscriberBindingRequest(transmitter.getUserUid(), msg, "patient").then(function () {
+                        channeler({ success: successMsg })
+                        webSockMessenger.transmitTo(key, msg, newReqMsgObj)
+                    }).catch(function (e) {
+                        channeler({ error: e.clientSafe })
+                        if (e.systemError) {
+                            logger.error( e.systemError)
+                        }
+                    })
+                }
             }
         }
     }

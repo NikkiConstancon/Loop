@@ -64,6 +64,13 @@ const webSockMessenger = module.exports = {
         } else {
             return null
         }
+    },
+    transmitTo: function (serviceKey, userUid, msg, errcb) {
+        for (var deviceUid in userSocketContextMap[userUid]) {
+            var context = userSocketContextMap[userUid][deviceUid]
+            var transmitter = context.subServiceMap[serviceKey]
+            transmitter.transmit(msg, errcb)
+        }
     }
 }
 var userSocketContextMap = {}
@@ -169,12 +176,13 @@ function authorize(ws) {
         return parseAuthorizationHeader(ws.upgradeReq.headers).then(function (auth) {
             var userUid = auth.Username;
             var ret = { ws: ws, user: auth.Username, serviceInstanceUuid: auth.serviceInstanceUuid }
-            if (auth.Username === '' || auth.Username == USER_ANONYMOUS) {
+            if (auth.Username == '' || auth.Username == USER_ANONYMOUS) {
                 ret.user = USER_ANONYMOUS
                 res(ret)
             } else {
                 return PatientManager.getPatient(auth).then(function (pat) {
                     if (pat.verifyPassword(auth.Password)) {
+                        ret.userType = 'patient'//why should this module ceep track of who is what kind of user? there are so much that is shared by the two principle users they should have been managed as one accout as I intally proposed!
                         res(ret)
                     } else {
                         ret.user = USER_ANONYMOUS
@@ -187,8 +195,8 @@ function authorize(ws) {
                     //HONESTLY DON'T KNOW WHY THE INITIAL DESIGN WAS NOT FOLLOWED (MAYBE IT IS JUST ME THAT IS INCAPABLE TO COMPREHEND THE CURRENT LAYOUT)
                     auth.Email = auth.Username
                     return SubscriberManager.getsubscriber(auth).then(function (thisIsSoWrong) {
-                        //todo validate password
                         if (thisIsSoWrong.verifyPassword(auth.Password)) {
+                            ret.userType = 'subscriber'//why should this module ceep track of who is what kind of user? there are so much that is shared by the two principle users they should have been managed as one accout as I intally proposed!
                             res(ret)
                         } else {
                             ret.user = USER_ANONYMOUS
@@ -197,7 +205,7 @@ function authorize(ws) {
                         }
                     }).catch(function (e) {
                         ret.user = USER_ANONYMOUS
-                        ret.tmpAuthError = { text: "No such account", field: "userUid" }
+                        ret.tmpAuthError = { text: "No such account. Note that capitalization is important.", field: "userUid" }
                         res(ret)
                     })
                 })
@@ -230,6 +238,8 @@ ServiceTransmitter.prototype.transmit = function (msg, errcb, force) {
     }
     return true
 }
+ServiceTransmitter.prototype.getUserUid = function () { return this.context.userUid }
+ServiceTransmitter.prototype.getUserType = function () { return this.context.userType }
 
 function pushMessage (ws, key, msg, errcb, context) {
     msgObj = { [key]: msg }
@@ -255,6 +265,7 @@ function UserSocketContext(clientBindingInfo) {
     this.userUid = clientBindingInfo.user
     this.deviceUid = clientBindingInfo.serviceInstanceUuid
     this.subServiceMap = {}
+    this.userType = clientBindingInfo.userType
     var tmpAuthError = clientBindingInfo.tmpAuthError
     tmpAuthError && (this.tmpAuthError = tmpAuthError)
     if (userSocketContextMap[this.userUid] && userSocketContextMap[this.userUid][this.deviceUid]) {
@@ -369,7 +380,11 @@ function DispatchChannels(channel, transmitter, rootMsg, channeler) {
                         transmitter.transmit({ [CHANNEL_KEY]: { [id]: msg } }, errcb)
                     }
                     var msg = obj[key][id]
-                    DispatchChannelKeys(channel[key],transmitter, msg, channeler)
+                    try {
+                        DispatchChannelKeys(channel[key], transmitter, msg, channeler)
+                    }catch(e){
+                        logger.error("invalid channel or key with: " + key + "\n", e)
+                    }
                 }
             }
         } catch (e) {
@@ -379,13 +394,9 @@ function DispatchChannels(channel, transmitter, rootMsg, channeler) {
 }
 
 function DispatchChannelKeys(handlers, transmitter, rootMsg, channeler) {
-    try {
-        for (var key in rootMsg) {
-            var msg = rootMsg[key]
-            handlers[key](transmitter, msg, key, channeler)
-        }
-    } catch (e) {
-        logger.debug(e, rootMsg)
+    for (var key in rootMsg) {
+        var msg = rootMsg[key]
+        handlers[key](transmitter, msg, key, channeler)
     }
 }
 
