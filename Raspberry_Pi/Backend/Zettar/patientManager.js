@@ -24,6 +24,9 @@ var accessKey = "4]),`~>{CKjv(E@'d:udH6N@/G4n(}4dn]Mi"
 var keys = require('./lib/keys')
 var sharedKeys = require('../Shared/sharedKeys')
 
+
+var subscriberManager = require("./subscriberManager")
+
 /**EXAMPLE USE
  * Encrypt 
  *var ciphertext = CryptoJS.AES.encrypt('my message', 'secret key 123');
@@ -299,6 +302,28 @@ var patientManager = module.exports = {
             })
         })
     },
+    addSubscriberBindingRequest: function (patientUid, subscriberUid, target) {
+        return new Promise((res, rej) => {
+            var selfTraget = target === "patient" ? "pateint" : "subscriber"
+            var subTraget = target !== "patient" ? "pateint" : "subscriber"
+            var userQuery = { Username: patientUid }
+            return patientManager.getPatient(userQuery).then(function (pat) {
+                subscriberManager.getsubscriber({ Email: subscriberUid }).then(function (sub) {
+                    pat.SubscriberBindingConfirmationMap = pat.SubscriberBindingConfirmationMap || {}//default is not working
+                    pat.SubscriberBindingConfirmationMap[subscriberUid] = JSON.stringify({ target: selfTraget, state: "pnending" })
+
+                    dbMan.models.instance.patient.update(userQuery, { SubscriberBindingConfirmationMap: pat.SubscriberBindingConfirmationMap }, null, function (err) {
+                        if (err) rej({ systemError: err, clientSafe: "We colud not send the request at this time, please try again later" })
+                        else res()
+                    });
+                }).catch(function (e) {
+                    rej({ systemError: e, clientSafe: "User " + subscriberUid + " could not be found." })
+                })
+            }).catch(function (e) {
+                rej( { systemError: e, clientSafe: "Patient " + patientUid + " could not be found." })
+            })
+        })
+    },
     /**
      * @brief bind the patients Zettalet's URI to the specific user
      **/
@@ -355,11 +380,11 @@ var patientManager = module.exports = {
             })
         })
     },
-    bindSubscriberListInofHook: function (userInfo, cb) {
+    bindSubscriberListInfoHook: function (userInfo, cb) {
         var userUid = userInfo.Username || userInfo.Email
         if (SubscriberListInofHookMap[userUid]) {
             try {
-                throw "@PatientManager.bindSubscriberListInofHook: already hooked for " + JSON.stringify(userInfo)
+                throw "@PatientManager.bindSubscriberListInfoHook: already hooked for " + JSON.stringify(userInfo)
             } catch (e) {
                 logger.warn(e)
             }
@@ -370,7 +395,7 @@ var patientManager = module.exports = {
             SubscriberListInofHookMap[pat.Username](pat.getSubscriberList())
         }).catch(() => { })
     },
-    unbindSubscriberListInofHook: function (userInfo, cb) {
+    unbindSubscriberListInfoHook: function (userInfo, cb) {
         var userUid = userInfo.Username || userInfo.Email
         if (SubscriberListInofHookMap[userUid]) {
             delete SubscriberListInofHookMap[userUid]
