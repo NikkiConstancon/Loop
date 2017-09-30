@@ -50,3 +50,5 @@ Raspberry_Pi/Backend/Zettar/.vs/
 Raspberry_Pi/Backend/Zettar/Zettar.njsproj
 Raspberry_Pi/Backend/Zettar/Zettar.njsproj.user
 Raspberry_Pi/Backend/Zettar/Zettar.sln
+bin
+debug

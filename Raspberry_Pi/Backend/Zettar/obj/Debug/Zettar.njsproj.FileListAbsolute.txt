@@ -1,2 +1,0 @@
-C:\Users\ME\Loop\Raspberry_Pi\Backend\Zettar\obj\Debug\Zettar.njsprojResolveAssemblyReference.cache
-C:\Users\ME\Loop\Raspberry_Pi\Backend\Zettar\bin\Microsoft.NodejsTools.WebRole.dll
