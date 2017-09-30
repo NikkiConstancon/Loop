@@ -5,6 +5,7 @@ package com.zetta.android.lib;
  */
 
 public class Interval {
+    public void begin(){}
     public void end() { }
     public void work(){ }
 
@@ -30,6 +31,7 @@ public class Interval {
             }
         };
         worker.start();
+        begin();
     }
 
     int steps = 0;

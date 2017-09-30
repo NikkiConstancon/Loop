@@ -17,6 +17,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
 import com.zetta.android.lib.NotifyCloudAwait;
+import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
@@ -52,7 +53,7 @@ public class login_activity extends AppCompatActivity {
     public void onBackPressed() {
         if (exit) {
             finish();
-            userManagerEndpoint.unbind(this);
+            loginEndpoint.unbind(this);
             this.finishAffinity();
         } else {
             Toast.makeText(this, "Press back again to exit ReVA", Toast.LENGTH_SHORT).show();
@@ -104,8 +105,10 @@ public class login_activity extends AppCompatActivity {
              */
             @Override
             public void onClick(View v) {
-                userManagerEndpoint.getService().setLogin(user.getText().toString(), passw.getText().toString());
-                buildLoginAwaitObject();
+                //if(attemptLogin()) {
+                loginEndpoint.getService().setLogin(user.getText().toString(), passw.getText().toString());
+                loginEndpoint.buildLoginAwaitObject(login_activity.this);
+                //}
             }
         });
 
@@ -134,49 +137,20 @@ public class login_activity extends AppCompatActivity {
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         });
-        userManagerEndpoint.bind(this);
+        loginEndpoint = new UserManager.LoginEndpoint(
+                this,
+                (EditText)findViewById(R.id.input_emailLogin),
+                (EditText)findViewById(R.id.input_passwordLogin)
+        );
+        loginEndpoint.bind(this);
     }
 
-    void buildLoginAwaitObject(){
-        if (notifyWait == null) {
-            notifyWait = new NotifyCloudAwait(login_activity.this, false,
-                    750, " ... validating your input ... ", 5000) {
-                @Override
-                public void end(NotifyCloudAwait.DISMISS_TYPE type) {
-                    if (type == DISMISS_TYPE.TIMEOUT) {
-                        AlertDialog.Builder builder1 = new AlertDialog.Builder(login_activity.this);
-                        builder1.setTitle("Could not connect to the cloud");
-                        builder1.setMessage("try again ?");
-                        builder1.setCancelable(true);
-                        builder1.setPositiveButton("YES",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        notifyWait = null;
-                                        buildLoginAwaitObject();
-                                        dialog.dismiss();
-                                    }
-                                });
-                        builder1.setNegativeButton("NO",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        notifyWait = null;
-                                        dialog.dismiss();
-                                    }
-                                });
-                        builder1.show();
-                    }
-                }
-            };
-            ((EditText) findViewById(R.id.input_emailLogin)).setError(null);
-            ((EditText) findViewById(R.id.input_passwordLogin)).setError(null);
-        }
-    }
 
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        userManagerEndpoint.unbind(this);
+        loginEndpoint.unbind(this);
     }
 
     /**
@@ -232,51 +206,5 @@ public class login_activity extends AppCompatActivity {
         }
         return false;
     }
-
-
-    NotifyCloudAwait notifyWait = null;
-    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
-
-    class UserManagerEndpoint extends RevaWebsocketEndpoint {
-        @Override
-        public String key() {
-            return "UserManager";
-        }
-
-        public void onMessage(LinkedTreeMap obj) {
-            //TODO move this to
-            final String USER_MANAGER_KEY_CONNECTED = "CONNECTED";
-            if (obj.containsKey(USER_MANAGER_KEY_CONNECTED)) {
-                notifyWait.dismiss();
-                notifyWait = null;
-                Map<String, Object> info = (Map<String, Object>) obj.get(USER_MANAGER_KEY_CONNECTED);
-                String userUid = (String) info.get("USER_UID");
-                if (userUid.compareTo(RevaWebSocketService.SPECIAL_USER_ANONYMOUS) != 0) {
-                    Intent intent = new Intent(login_activity.this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra("Username", userUid.toString());
-                    startActivity(intent);
-                } else {
-                    final Map<String, String> errorMap = (Map<String, String>) info.get("ERROR");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (errorMap != null) {
-                                String error = errorMap.get("text");
-                                EditText text = null;
-                                if (errorMap.get("field").compareTo("password") == 0) {
-                                    text = findViewById(R.id.input_passwordLogin);
-                                } else {
-                                    text = findViewById(R.id.input_emailLogin);
-                                }
-                                text.setError(error);
-                            } else {
-                                ((EditText) findViewById(R.id.input_emailLogin)).setError("You must specify a username");
-                            }
-                        }
-                    });
-                }
-            }
-        }
-    }
+    UserManager.LoginEndpoint loginEndpoint = null;
 }

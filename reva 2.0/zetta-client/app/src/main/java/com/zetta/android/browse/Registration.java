@@ -7,29 +7,18 @@ package com.zetta.android.browse;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.Toast;
-
-import com.google.gson.GsonBuilder;
-import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
-import com.zetta.android.revawebsocketservice.ChannelPublisher;
-import com.zetta.android.revawebsocketservice.CloudAwaitObject;
-import com.zetta.android.revawebsocketservice.RevaWebSocketService;
-import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
+import com.zetta.android.revaServices.UserManager;
 
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -104,13 +93,13 @@ public class Registration extends AppCompatActivity {
 
         });
 
-        userManagerEndpoint.bind(this);
+        registerEndpoint.bind(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        userManagerEndpoint.unbind(this);
+        registerEndpoint.unbind(this);
     }
 
     boolean checkedRad = false;
@@ -192,91 +181,8 @@ public class Registration extends AppCompatActivity {
                     emailText.setError(null);
                 }
             });
-
-            userManagerEndpoint.attachCloudAwaitObject(builder1, validateEmailCAO)
-                    .send(this, "VALIDATE_EMAIL", regEmail)
-                    .then(registerNonPatientCAO);
+            registerEndpoint.sendRequest(patient, regEmail, regPass, (EditText) findViewById(R.id.input_emailReg), builder1);
         }
     }
-
-    CloudAwaitObject validateEmailCAO = new CloudAwaitObject("REGISTER") {
-        @Override
-        public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
-            Object ret = null;
-            try{
-                final AlertDialog.Builder builder1 = (AlertDialog.Builder)localMsg;
-                final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>)obj;
-                if((boolean)got.get("PASS")) {
-                    if (patient) {
-                        /////////////////////////////////////////change intent to Registration_cont
-                        Intent toReg = new Intent(Registration.this, Registration_Cont.class);
-                        toReg.putExtra("regEmail", regEmail);
-                        toReg.putExtra("regPass", regPass);
-                        startActivityForResult(toReg, 0);
-                        return true;
-                    } else {
-                        //pass the builder
-                        Map<String, Object> sendMap = new TreeMap<>();
-                        sendMap.put("Email", regEmail);
-                        sendMap.put("Password", regPass);
-                        return new CloudAwaitObject.Chain(Registration.this, "REGISTER_NON_PATIENT", sendMap, builder1);
-                    }
-                }else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            EditText emailText = (EditText) findViewById(R.id.input_emailReg);
-                            emailText.setError((String) got.get("ERROR"));
-                        }
-                    });
-                }
-            }catch (Exception e){Log.e(this.getClass().getName(), e.toString());}
-            return ret;
-        }
-    };
-    CloudAwaitObject registerNonPatientCAO = new CloudAwaitObject("REGISTER") {
-        @Override
-        public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
-            Object ret = null;
-            final AlertDialog.Builder builder1 = (AlertDialog.Builder)localMsg;
-            try {
-                final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>) obj;
-                if ((boolean) got.get("NON_PATIENT_PASS")) {
-                    ret = true;
-                    userManagerEndpoint.getService().setLogin(regEmail, regPass);
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(Registration.this, "Welcome " + regEmail, Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(Registration.this, MainActivity.class);
-                            intent.putExtra("Username", regEmail.toString());
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                        }
-                    });
-                } else {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            try {
-                                builder1.setMessage((String) got.get("NON_PATIENT_ERROR"));
-                                AlertDialog alertWarning = builder1.create();
-                                alertWarning.show();
-                            } catch (Exception e) {
-                            }
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                Log.e(this.getClass().getName(), e.toString());
-            }
-            return ret;
-        }
-    };
-
-    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
-    class UserManagerEndpoint extends RevaWebsocketEndpoint {
-        @Override
-        public String key() {
-            return "UserManager";
-        }
-    }
+    UserManager.RegisterEndpoint registerEndpoint = new UserManager.RegisterEndpoint(this);
 }

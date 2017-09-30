@@ -13,15 +13,18 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -38,6 +41,7 @@ import com.zetta.android.ZettaDeviceId;
 import com.zetta.android.device.DeviceDetailsActivity;
 import com.zetta.android.device.actions.OnActionClickListener;
 import com.zetta.android.lib.Interval;
+import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
@@ -45,6 +49,7 @@ import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,32 +76,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: Starting.");
+
         userManagerEndpoint.bind(this);
-        if (validateUserUidInterval != null) {
-            validateUserUidInterval.clearInterval();
-        }
-        validateUserUidInterval = new Interval(100, Integer.MAX_VALUE) {
-            @Override
-            public void work() {
-                if (webService != null) {
-                    self.clearInterval();
-                }
-            }
-            @Override
-            public void end() {
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (webService.isLoggedIn()) {
-                            bootstrap(webService.getAuthId());
-                        } else {
-                            triggerLoginIntent();
-                        }
-                    }
-                });
-            }
-            Interval self = this;
-        };
+
+        userManagerEndpoint.hardGuardActivityByVerifiedUser(workOnUser);
     }
 
     @Override
@@ -108,22 +91,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        if (webService != null) {
-            //Note: do nothing and wait for onCreate to build the webService
-            if (webService.isLoggedIn()) {
-                bootstrap(webService.getAuthId());
-            } else {
-                triggerLoginIntent();
-            }
-        }
+        userManagerEndpoint.nonConstructedGuardActivityByVerifiedUser(workOnUser);
     }
 
-    void triggerLoginIntent(){
-        webService.signOut();
-        Intent intent = new Intent(MainActivity.this, login_activity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
+    UserManager.MainActivityEndpoint.WorkOnUser workOnUser
+            = new UserManager.MainActivityEndpoint.WorkOnUser(){
+        @Override public void work(String userUid){
+            bootstrap(userUid);
+        }
+    };
 
     void bootstrap(String zettaUser_) {
         zettaUser = zettaUser_;//getIntent().getStringExtra("Username");
@@ -141,10 +117,9 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.DrawerNameSignOut);
-        SecondaryDrawerItem item2 = new SecondaryDrawerItem().withIdentifier(2).withName("These are also words");
+        PrimaryDrawerItem signOutItem = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.DrawerNameSignOut);
+        signOutItem.withTag(R.string.DrawerNameSignOut);
 
-        item1.withTag(R.string.DrawerNameSignOut);
 
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -165,9 +140,8 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .addDrawerItems(
-                        item1,
+                        signOutItem,
                         new DividerDrawerItem(),
-                        item2,
                         new SecondaryDrawerItem().withName("Settings")
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -177,10 +151,13 @@ public class MainActivity extends AppCompatActivity {
                         Object tag = drawerItem.getTag();
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
-                            if(value == R.string.DrawerNameSignOut){
-                                triggerLoginIntent();
+                            switch(value){
+                                case R.string.DrawerNameSignOut:{
+                                    userManagerEndpoint.triggerLoginIntent();
+                                }break;
                             }
                         }
+
                         return true;
                     }
                 })
@@ -217,20 +194,5 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new notifications(), "Alerts");
         viewPager.setAdapter(adapter);
     }
-
-
-    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
-    RevaWebSocketService webService = null;
-
-    class UserManagerEndpoint extends RevaWebsocketEndpoint {
-        @Override
-        public String key() {
-            return "UserManager";
-        }
-
-        @Override
-        public void onServiceConnect(RevaWebSocketService service) {
-            webService = service;
-        }
-    }
+    UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(this);
 }

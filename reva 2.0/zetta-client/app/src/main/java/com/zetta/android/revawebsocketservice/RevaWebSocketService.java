@@ -24,6 +24,7 @@ import com.zetta.android.R;
 import com.zetta.android.browse.MainActivity;
 import com.zetta.android.browse.login_activity;
 import com.zetta.android.lib.Interval;
+import com.zetta.android.revaServices.UserManager;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
@@ -276,6 +277,7 @@ public class RevaWebSocketService extends Service {
         }
     }
 
+    UserManager userManager = UserManager.instance();
 
     protected synchronized static void notifyServiceBind(String key, ResultReceiver subscriberResultReceiver) {
         rccPushServiceBinding(key, true);

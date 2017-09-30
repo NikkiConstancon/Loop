@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
+import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.ChannelPublisher;
 import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
@@ -70,13 +71,13 @@ public class Registration_Patient extends AppCompatActivity {
             }
         });
 
-        userManagerEndpoint.bind(this);
+        registerPatientEndpoint.bind(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        userManagerEndpoint.unbind(this);
+        registerPatientEndpoint.unbind(this);
     }
 
     /**
@@ -206,73 +207,16 @@ public class Registration_Patient extends AppCompatActivity {
             AlertDialog alertWarning = builder1.create();
             alertWarning.show();
         } else {
-            String regEmail = getIntent().getStringExtra("regEmail");
-            String regPass = getIntent().getStringExtra("regPass");
-            String address = getIntent().getStringExtra("address");
-            final String username = getIntent().getStringExtra("username");
-            final String subPass = getIntent().getStringExtra("subPass");
-
-            /*
-                Username: username,
-                Password: 'Password',
-                AccessPassword: 'adsfasdf',
-                Email: 'COS332.Marthinus@gmail.com',
-                Address: '42 Dale Avenue Hempton 1765',
-                Age: 42,
-                Weight: 23,
-                Height: 32,
-                Reason: 'Disability'
-             */
-
-            Map<String,String> sendMap = new TreeMap<>();
-            sendMap.put("Email", regEmail);
-            sendMap.put("Password", regPass);
-            sendMap.put("Address", address);
-            sendMap.put("Username", username);
-            sendMap.put("AccessPassword", subPass);
-
-            userManagerEndpoint.attachCloudAwaitObject(true, new CloudAwaitObject("REGISTER") {
-                @Override
-                public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
-                    Object ret = null;
-                    try{
-                        final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>)obj;
-                        if((boolean)got.get("PATIENT_PASS")) {
-                            ret = true;
-                            userManagerEndpoint.getService().setLogin(username, subPass);
-                            runOnUiThread(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(Registration_Patient.this, "Welcome " + username, Toast.LENGTH_LONG).show();
-                                    Intent intent = new Intent(Registration_Patient.this, MainActivity.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    intent.putExtra("Username", username.toString());
-                                    startActivity(intent);
-                                }
-                            });
-                        }else {
-                            runOnUiThread(new Runnable() {
-                                public void run() {
-                                    try {
-                                        builder1.setMessage((String)got.get("PATIENT_ERROR"));
-                                        AlertDialog alertWarning = builder1.create();
-                                        alertWarning.show();
-                                    }catch (Exception e){}
-                                }
-                            });
-                        }
-                    }catch (Exception e){Log.e(this.getClass().getName(), e.toString());}
-                    return ret;
-                }
-            }).send(this, "REGISTER_PATIENT", sendMap);
-
-            //NOTE! Moved the startActivityForResult execute after confirmation from server
+            registerPatientEndpoint.sendRequest(
+                    builder1,
+                    getIntent().getStringExtra("regEmail"),
+                    getIntent().getStringExtra("regPass"),
+                    getIntent().getStringExtra("address"),
+                    getIntent().getStringExtra("username"),
+                    getIntent().getStringExtra("subPass")
+            );
         }
     }
-    UserManagerEndpoint userManagerEndpoint = new UserManagerEndpoint();
-    class UserManagerEndpoint extends RevaWebsocketEndpoint {
-        @Override
-        public String key() {
-            return "UserManager";
-        }
-    }
+
+    UserManager.RegisterPatientEndpoint registerPatientEndpoint = new UserManager.RegisterPatientEndpoint(this);
 }

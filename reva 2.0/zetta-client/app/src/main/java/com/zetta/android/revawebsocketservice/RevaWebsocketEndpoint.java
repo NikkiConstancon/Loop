@@ -64,7 +64,7 @@ public abstract class RevaWebsocketEndpoint {
         return mPublisher;
     }
 
-    public final RevaWebSocketService.Publisher bind(Context context_) {
+    public RevaWebSocketService.Publisher bind(Context context_) {
         context = context_;
         if (mPublisher != null) {
             return mPublisher;
@@ -235,7 +235,7 @@ public abstract class RevaWebsocketEndpoint {
     }
 
 
-    protected Map<String, CloudAwaitObject> cloudAwaitObjectMap = new TreeMap<>();
+    protected Map<String, CloudAwaitObject> cloudAwaitObjectMap = new TreeMap<>();//TODO the way this is used could cause a memory leek, as new object are never released
     public CloudAwaitObject attachCloudAwaitObject(Object localMsg, CloudAwaitObject cao) {
         cloudAwaitObjectMap.put(cao.id, cao);
         cao.setServicePublisher(this);

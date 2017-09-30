@@ -45,6 +45,11 @@ public abstract class CloudAwaitObject {
         channelKey = channelKey_;
         publisher = new ChannelPublisher(channelKey);
     }
+    public CloudAwaitObject(String channelKey_, boolean silent_) {
+        channelKey = channelKey_;
+        silent = silent_;
+        publisher = new ChannelPublisher(channelKey);
+    }
 
     CloudAwaitObject next = null;
 
@@ -77,11 +82,19 @@ public abstract class CloudAwaitObject {
             open = false;
             awaiting = true;
             publishInterval = new Interval(RESEND_INTERVAL, MAX_RESEND) {
+                NotifyCloudAwait notifyWait;
+                @Override public void begin(){
+                    if(!silent){
+                        notifyWait = new NotifyCloudAwait(context, true,
+                                750, " ... connecting to the cloud ... ",
+                                Integer.MAX_VALUE//Users should cancel them self
+                        );
+                    }
+                }
                 @Override
                 public void work() {
                     publisher.publish(id, key, obj);
                 }
-
                 @Override
                 public void end() {
                     new Interval(1000, 1){
@@ -91,12 +104,10 @@ public abstract class CloudAwaitObject {
                         }
                     };
                     awaiting = false;
-                    notifyWait.dismiss();
+                    if(notifyWait != null) {
+                        notifyWait.dismiss();
+                    }
                 }
-                NotifyCloudAwait notifyWait = new NotifyCloudAwait(context, true,
-                        750, " ... connecting to the cloud ... ",
-                        Integer.MAX_VALUE//Users should cancel them self
-                );
             };
         }
         return this;
@@ -135,4 +146,5 @@ public abstract class CloudAwaitObject {
     final static int RESEND_INTERVAL = 3000;
     final static int MAX_RESEND = 4;
 
+    private boolean silent = false;
 }
