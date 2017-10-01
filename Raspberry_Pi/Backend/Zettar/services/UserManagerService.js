@@ -1,4 +1,5 @@
 ﻿const webSockMessenger = require('../lib/webSockMessenger')
+const userManager = require('../userManager')
 const patientManager = require("../patientManager");
 var subscriberManager = require('../subscriberManager');
 
@@ -87,30 +88,18 @@ webSockMessenger.attach(serviceName, {
             }
         },
         BIND_PATIENT_AND_SUBSCRIBER: {
-            REQ_BIND: function (transmitter, msg, key, channeler) {
-                const successMsg = "Your request has been sent"
-                const newReqMsgObj = { NEW_PUBSUB_BINDING_REQ: transmitter.getUserUid() }
-                if (transmitter.getUserType() === 'patient') {
-                    patientManager.addSubscriberBindingRequest(transmitter.getUserUid(), msg, "subscriber").then(function () {
-                        channeler({ success: successMsg })
-                        webSockMessenger.transmitTo(serviceName, msg, newReqMsgObj)
-                    }).catch(function (e) {
-                        channeler({ error: e.clientSafe })
-                        if (e.systemError) {
-                            logger.error(e.systemError)
-                        }
-                    })
-                } else {
-                    patientManager.addSubscriberBindingRequest(transmitter.getUserUid(), msg, "patient").then(function () {
-                        channeler({ success: successMsg })
-                        webSockMessenger.transmitTo(key, msg, newReqMsgObj)
-                    }).catch(function (e) {
-                        channeler({ error: e.clientSafe })
-                        if (e.systemError) {
-                            logger.error( e.systemError)
-                        }
-                    })
-                }
+            REQ_BIND: function (transmitter, msg, key, channel) {
+                userManager.pubSubBindRequest(
+                    function () {
+                        channel({ success: "Your request has been sent"})
+                    },
+                    function (errMsg) {
+                        channel({ error:  errMsg.clientSafe || "Opps! Something went wrong :(" })
+                    },
+                    transmitter.getUserUid(),
+                    msg,
+                    transmitter.getUserType()
+                )
             }
         }
     }

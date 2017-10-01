@@ -302,28 +302,6 @@ var patientManager = module.exports = {
             })
         })
     },
-    addSubscriberBindingRequest: function (patientUid, subscriberUid, target) {
-        return new Promise((res, rej) => {
-            var selfTraget = target === "patient" ? "pateint" : "subscriber"
-            var subTraget = target !== "patient" ? "pateint" : "subscriber"
-            var userQuery = { Username: patientUid }
-            return patientManager.getPatient(userQuery).then(function (pat) {
-                subscriberManager.getsubscriber({ Email: subscriberUid }).then(function (sub) {
-                    pat.SubscriberBindingConfirmationMap = pat.SubscriberBindingConfirmationMap || {}//default is not working
-                    pat.SubscriberBindingConfirmationMap[subscriberUid] = JSON.stringify({ target: selfTraget, state: "pnending" })
-
-                    dbMan.models.instance.patient.update(userQuery, { SubscriberBindingConfirmationMap: pat.SubscriberBindingConfirmationMap }, null, function (err) {
-                        if (err) rej({ systemError: err, clientSafe: "We colud not send the request at this time, please try again later" })
-                        else res()
-                    });
-                }).catch(function (e) {
-                    rej({ systemError: e, clientSafe: "User " + subscriberUid + " could not be found." })
-                })
-            }).catch(function (e) {
-                rej( { systemError: e, clientSafe: "Patient " + patientUid + " could not be found." })
-            })
-        })
-    },
     /**
      * @brief bind the patients Zettalet's URI to the specific user
      **/

@@ -2,6 +2,7 @@ var util = require('util')
 var uuidv1 = require('uuid/v1')
 
 var Model = require('../lib/modelClass')
+const userManagerUtil = require('../userManagerUtil')
 
 var CryptoJS = require("crypto-js");
 const ENCRYPT_KEY = "xP{}Lk.x#3V2S?F2p'q{kqd[Qu{7/S-d*bzt"
@@ -14,14 +15,13 @@ function decrypt(value) {
 }
 
 
+
 var mailer = require('../lib/mailer')
 var keys = require('../lib/keys')
 var logger = require('../revaLog')
 
-class SubscriberModel extends Model {
-	constructor() {
-	    super()
-	    this.fields = {
+module.exports = {
+    fields: {
 	    	Email: {
 	                type: "text",
 	                rule: {
@@ -56,7 +56,7 @@ class SubscriberModel extends Model {
 	                type: "list",
 	                typeDef: "<text>"
             },
-            PublisherBindingConfirmationMap: {
+            PubSubBindingConfirmationMap: {
                 type: 'map',
                 typeDef: '<text, text>'
             },
@@ -78,32 +78,34 @@ class SubscriberModel extends Model {
                     })
                     return context
                 }
+            },
+            FlagPasswordEncrypted: {
+                type: 'boolean'
             }
 	    },
-	    this.key = ["Email"]
-		this.methods = {
+	    key: ["Email"],
+        methods: {
 		    verifyPassword: function (value) {
 		        return decrypt(this.Password) === value
-		    }
-		}
-		this.after_save = function (instance, options, next) {
-		    const dbMan = require('../databaseManager')
-		    //Encrypt password
-		    dbMan.models.instance.patient.update(
-		        { Username: instance.Email },
-		        { Password: encrypt(instance.Password) },
-		        function (err) {
-		            if (err) {
-		                console.log(err); next(err)
-		            } else { next() }
-		        });
+            },
+            addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
+            addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
+            getPassword: function () { return this.Password }//test
+        },
+        after_save: function (instance, options, next) {
+            const dbMan = require('../databaseManager')
+            //Why is express cassandra so shitty? nothing is working as expected
+            if (!instance.FlagPasswordEncrypted) {
+                dbMan.models.instance.subscriber.update(
+                    { Email: instance.Email },
+                    { Password: encrypt(instance.Password), FlagPasswordEncrypted: true },
+                    function (err) {
+                        if (err) {
+                            console.log(err); next(err)
+                        } else { next() }
+                    });
+            } else {
+                next()
+            }
 		}
 	}
-}
-var thing = new SubscriberModel()
-var obj = {}
-
-for (var k in thing) {
-    obj[k] = thing[k]
-}
-module.exports = obj

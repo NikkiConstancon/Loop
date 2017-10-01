@@ -8,6 +8,8 @@
 var util = require('util')
 var uuidv1 = require('uuid/v1')
 
+const userManagerUtil = require('../userManagerUtil')
+
 var CryptoJS = require("crypto-js");
 const ENCRYPT_KEY = "xP{}Lk.x#3V2S?F2p'q{kqd[Qu{7/S-d*bzt"
 
@@ -24,11 +26,9 @@ var keys = require('../lib/keys')
 var logger = require('../revaLog')
 
 var Model = require('../lib/modelClass')
-class PatientModel extends Model {
-    constructor() {
-        super()
+module.exports = {
 //-------------------------------begin fields---------------------------------//
-        this.fields = {
+        fields: {
             Username: 'text',
             Password: {
                 type: "text",
@@ -95,7 +95,7 @@ class PatientModel extends Model {
                     message: 'Reason is not included in the set of reasons.'
                 }
             },
-            SubscriberBindingConfirmationMap: {
+            PubSubBindingConfirmationMap: {
                 type: 'map',
                 typeDef: '<text, text>'
             },
@@ -122,11 +122,14 @@ class PatientModel extends Model {
                 type: 'map',
                 typeDef: '<text, boolean>',
                 default: function () { return {} }
+            },
+            FlagPasswordEncrypted: {
+                type: 'boolean'
             }
-        }
+        },
 //-------------------------------End fields---------------------------------//
-        this.key = ["Username"]
-        this.methods = {
+        key : ["Username"],
+        methods: {
             verifyPassword: function (value) {
                 return decrypt(this.Password) === value
             },
@@ -159,22 +162,34 @@ class PatientModel extends Model {
                     ret.push(this.SubscriberList[i])
                 }
                 return ret
-            }
-        }
-        this.after_save = function (instance, options, next) {
+            },
+            addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
+            addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget
+        },
+        before_save: function (instance, options, next) {
+            //instance.Password = encrypt(instance.Password)
+            next()
+        },
+        after_save: function (instance, options, next) {
             const dbMan = require('../databaseManager')
             //Encrypt password
-            dbMan.models.instance.patient.update(
-                { Username: instance.Username },
-                { Password: encrypt(instance.Password) },
-                function (err) {
-                    if (err) {
-                        console.log(err); next(err)
-                    } else { next() }
-                });
+            //Why is express cassandra so shitty? nothing is working as expected
+            if (!instance.FlagPasswordEncrypted) {
+                dbMan.models.instance.patient.update(
+                    { Username: instance.Username },
+                    { Password: encrypt(instance.Password), FlagPasswordEncrypted: true },
+                    function (err) {
+                        if (err) {
+                            console.log(err); next(err)
+                        } else { next() }
+                    });
+            } else {
+                next()
+            }
+
         }
     }
-}
+/*
 var thing = new PatientModel()
 var obj = {}
 
@@ -183,7 +198,7 @@ for (var k in thing) {
 }
 module.exports = obj
 module.exports.class = PatientModel
-
+*/
 
 var dbMan;
 setTimeout(function () { dbMan = require('../databaseManager') }, 0)
