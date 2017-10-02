@@ -34,10 +34,14 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
         },
         GRAPH_POINTS: {
             GRAPH_INFO: function (transmitter, msg, key, channel) {
+                console.log("Stats Request sent")
+                var obj = {Username: msg.Username, DeviceId: msg.DeviceId, StartTime: msg.StartTime, EndTime: msg.EndTime}
+                console.log(obj);
                 dataManager.getGraphPoints({Username: msg.Username, DeviceId: msg.DeviceId, StartTime: msg.StartTime, EndTime: msg.EndTime}).then(function(result){
+                    console.log(result)
                     channel(result)
                 }).catch(function () {
-                    logger.error('@webSockMessenger$UserManager#receiver:KEY_REGISTER_USER', e)
+                    logger.error('GraphRetievalError', e)
                 })  
             }
         }
