@@ -99,15 +99,19 @@ public class MainActivity extends AppCompatActivity {
         signOutItem.withTag(R.string.drawerNameSignOut);
 
 
+        Object newTag;
 
         PrimaryDrawerItem tmpItem = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
         tmpItem.withTag(123);
         if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
             tmpItem.withName("Patient TMP");
+            newTag = R.string.drawerNameAddSub;
         }else{
             tmpItem.withName("Subscriber TMP");
+            newTag = R.string.drawerNameAddUser;
         }
 
+        SecondaryDrawerItem adder = new SecondaryDrawerItem().withName(newTag.toString()).withTag(newTag.toString());
 
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -132,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                         signOutItem,
                         tmpItem,
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName(R.string.drawerNameAdd).withTag(R.string.drawerNameAdd),
+                        adder,
                         new SecondaryDrawerItem().withName(R.string.drawerNameSettings).withTag(R.string.drawerNameSettings)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
