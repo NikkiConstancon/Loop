@@ -99,19 +99,17 @@ public class MainActivity extends AppCompatActivity {
         signOutItem.withTag(R.string.drawerNameSignOut);
 
 
-        Object newTag;
+        PrimaryDrawerItem adder;
 
         PrimaryDrawerItem tmpItem = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
         tmpItem.withTag(123);
         if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
             tmpItem.withName("Patient TMP");
-            newTag = R.string.drawerNameAddSub;
+             adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddSub).withTag(R.string.drawerNameAddSub);
         }else{
             tmpItem.withName("Subscriber TMP");
-            newTag = R.string.drawerNameAddUser;
+            adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddUser).withTag(R.string.drawerNameAddUser);
         }
-
-        SecondaryDrawerItem adder = new SecondaryDrawerItem().withName(newTag.toString()).withTag(newTag.toString());
 
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -133,11 +131,9 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .addDrawerItems(
-                        signOutItem,
-                        tmpItem,
-                        new DividerDrawerItem(),
                         adder,
-                        new SecondaryDrawerItem().withName(R.string.drawerNameSettings).withTag(R.string.drawerNameSettings)
+                        new DividerDrawerItem(),
+                        signOutItem
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -152,7 +148,10 @@ public class MainActivity extends AppCompatActivity {
                                 case R.string.drawerNameSignOut:{
                                     userManagerEndpoint.triggerLoginIntent();
                                 }break;
-                                case R.string.drawerNameAdd:{
+                                case R.string.drawerNameAddUser:{
+                                    Toast.makeText(cont,drawerItem.getTag().toString(),Toast.LENGTH_SHORT).show();
+                                }break;
+                                case R.string.drawerNameAddSub:{
                                     Toast.makeText(cont,drawerItem.getTag().toString(),Toast.LENGTH_SHORT).show();
                                 }break;
                                 case R.string.drawerNameSettings: {

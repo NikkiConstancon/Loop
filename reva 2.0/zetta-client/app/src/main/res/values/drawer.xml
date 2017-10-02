@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="drawerNameSignOut">Sign out</string>
-<<<<<<< HEAD
     <string name="drawerNameAddSub">Add Subscriber</string>
     <string name="drawerNameAddUser">Add User</string>
-=======
-    <string name="addSubscriber">Add subscriber</string>
-    <string name="drawerNameAdd">Add Subscriber</string>
->>>>>>> 25a9ff2bb77eb8d94bf2178d83920032f9431ede
     <string name="drawerNameSettings">Settings</string>
 
 </resources>
