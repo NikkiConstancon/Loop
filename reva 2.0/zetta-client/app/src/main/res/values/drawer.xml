@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="drawerNameSignOut">Sign out</string>
+    <string name="drawerNameAdd">Add Subscriber</string>
+    <string name="drawerNameSettings">Settings</string>
 </resources>
