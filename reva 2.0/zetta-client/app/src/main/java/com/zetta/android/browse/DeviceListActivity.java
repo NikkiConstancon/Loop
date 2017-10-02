@@ -56,6 +56,11 @@ public class DeviceListActivity extends Fragment {
     private BottomSheetBehavior<? extends View> bottomSheetBehavior;
     private QuickActionsAdapter quickActionsAdapter;
     private static SdkProperties sdkProperties;
+    private String user;
+
+    public void setUser(String usr) {
+        user = usr;
+    }
 
     @Nullable
     @Override
@@ -64,13 +69,12 @@ public class DeviceListActivity extends Fragment {
         super.onCreate(savedInstanceState);
         sdkProperties = SdkProperties.newInstance(getActivity());
 
-        MainActivity activity = (MainActivity) getActivity();
-        String myDataFromActivity = activity.getUser();
+        String myDataFromActivity = user;
 
         String serverURI = getString(R.string.serverURL) + ":3009";
         sdkProperties.setUrl(serverURI);
         Log.d("data", myDataFromActivity);
-        DeviceListSdkService sdkService = new DeviceListSdkService(myDataFromActivity); // this is a hotfix
+        DeviceListSdkService sdkService = new DeviceListSdkService(myDataFromActivity);
 
 
 
@@ -142,7 +146,6 @@ public class DeviceListActivity extends Fragment {
         }
         @Override public String toString(){
             return "{Name: " + name + ", deviceInfoMap: " + deviceInfoMap.toString() + "}";
-
         }
     }
     static class RealTimeMeta{

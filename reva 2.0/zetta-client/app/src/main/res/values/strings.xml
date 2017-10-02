@@ -23,7 +23,7 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="webSocketServerPort">8080</string>
-    <string name="serverURL">192.168.8.102</string>
+    <string name="serverURL">192.168.8.100</string>
     <!--string name="serverURL">192.168.1.101</string-->
     <string name="vitals_prompt">Choose a vital to view</string>
     <string name="simp_stat_prompt">Choose a statistic to view</string>
