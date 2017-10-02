@@ -11,7 +11,7 @@ var UserManager = module.exports = {
         this.PubSubBindingConfirmationMap = map
         this.save(function (err) {
             if (err) failCb && failCb({systemError: err });
-            else passCb && passCb()
+            else passCb && passCb(info)
         });
     },
     addPubSubRequestAsTarget: function (userUid, passCb, failCb) {
@@ -24,7 +24,7 @@ var UserManager = module.exports = {
         this.PubSubBindingConfirmationMap = map
         this.save(function (err) {
             if (err) failCb && failCb({systemError: err })
-            else passCb && passCb()
+            else passCb && passCb(info)
         });
     }
 }

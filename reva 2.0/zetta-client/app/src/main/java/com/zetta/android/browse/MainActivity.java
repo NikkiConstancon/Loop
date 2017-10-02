@@ -36,6 +36,8 @@ import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
+import java.util.Map;
+
 import static com.github.mikephil.charting.charts.Chart.LOG_TAG;
 
 public class MainActivity extends AppCompatActivity {
@@ -260,6 +262,17 @@ public class MainActivity extends AppCompatActivity {
             new UserManager.MainActivityEndpoint.PubSubWorker(){
                 @Override public void work(String msg){
                     Log.d("------TEST---------", msg);
+                }
+            },
+            new UserManager.MainActivityEndpoint.PubSubInfoWorker(){
+                @Override public void onConnect(Map<String, UserManager.MainActivityEndpoint.pubSubReqInfo> infoMap){
+                    for(Map.Entry<String, UserManager.MainActivityEndpoint.pubSubReqInfo> entry : infoMap.entrySet()){
+                        UserManager.MainActivityEndpoint.pubSubReqInfo info =  entry.getValue();
+                        Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
+                    }
+                }
+                @Override public void newReq(UserManager.MainActivityEndpoint.pubSubReqInfo info){
+                    Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                 }
             }
     );
