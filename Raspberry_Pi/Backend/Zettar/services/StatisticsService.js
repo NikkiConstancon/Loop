@@ -1,7 +1,8 @@
 ﻿const webSockMessenger = require('../lib/webSockMessenger')
 const patientManager = require("../patientManager");
-var subscriberManager = require('../subscriberManager');
 
+const subscriberManager = require('../subscriberManager');
+const dataManager = require('../patientDataManager');
 const logger = require('../revaLog')
 
 const serviceName = 'Stats'
@@ -33,7 +34,16 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
         },
         GRAPH_POINTS: {
             RAW: function (transmitter, msg, key, channel) {
-                channel({ PASS: "a" })
+                // console.log("Stats Request sent" + msg.nameValuePairs.Username)
+                var tmp = msg.nameValuePairs
+                var obj = {Username: tmp.Username, DeviceId: tmp.DeviceId, StartTime: tmp.StartTime, EndTime: tmp.EndTime}
+                console.log(obj);
+                dataManager.getGraphPoints({Username: msg.Username, DeviceId: msg.DeviceId, StartTime: msg.StartTime, EndTime: msg.EndTime}).then(function(result){
+                    console.log(result)
+                    channel(result)
+                }).catch(function () {
+                    logger.error('GraphRetievalError', e)
+                })  
             }
         }
     }

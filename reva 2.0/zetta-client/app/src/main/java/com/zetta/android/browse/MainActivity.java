@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String m_Text = "";
 
+    private DeviceListActivity dList = new DeviceListActivity();
 
     private String zettaUser;
 
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPageAdapter);
+        dList.setUser(getUser());
         setupViewPager(mViewPager);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -131,6 +133,8 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem tmpItemForNikki = new PrimaryDrawerItem().withIdentifier(1).withName("For Nikki");
         tmpItemForNikki.withTag(1234);
 
+        PrimaryDrawerItem greg = new PrimaryDrawerItem().withIdentifier(1).withName("greg").withTag(60);
+
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
@@ -151,7 +155,9 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .addDrawerItems(
+                        greg,
                         adder,
+
                         new DividerDrawerItem(),
                         signOutItem,
                         tmpItemForNikki
@@ -167,6 +173,10 @@ public class MainActivity extends AppCompatActivity {
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
                             switch(value){
+                                case 60: {
+                                    dList.setUser("greg");
+                                    setupViewPager(mViewPager);
+                                }break;
                                 case R.string.drawerNameSignOut:{
                                     userManagerEndpoint.triggerLoginIntent();
                                 }break;
@@ -275,11 +285,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(new DeviceListActivity(), "Vitals");
+
+        adapter.addFragment(dList, "Vitals");
         adapter.addFragment(new StatFragment(), "Stats");
         adapter.addFragment(new notifications(), "Alerts");
         viewPager.setAdapter(adapter);
     }
+
     UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(
             this,
             new UserManager.MainActivityEndpoint.PubSubWorker(){
