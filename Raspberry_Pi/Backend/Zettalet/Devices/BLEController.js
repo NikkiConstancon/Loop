@@ -1,0 +1,51 @@
+var SerialPort = require('serialport');
+const Readline = SerialPort.parsers.Readline;
+const parser = new Readline();
+const portName = '/dev/rfcomm0';
+
+var BLEController = module.exports = function() 
+{
+	
+	this.data = 0;
+	
+	this.toMonitor = 0;
+	this.devices = [];
+	this.port = new SerialPort(portName, {
+		baudRate: 115200});
+	this.port.pipe(parser);
+console.log("in controller constructor");
+	
+	
+}
+
+BLEController.prototype.addDevice = function(newDevice)
+{
+	this.devices.push(newDevice);
+}
+
+BLEController.prototype.onChange = function(cb)
+{
+	
+	var self = this;
+	
+	console.log("\tin onChange: " + self.data);
+	parser.on('data', function (data) {
+		console.log('\tgot something:', data);
+		if (data.length > 5)
+		{
+			self.toMonitor = data.substr(0, 5);
+			console.log('\tTo Monitor:', self.toMonitor);
+			self.data = parseFloat(data.substr(5));
+			console.log("Data recieved: " + parseFloat(data.substr(5)));
+			for (var i = 0; i < self.devices.length; i++) {
+				self.devices[i].setVitals(self.toMonitor, self.data);
+			};
+			//self.devices[0].setVitals(self.toMonitor, self.data);
+			console.log("device data changed to: " + self.devices[0].vitals);
+		}
+		cb();
+	});	
+}
+
+
+
