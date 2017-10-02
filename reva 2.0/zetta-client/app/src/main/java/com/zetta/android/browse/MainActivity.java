@@ -206,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();
                 userManagerEndpoint.pubSubBindingRequest(m_Text);
+
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
