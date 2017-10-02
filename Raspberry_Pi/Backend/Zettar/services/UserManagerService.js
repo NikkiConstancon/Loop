@@ -92,10 +92,10 @@ webSockMessenger.attach(serviceName, {
             REQ_BIND: function (transmitter, msg, key, channel) {
                 userManager.pubSubBindRequest(
                     function () {
-                        channel({ success: "Your request has been sent"})
+                        channel("")
                     },
                     function (errMsg) {
-                        channel({ error:  errMsg.clientSafe || "Opps! Something went wrong :(" })
+                        channel(errMsg.clientSafe || "Opps! Something went wrong :(" )
                     },
                     transmitter.getUserUid(),
                     msg,
