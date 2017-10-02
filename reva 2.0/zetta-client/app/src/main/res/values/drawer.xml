@@ -2,7 +2,7 @@
 <resources>
     <string name="drawerNameSignOut">Sign out</string>
     <string name="drawerNameAddSub">Add Subscriber</string>
-    <string name="drawerNameAddUser">Add User</string>
+    <string name="drawerNameAddPatient">Add Patient</string>
     <string name="drawerNameSettings">Settings</string>
 
 </resources>

@@ -113,13 +113,12 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem adder;
 
         PrimaryDrawerItem tmpItem = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
-        tmpItem.withTag(123);
         if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
-            tmpItem.withName("Patient TMP");
+            tmpItem.withName("Add Patient");
              adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddSub).withTag(R.string.drawerNameAddSub);
         }else{
             tmpItem.withName("Subscriber TMP");
-            adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddUser).withTag(R.string.drawerNameAddUser);
+            adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
         }
 
         AccountHeader headerResult = new AccountHeaderBuilder()
@@ -159,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                                 case R.string.drawerNameSignOut:{
                                     userManagerEndpoint.triggerLoginIntent();
                                 }break;
-                                case R.string.drawerNameAddUser:{
+                                case R.string.drawerNameAddPatient:{
                                     addAlert();
                                 }break;
                                 case R.string.drawerNameAddSub:{
@@ -201,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setView(input);
 
         // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(Html.fromHtml("<font color='black'>OK</font>"), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();
