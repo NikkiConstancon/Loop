@@ -1,5 +1,6 @@
 package com.zetta.android.browse;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,7 +32,9 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zetta.android.R;
 import com.zetta.android.lib.Interval;
 import com.zetta.android.revaServices.UserManager;
+import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
+import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
 import static com.github.mikephil.charting.charts.Chart.LOG_TAG;
 
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
         userManagerEndpoint.bind(this);
+        statTmpForNikkiEndpoint.bind(this);
 
         userManagerEndpoint.hardGuardActivityByVerifiedUser(workOnUser);
     }
@@ -73,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         userManagerEndpoint.unbind(this);
+        statTmpForNikkiEndpoint.unbind(this);
     }
 
     @Override
@@ -118,6 +123,10 @@ public class MainActivity extends AppCompatActivity {
             adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
         }
 
+
+        PrimaryDrawerItem tmpItemForNikki = new PrimaryDrawerItem().withIdentifier(1).withName("For Nikki");
+        tmpItemForNikki.withTag(1234);
+
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
@@ -137,6 +146,13 @@ public class MainActivity extends AppCompatActivity {
         Drawer result = new DrawerBuilder().withAccountHeader(headerResult)
                 .withActivity(this)
                 .withToolbar(toolbar)
+                .addDrawerItems(
+                        adder,
+                        new DividerDrawerItem(),
+                        signOutItem,
+                        tmpItemForNikki
+                )
+
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -162,6 +178,12 @@ public class MainActivity extends AppCompatActivity {
                                 case 123:{
                                     userManagerEndpoint.pubSubBindingRequest("what@sub.com");
                                 }break;
+                                case 1234:{
+                                    statTmpForNikkiEndpoint.attachCloudAwaitObject(
+                                            null,
+                                            statTmpForNikki
+                                    ).send(MainActivity.this, "RAW", "THE MSG");
+                                }break;
                             }
                         }
 
@@ -169,13 +191,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .build();
-        if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT) {
-            Log.d("PATIENT", "PATIENCE");
-            result.addItems(adder,patient, new DividerDrawerItem(), signOutItem);
-        } else {
-            Log.d("NOTPATI", "PATIENCE");
-            result.addItems(adder, new DividerDrawerItem(), signOutItem);
-        }
 
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -280,4 +295,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
     );
+
+
+
+
+
+    StatTmpForNikkiEndpoint statTmpForNikkiEndpoint = new StatTmpForNikkiEndpoint();
+    public static class StatTmpForNikkiEndpoint extends RevaWebsocketEndpoint {
+        @Override
+        public String key() {
+            return "Stats";
+        }
+    }
+    public CloudAwaitObject statTmpForNikki = new CloudAwaitObject("GRAPH_POINTS") {
+        @Override
+        public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
+            return null;
+        }
+    };
 }

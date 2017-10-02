@@ -12,11 +12,13 @@ webSockMessenger.attach(serviceName, {
         transmitter.transmit({ userType: transmitter.getUserType() })
         if (transmitter.getUserType() === 'patient') {
             patientManager.getPatient({ Username: transmitter.getUserUid() }).then(function (pat) {
-                transmitter.transmit({ BINDING_CONFIRMATION_REQ_MAP: pat.SubscriberBindingConfirmationMap })
+                for (var user in pat.PubSubBindingConfirmationMap) {
+                    transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse( pat.PubSubBindingConfirmationMap[user]) } })
+                }
             });
         } else {
             subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (pat) {
-                transmitter.transmit({ BINDING_CONFIRMATION_REQ_MAP: pat.publisherBindingConfirmationMap })
+                transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(pat.PubSubBindingConfirmationMap[user]) } })
             });
         }
     },
