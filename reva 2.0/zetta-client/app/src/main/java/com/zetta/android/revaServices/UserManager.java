@@ -43,6 +43,7 @@ public class UserManager extends RevaService {
     }
 
 
+
     public static class MainActivityEndpoint extends RevaWebsocketEndpoint {
         public RevaWebSocketService.USER_TYPE getUserType(){
             return webService.getUserType();
@@ -54,8 +55,9 @@ public class UserManager extends RevaService {
         public String key() {
             return "UserManager";
         }
-        public MainActivityEndpoint(Activity activity_){
+        public MainActivityEndpoint(Activity activity_, PubSubWorker pubSubWorker_){
             activity = activity_;
+            pubSubWorker = pubSubWorker_;
         }
 
         Interval validateUserUidInterval;
@@ -131,9 +133,14 @@ public class UserManager extends RevaService {
         CloudAwaitObject pubSubCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
             @Override
             public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
+                pubSubWorker.work((String)obj);
                 return null;
             }
         };
+        public static abstract class PubSubWorker{
+            abstract public void work(String msg);
+        }
+        final PubSubWorker pubSubWorker;
     }
 
 

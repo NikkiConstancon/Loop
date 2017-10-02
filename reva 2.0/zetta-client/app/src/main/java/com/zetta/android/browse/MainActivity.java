@@ -240,5 +240,12 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new notifications(), "Alerts");
         viewPager.setAdapter(adapter);
     }
-    UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(this);
+    UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(
+            this,
+            new UserManager.MainActivityEndpoint.PubSubWorker(){
+                @Override public void work(String msg){
+                    Log.d("------TEST---------", msg);
+                }
+            }
+    );
 }
