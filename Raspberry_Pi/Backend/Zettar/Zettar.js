@@ -23,7 +23,7 @@ var dbManager1 = require("./userManager");
 var patientManager = require("./patientManager");
 var patientDataManager = require("./patientDataManager");
 
-const realtimeDataService = require('./Services/realtimeDataService')
+const realtimeDataService = require('./services/RealtimeDataService')
 
 
 //init zetta as usual, but dont call link yet
