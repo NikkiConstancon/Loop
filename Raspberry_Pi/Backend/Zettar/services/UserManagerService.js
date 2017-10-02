@@ -9,16 +9,19 @@ const serviceName = 'UserManager'
 
 webSockMessenger.attach(serviceName, {
     connect: function (transmitter) {
-        transmitter.transmit({ userType: transmitter.getUserType() })
         if (transmitter.getUserType() === 'patient') {
             patientManager.getPatient({ Username: transmitter.getUserUid() }).then(function (pat) {
                 for (var user in pat.PubSubBindingConfirmationMap) {
                     transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse( pat.PubSubBindingConfirmationMap[user]) } })
                 }
+                transmitter.transmit({ PATIENT_LIST: pat.PatientList })
             });
         } else {
-            subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (pat) {
-                transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(pat.PubSubBindingConfirmationMap[user]) } })
+            subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (sub) {
+                for (var user in sub.PubSubBindingConfirmationMap) {
+                    transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(sub.PubSubBindingConfirmationMap[user]) } })
+                }
+                transmitter.transmit({ PATIENT_LIST: sub.PatientList })
             });
         }
     },

@@ -150,6 +150,7 @@ public class UserManager extends RevaService {
             }
         }
 
+        List<String> patientList = new ArrayList<>();
         Map<String, pubSubReqInfo> pubSubInfoMap = new TreeMap<>();
 
         public ArrayList<String> getPubSubList(){
@@ -187,6 +188,10 @@ public class UserManager extends RevaService {
                         pubSubInfoMap.put(entryInfo.get("userUid"),info);
                         pubSubInfoWorker.newReq(info);
                     }break;
+                    case "PATIENT_LIST":{
+                        patientList = (ArrayList<String>)entry.getValue();
+                        pubSubInfoWorker.onPatientList(patientList);
+                    }break;
                 }
             }
         }
@@ -211,6 +216,7 @@ public class UserManager extends RevaService {
         public static abstract class PubSubInfoWorker{
             abstract public void onConnect(Map<String, pubSubReqInfo> infoMap);
             abstract public void newReq(pubSubReqInfo info);
+            abstract public void onPatientList(List<String> patientList);
         }
         final PubSubInfoWorker pubSubInfoWorker;
     }

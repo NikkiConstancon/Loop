@@ -36,6 +36,8 @@ import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.mikephil.charting.charts.Chart.LOG_TAG;
@@ -305,6 +307,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 @Override public void newReq(UserManager.MainActivityEndpoint.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
+                }
+                @Override public void onPatientList(List<String> patientList){
+                    Log.d("----sub-list---", patientList.toString());
                 }
             }
     );
