@@ -89,16 +89,16 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        PrimaryDrawerItem signOutItem = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut);
-        signOutItem.withTag(R.string.drawerNameSignOut);
+        PrimaryDrawerItem signOutItem = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.DrawerNameSignOut);
+        signOutItem.withTag(R.string.DrawerNameSignOut);
 
 
         PrimaryDrawerItem tmpItem = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
         tmpItem.withTag(123);
         if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
-            tmpItem.withName("Add subscriber");
+            tmpItem.withName("Patient TMP");
         }else{
-            tmpItem.withName("Add patient");
+            tmpItem.withName("Subscriber TMP");
         }
 
 
@@ -121,10 +121,10 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .addDrawerItems(
+                        signOutItem,
                         tmpItem,
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Settings"),
-                        signOutItem
+                        new SecondaryDrawerItem().withName("Settings")
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
                             switch(value){
-                                case R.string.drawerNameSignOut:{
+                                case R.string.DrawerNameSignOut:{
                                     userManagerEndpoint.triggerLoginIntent();
                                 }break;
                                 case 123:{
