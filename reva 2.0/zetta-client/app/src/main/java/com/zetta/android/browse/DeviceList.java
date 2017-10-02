@@ -115,7 +115,7 @@ class DeviceList {
         @NonNull
         public DeviceListItem createDeviceListItem(@NonNull ZIKServer server, @NonNull ZIKDevice device) {
             ZettaStyle style = zettaStyleParser.parseStyle(server, device);
-            String state = "NS";
+            String state = "-";
 
             Map<String, Object> properties = device.getProperties();
             String val = String.valueOf(properties.get("units"));
