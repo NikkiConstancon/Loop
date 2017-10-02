@@ -61,26 +61,30 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
-
-            <TextView
-                android:gravity="right"
-                android:textSize="28dp"
-                android:textColor="@color/colorPrimaryText"
-                android:id="@+id/stat_simple"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="35.23" />
+                android:layout_height="wrap_content">
+                <TextView
+                    android:gravity="right"
+                    android:textSize="24sp"
+                    android:textColor="@color/colorPrimaryText"
+                    android:id="@+id/stat_simple"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="35.23" />
 
-            <TextView
-                android:layout_gravity="bottom"
-                android:layout_marginLeft="5dp"
-                android:layout_marginBottom="8dp"
-                android:textSize="16dp"
-                android:id="@+id/units_simple_stat"
-                android:textColor="@color/colorSecondaryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="BPM"/>
+                <TextView
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginBottom="1dp"
+                    android:textSize="14sp"
+                    android:id="@+id/units_simple_stat"
+                    android:textColor="@color/colorSecondaryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="BPM"/>
+            </LinearLayout>
+
 
         </LinearLayout>
 
