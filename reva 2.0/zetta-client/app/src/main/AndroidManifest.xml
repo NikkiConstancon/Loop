@@ -13,6 +13,7 @@
         android:supportsRtl="false"
         android:theme="@style/AppThemeLight">
         <activity
+            android:theme="@style/Form"
             android:name=".browse.login_activity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
@@ -25,9 +26,7 @@
         <activity
             android:name=".browse.MainActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
-
-            android:theme="@style/Form">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
