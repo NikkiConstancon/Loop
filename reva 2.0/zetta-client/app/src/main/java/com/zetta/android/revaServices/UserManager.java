@@ -111,16 +111,35 @@ public class UserManager extends RevaService {
             attachCloudAwaitObject(null,pubSubCAO).send(activity, "REQ_BIND", target);
         }
 
+        static public class pubSubReqInfo{
+            public enum TYPE {REQUESTER, TARGET};
+            public enum STATE {PENDING, DELIVERED, ACCEPTED};
+            public final String userUid;
+            public final TYPE type;
+            public final STATE state;
 
+            public pubSubReqInfo(
+                    String userUid_,
+                    final TYPE type_,
+                    final STATE state_
+            ){
+                userUid = userUid_;
+                type = type_;
+                state = state_;
+            }
+        }
+
+        Map<String, pubSubReqInfo> pubSubInfoMap = new TreeMap<>();
 
         final Activity activity;
         @Override
         public void onMessage(LinkedTreeMap obj){
-            Map<String, Object> gotMap = obj;
-            for(Map.Entry<String, Object> entry : gotMap.entrySet()){
+            Map<String, Object> gotMapKeys = obj;
+            for(Map.Entry<String, Object> entry : gotMapKeys.entrySet()){
                 switch (entry.getKey()){
-                    case "BINDING_CONFIRMATION_REQ_MAP":{
-
+                    case "BINDING_CONFIRMATION_REQ":{
+                        Map<String, Map<String, String>> gotMap = (Map<String, Map<String, String>>)entry.getValue();
+                        Log.d("-----TEST------", obj.toString());
                     }break;
                 }
             }
