@@ -33,9 +33,10 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
             }
         },
         GRAPH_POINTS: {
-            GRAPH_INFO: function (transmitter, msg, key, channel) {
-                console.log("Stats Request sent")
-                var obj = {Username: msg.Username, DeviceId: msg.DeviceId, StartTime: msg.StartTime, EndTime: msg.EndTime}
+            RAW: function (transmitter, msg, key, channel) {
+                // console.log("Stats Request sent" + msg.nameValuePairs.Username)
+                var tmp = msg.nameValuePairs
+                var obj = {Username: tmp.Username, DeviceId: tmp.DeviceId, StartTime: tmp.StartTime, EndTime: tmp.EndTime}
                 console.log(obj);
                 dataManager.getGraphPoints({Username: msg.Username, DeviceId: msg.DeviceId, StartTime: msg.StartTime, EndTime: msg.EndTime}).then(function(result){
                     console.log(result)
