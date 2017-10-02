@@ -21,6 +21,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zetta.android.R;
 import com.zetta.android.lib.Interval;
 import com.zetta.android.revaServices.UserManager;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -94,6 +95,11 @@ public class MainActivity extends AppCompatActivity {
 
         PrimaryDrawerItem tmpItem = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
         tmpItem.withTag(123);
+        if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
+            tmpItem.withName("Patient TMP");
+        }else{
+            tmpItem.withName("Subscriber TMP");
+        }
 
 
         AccountHeader headerResult = new AccountHeaderBuilder()

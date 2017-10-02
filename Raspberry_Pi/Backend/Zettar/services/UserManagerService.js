@@ -9,6 +9,7 @@ const serviceName = 'UserManager'
 
 webSockMessenger.attach(serviceName, {
     connect: function (transmitter) {
+        transmitter.transmit({ userType: transmitter.getUserType() })
         if (transmitter.getUserType() === 'patient') {
             patientManager.getPatient({ Username: transmitter.getUserUid() }).then(function (pat) {
                 transmitter.transmit({ BINDING_CONFIRMATION_REQ_MAP: pat.SubscriberBindingConfirmationMap })
