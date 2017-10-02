@@ -26,12 +26,12 @@ var UserManager = module.exports = {
         if (reqType === 'patient') {//this shoud not be manage externally, but what can you do???
             patientManager.getPatient({ Username: requester }).then(function (requester) {
                 patientManager.getPatient({ Username: target }).then(function (target) {
-                    requester.addPubSubRequestAsRequester(target.Username, passCb, failCb)
-                    target.addPubSubRequestAsTarget(requester.Username)
+                    requester.addPubSubRequestAsRequester(target.Username)
+                    target.addPubSubRequestAsTarget(requester.Username, passCb, failCb)
                 }).catch(function (e) {
                     subscriberManager.getsubscriber({ Email: target }).then(function (target) {
-                        requester.addPubSubRequestAsRequester(target.Email, passCb, failCb)
-                        target.addPubSubRequestAsTarget(requester.Username)
+                        requester.addPubSubRequestAsRequester(target.Email)
+                        target.addPubSubRequestAsTarget(requester.Username, passCb, failCb)
                     }).catch(function (e) {
                         failCb({ clientSafe: "No such account" })
                     })
@@ -47,8 +47,8 @@ var UserManager = module.exports = {
         } else {
             subscriberManager.getsubscriber({ Email: requester }).then(function (requester) {
                 patientManager.getPatient({ Username: target }).then(function (target) {
-                    requester.addPubSubRequestAsRequester(target.Username, passCb, failCb)
-                    target.addPubSubRequestAsTarget(requester.Email)
+                    requester.addPubSubRequestAsRequester(target.Username)
+                    target.addPubSubRequestAsTarget(requester.Email, passCb, failCb)
                 }).catch(function () {
                     failCb({ clientSafe: "You cannot subscribe to this user" })
                 })
