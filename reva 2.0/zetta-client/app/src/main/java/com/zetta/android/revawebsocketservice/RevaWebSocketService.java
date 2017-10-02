@@ -61,7 +61,9 @@ import javax.net.ssl.X509TrustManager;
 
 public class RevaWebSocketService extends Service {
     // ------------------------------ BEGIN PUBLICS -------------------------------------------
-    public static final String SERVICE_USER_MANAGER_NAME = "UserManager";
+    public USER_TYPE getUserType() {
+        return userType;
+    }
 
     public synchronized boolean setLogin(String authId, String password) {
         if (isConnected()) {
@@ -129,6 +131,7 @@ public class RevaWebSocketService extends Service {
         public synchronized void send(Object obj) {
             addToMessagePool(key, obj);
         }
+
         private String key;
 
         private Publisher(String key_) {
@@ -226,6 +229,11 @@ public class RevaWebSocketService extends Service {
     static Publisher rccPublisher = null;
     RCCEndpoint rccEndpoint = new RCCEndpoint();
 
+    public enum USER_TYPE {PATIENT, SUBSCRIBER}
+
+    ;
+    USER_TYPE userType;
+
     class RCCEndpoint extends RevaWebsocketEndpoint {
         private final String TAG = this.getClass().getName();
 
@@ -247,13 +255,19 @@ public class RevaWebSocketService extends Service {
                 }
                 JsonElement connectedJson = jsonObject.get("CONNECTED");
                 if (connectedJson != null) {
-                    String userUid = (String) connectedJson.getAsJsonObject().get("USER_UID").getAsString();
+                    String userUid = connectedJson.getAsJsonObject().get("USER_UID").getAsString();
                     if (userUid != null) {
                         if (userUid.compareTo(SPECIAL_USER_ANONYMOUS) == 0) {
                             prefs.edit().putString(SHARED_PREF_KEY_AUTH_VALID, "false").commit();
                             commitCredentials(userUid, "");
                         } else {
                             prefs.edit().putString(SHARED_PREF_KEY_AUTH_VALID, "true").commit();
+                            String test = connectedJson.getAsJsonObject().get("USER_TYPE").getAsString();
+                            if (connectedJson.getAsJsonObject().get("USER_TYPE").getAsString().compareTo("patient") == 0) {
+                                userType = USER_TYPE.PATIENT;
+                            } else {
+                                userType = USER_TYPE.SUBSCRIBER;
+                            }
                         }
                     }
                 }
@@ -596,7 +610,7 @@ public class RevaWebSocketService extends Service {
                 long delta = Math.abs(connectThrashingGuardLastOpen - (new Date()).getTime());
                 delta = (delta / 100) + 1;
                 double threshhold = 40000;
-                double expRatio = 0.95 * Math.abs((threshhold) / (threshhold + delta * 0.2 * threshhold) );
+                double expRatio = 0.95 * Math.abs((threshhold) / (threshhold + delta * 0.2 * threshhold));
                 connectThrashingGuardLastDelay = (long) (expRatio * connectThrashingGuardLastDelay)
                         + (long) ((1 - expRatio) * (threshhold / delta));
                 try {

@@ -37,11 +37,12 @@ var patientDataManager = module.exports = {
                     if (err) {
                         logger.error(err)
                         reject(err)
+                    } else {
+                        //Note that returned variable john here is an instance of your model,
+                        //so you can also do john.delete(), john.save() type operations on the instance.
+                        logger.debug('Found Instance: ' + found.name)
+                        resolve(found)
                     }
-                    //Note that returned variable john here is an instance of your model,
-                    //so you can also do john.delete(), john.save() type operations on the instance.
-                    logger.debug('Found Instance: ' + found.name)
-                    resolve(found)
                 })
             }).catch((err) => {
                 reject(err)

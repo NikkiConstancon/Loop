@@ -196,44 +196,46 @@ var subscriberManager = module.exports = {
 
                 //Find 
                 dbMan.models.instance.subscriber.findOne({ Email: _subscriber.Email }, function (err, found) {
-                    if (err) {
+                    if (err || !found) {
                         logger.error(err)
                         reject(err)
-                    }
-                    //now update
-                    logger.debug('Found subscriber: ' + found.PatientList)
-                    
-                    //is that subscriber already on the list?
-                    var updateValue;
-                    if (found.PatientList == null) {
-                        updateValue = [_newPatient]
                     } else {
-                        updateValue = found.PatientList
-                        if (updateValue.indexOf(_newPatient) > -1) {
-                            //already on list
-                            reject(null);
-                            return null;
+                    //now update
+                        logger.debug('Found subscriber: ' + found.PatientList)
+                        
+                        //is that subscriber already on the list?
+                        var updateValue;
+                        if (found.PatientList == null) {
+                            updateValue = [_newPatient]
+                        } else {
+                            updateValue = found.PatientList
+                            if (updateValue.indexOf(_newPatient) > -1) {
+                                //already on list
+                                reject(null);
+                                return null;
+                            }
+                            updateValue.push(_newPatient)
                         }
-                        updateValue.push(_newPatient)
+                        //store updated value
+                        console.log(updateValue)
+
+
+                        //Check if password is correct:
+                        validatePatient(_newPatient);
+
+
+
+
+                        found.PatientList = updateValue;
+                        founs.save(function(err){})
+                        // var query_object = {Email: _subscriber.Email};
+                        // var update_values_object = {PatientList: updateValue};
+                        // dbMan.models.instance.subscriber.update(query_object, update_values_object, null, function(err) {
+                        //     if (err) console.log(err);
+                        //     else console.log('Yuppiie!');
+                        // });
+                        resolve(found)
                     }
-                    //store updated value
-                    console.log(updateValue)
-
-
-                    //Check if password is correct:
-                    validatePatient(_newPatient);
-
-
-
-
-
-                    var query_object = {Email: _subscriber.Email};
-                    var update_values_object = {PatientList: updateValue};
-                    dbMan.models.instance.subscriber.update(query_object, update_values_object, null, function(err) {
-                        if (err) console.log(err);
-                        else console.log('Yuppiie!');
-                    });
-                    resolve(found)
                 })
 
             }).catch((err) => {
@@ -246,36 +248,39 @@ var subscriberManager = module.exports = {
             dbMan.try().then(function () {
                   //Find 
                 dbMan.models.instance.subscriber.findOne({ Email: _subscriber.Email }, function (err, found) {
-                    if (err) {
+                    if (err || ! founs) {
                         logger.error(err)
                         reject(err)
-                    }
-                    //now remove
-                    logger.debug('Found subscriber: ' + found.PatientList)
-                    
-                    //is that subscriber on the list?
-                    var updateValue;
-                    if (found.PatientList == null) {
-                        resolve("notOnList");
-                        return null;
                     } else {
-                        updateValue = found.PatientList
-                        if (updateValue.indexOf(_oldSubscriber) < -1) {
-                            //already on list
+                        //now remove
+                        logger.debug('Found subscriber: ' + found.PatientList)
+                        
+                        //is that subscriber on the list?
+                        var updateValue;
+                        if (found.PatientList == null) {
                             resolve("notOnList");
                             return null;
+                        } else {
+                            updateValue = found.PatientList
+                            if (updateValue.indexOf(_oldSubscriber) < -1) {
+                                //already on list
+                                resolve("notOnList");
+                                return null;
+                            }
+                            updateValue.splice(_oldSubscriber.indexOf(_oldSubscriber),1)
                         }
-                        updateValue.splice(_oldSubscriber.indexOf(_oldSubscriber),1)
+                        //store updated value
+                        console.log(updateValue)
+                        found.PatientList = updateValue;
+                        found.save(function(err){});
+                        // var query_object = {Email: _subscriber.Email};
+                        // var update_values_object = {PatientList: updateValue};
+                        // dbMan.models.instance.subscriber.update(query_object, update_values_object, null, function(err){
+                        //     if (err) console.log(err);
+                        //     else console.log('Yuppiie!');
+                        // });
+                        resolve(found)
                     }
-                    //store updated value
-                    console.log(updateValue)
-                    var query_object = {Email: _subscriber.Email};
-                    var update_values_object = {PatientList: updateValue};
-                    dbMan.models.instance.subscriber.update(query_object, update_values_object, null, function(err){
-                        if (err) console.log(err);
-                        else console.log('Yuppiie!');
-                    });
-                    resolve(found)
                 })
             }).catch((err) => {
                 reject(err)

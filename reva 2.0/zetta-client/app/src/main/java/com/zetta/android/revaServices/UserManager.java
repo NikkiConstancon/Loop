@@ -44,6 +44,9 @@ public class UserManager extends RevaService {
 
 
     public static class MainActivityEndpoint extends RevaWebsocketEndpoint {
+        public RevaWebSocketService.USER_TYPE getUserType(){
+            return webService.getUserType();
+        }
         public static abstract class WorkOnUser{
             abstract public void work(String userUid);
         }
@@ -84,7 +87,7 @@ public class UserManager extends RevaService {
                 Interval self = this;
             };
         }
-        public void nonConstructedGuardActivityByVerifiedUser(WorkOnUser then){
+        public void resumeGuardActivityByVerifiedUser(WorkOnUser then){
             if (webService != null) {
                 //Note: do nothing and wait for onCreate to build the webService
                 if (webService.isLoggedIn()) {
@@ -101,6 +104,12 @@ public class UserManager extends RevaService {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             activity.startActivity(intent);
         }
+
+        public void pubSubBindingRequest(String target){
+            attachCloudAwaitObject(null,pubSubCAO).send(activity, "REQ_BIND", target);
+        }
+
+
 
         final Activity activity;
         @Override
@@ -119,6 +128,12 @@ public class UserManager extends RevaService {
             webService = service;
         }
         RevaWebSocketService webService = null;
+        CloudAwaitObject pubSubCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
+            @Override
+            public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
+                return null;
+            }
+        };
     }
 
 

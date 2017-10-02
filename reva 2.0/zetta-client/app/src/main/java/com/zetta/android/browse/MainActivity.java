@@ -3,30 +3,15 @@ package com.zetta.android.browse;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.gson.internal.LinkedTreeMap;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -37,21 +22,10 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.zetta.android.ListItem;
 import com.zetta.android.R;
-import com.zetta.android.ZettaDeviceId;
-import com.zetta.android.device.DeviceDetailsActivity;
-import com.zetta.android.device.actions.OnActionClickListener;
 import com.zetta.android.lib.Interval;
 import com.zetta.android.revaServices.UserManager;
-import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
-import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -95,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        userManagerEndpoint.nonConstructedGuardActivityByVerifiedUser(workOnUser);
+        userManagerEndpoint.resumeGuardActivityByVerifiedUser(workOnUser);
     }
 
     UserManager.MainActivityEndpoint.WorkOnUser workOnUser
@@ -126,6 +100,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+        PrimaryDrawerItem tmpItem = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
+        tmpItem.withTag(123);
+        if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
+            tmpItem.withName("Patient TMP");
+        }else{
+            tmpItem.withName("Subscriber TMP");
+        }
+
+
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
@@ -147,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 .withToolbar(toolbar)
                 .addDrawerItems(
                         signOutItem,
+                        tmpItem,
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem().withName(R.string.drawerNameAdd).withTag(R.string.drawerNameAdd),
                         new SecondaryDrawerItem().withName(R.string.drawerNameSettings).withTag(R.string.drawerNameSettings)
@@ -167,8 +151,11 @@ public class MainActivity extends AppCompatActivity {
                                 case R.string.drawerNameAdd:{
                                     Toast.makeText(cont,drawerItem.getTag().toString(),Toast.LENGTH_SHORT).show();
                                 }break;
-                                case R.string.drawerNameSettings:{
-                                    Toast.makeText(cont,drawerItem.getTag().toString(),Toast.LENGTH_SHORT).show();
+                                case R.string.drawerNameSettings: {
+                                    Toast.makeText(cont, drawerItem.getTag().toString(), Toast.LENGTH_SHORT).show();
+                                }break;
+                                case 123:{
+                                    userManagerEndpoint.pubSubBindingRequest("what@sub.com");
                                 }break;
                             }
                         }

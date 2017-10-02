@@ -407,7 +407,7 @@ function DispatchChannelKeys(handlers, transmitter, rootMsg, channeler) {
 var RCC_EXCLUDE_PAUS_RESUME_MAP = { RCC: true, UserManager: true }
 webSockMessenger.attach('RCC', {
     connect: function (transmitter) {
-        transmitter.transmit({ CONNECTED: { USER_UID: transmitter.context.userUid, ERROR: transmitter.context.tmpAuthError }, RCC_REDIRECT: ["UserManager"] })
+        transmitter.transmit({ CONNECTED: { USER_TYPE: transmitter.getUserType(), USER_UID: transmitter.context.userUid, ERROR: transmitter.context.tmpAuthError }, RCC_REDIRECT: ["UserManager"] })
         delete transmitter.context.tmpAuthError;
     },
     close: function (transmitter) {
