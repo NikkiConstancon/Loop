@@ -1,7 +1,8 @@
 ﻿const webSockMessenger = require('../lib/webSockMessenger')
 const patientManager = require("../patientManager");
-var subscriberManager = require('../subscriberManager');
 
+const subscriberManager = require('../subscriberManager');
+const dataManager = require('../patientDataManager');
 const logger = require('../revaLog')
 
 const serviceName = 'Stats'
@@ -32,8 +33,12 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
             }
         },
         GRAPH_POINTS: {
-            RAW: function (transmitter, msg, key, channel) {
-                channel({ PASS: "a" })
+            GRAPH_INFO: function (transmitter, msg, key, channel) {
+                dataManager.getGraphPoints({Username: msg.Username, DeviceId: msg.DeviceId, StartTime: msg.StartTime, EndTime: msg.EndTime}).then(function(result){
+                    channel(result)
+                }).catch(function () {
+                    logger.error('@webSockMessenger$UserManager#receiver:KEY_REGISTER_USER', e)
+                })  
             }
         }
     }
