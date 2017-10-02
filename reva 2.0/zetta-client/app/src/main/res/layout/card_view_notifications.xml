@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     tools:context="com.zetta.android.browse.notifications"
     android:theme="@style/AppThemeLight"
-    android:padding="5dp">
+    >
 
 
 
@@ -20,9 +20,9 @@
         card_view:cardCornerRadius="2dp"
         card_view:cardElevation="2dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="4dp"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="2dp">
+        android:layout_marginBottom="4dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -33,9 +33,9 @@
                 android:id="@+id/notif_status_image"
                 android:layout_width="17dip"
                 android:layout_height="17dip"
-                android:layout_marginTop="30dp"
                 android:layout_alignParentStart="true"
                 android:layout_marginRight="10dp"
+                android:layout_marginTop="3dp"
                 android:background="@drawable/notif_status_circle"
                 android:importantForAccessibility="no"
                 tools:ignore="RtlHardcoded" />
@@ -44,6 +44,7 @@
                 android:id="@+id/txt_noteTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
                 android:layout_alignBottom="@id/notif_status_image"
                 android:layout_toEndOf="@+id/notif_status_image"
                 android:text="Heart Rate"
@@ -68,15 +69,13 @@
 
             <Button
                 android:id="@+id/btn_closeNotification"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_alignParentRight="true"
-                android:gravity="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:ignore="RtlHardcoded"
-                tools:layout_constraintBottom_creator="1"
-                tools:layout_constraintLeft_creator="1"
-                tools:layout_constraintRight_creator="1"
+                android:layout_alignParentTop="true"
+                android:layout_margin="0dp"
+
+                android:gravity="top"
                 tools:text="X"
                 tools:textSize="8sp" />
 
@@ -98,4 +97,4 @@
 
     </android.support.v7.widget.CardView>
 
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

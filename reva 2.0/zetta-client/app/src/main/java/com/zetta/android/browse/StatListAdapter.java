@@ -132,7 +132,6 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             default:
                 throw new IllegalStateException("Attempted to bind a type you haven't coded for: " + holder.getItemViewType());
         }
-
     }
     ImageLoader imageLoader = new ImageLoader();
     /**

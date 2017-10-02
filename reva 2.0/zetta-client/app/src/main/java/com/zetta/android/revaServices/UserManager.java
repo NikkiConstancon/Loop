@@ -19,6 +19,7 @@ import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -55,9 +56,14 @@ public class UserManager extends RevaService {
         public String key() {
             return "UserManager";
         }
-        public MainActivityEndpoint(Activity activity_, PubSubWorker pubSubWorker_){
+        public MainActivityEndpoint(
+                Activity activity_,
+                PubSubWorker pubSubWorker_,
+                PubSubInfoWorker pubSubInfoWorker_
+        ){
             activity = activity_;
             pubSubWorker = pubSubWorker_;
+            pubSubInfoWorker = pubSubInfoWorker_;
         }
 
         Interval validateUserUidInterval;
@@ -120,16 +126,40 @@ public class UserManager extends RevaService {
 
             public pubSubReqInfo(
                     String userUid_,
-                    final TYPE type_,
-                    final STATE state_
+                    final String typeStr ,
+                    final String stateStr
             ){
                 userUid = userUid_;
-                type = type_;
-                state = state_;
+
+                if(typeStr.compareTo("request") == 0){
+                    type = TYPE.REQUESTER;
+                }else{
+                    type = TYPE.TARGET;
+                }
+                switch (stateStr){
+                    case "pending":{
+                        state = STATE.PENDING;
+                    }break;
+                    case "delivered":{
+                        state = STATE.DELIVERED;
+                    }break;
+                    default:{
+                        state = STATE.ACCEPTED;
+                    }
+                }
             }
         }
 
         Map<String, pubSubReqInfo> pubSubInfoMap = new TreeMap<>();
+
+        public ArrayList<String> getPubSubList(){
+            return new ArrayList<>(pubSubInfoMap.keySet());
+        }
+
+        pubSubReqInfo getPubSubInfo(int i){
+            ArrayList names = getPubSubList();
+            return pubSubInfoMap.get(names.get(i));
+        }
 
         final Activity activity;
         @Override
@@ -139,7 +169,23 @@ public class UserManager extends RevaService {
                 switch (entry.getKey()){
                     case "BINDING_CONFIRMATION_REQ":{
                         Map<String, Map<String, String>> gotMap = (Map<String, Map<String, String>>)entry.getValue();
-                        Log.d("-----TEST------", obj.toString());
+                        for(Map.Entry<String, Map<String, String>> entryInfo : gotMap.entrySet()){
+                            Map<String, String> info = entryInfo.getValue();
+                            pubSubInfoMap.put(entryInfo.getKey(), new pubSubReqInfo(entryInfo.getKey(), info.get("type"), info.get("state")));
+                        }
+                        pubSubInfoWorker.onConnect(pubSubInfoMap);
+                    }break;
+                    case "NEW_BINDING_CONFIRMATION_REQ":{
+                        Map<String, String> entryInfo = (Map<String, String>)entry.getValue();
+                        pubSubReqInfo info =
+                                new pubSubReqInfo(
+                                        entryInfo.get("userUid"),
+                                        entryInfo.get("type"),
+                                        entryInfo.get("state")
+                                );
+
+                        pubSubInfoMap.put(entryInfo.get("userUid"),info);
+                        pubSubInfoWorker.newReq(info);
                     }break;
                 }
             }
@@ -160,6 +206,13 @@ public class UserManager extends RevaService {
             abstract public void work(String msg);
         }
         final PubSubWorker pubSubWorker;
+
+
+        public static abstract class PubSubInfoWorker{
+            abstract public void onConnect(Map<String, pubSubReqInfo> infoMap);
+            abstract public void newReq(pubSubReqInfo info);
+        }
+        final PubSubInfoWorker pubSubInfoWorker;
     }
 
 
