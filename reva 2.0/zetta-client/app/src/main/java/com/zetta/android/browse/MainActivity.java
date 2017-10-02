@@ -52,8 +52,6 @@ public class MainActivity extends AppCompatActivity {
     public Context cont = this;
 
 
-
-
     /**
      * Main activity that allows for tab functionality and switching of views
      *
@@ -112,12 +110,11 @@ public class MainActivity extends AppCompatActivity {
 
         PrimaryDrawerItem adder;
 
-        PrimaryDrawerItem tmpItem = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
+        PrimaryDrawerItem patient = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
         if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
-            tmpItem.withName("Add Patient");
+            patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
              adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddSub).withTag(R.string.drawerNameAddSub);
         }else{
-            tmpItem.withName("Subscriber TMP");
             adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
         }
 
@@ -140,11 +137,6 @@ public class MainActivity extends AppCompatActivity {
         Drawer result = new DrawerBuilder().withAccountHeader(headerResult)
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .addDrawerItems(
-                        adder,
-                        new DividerDrawerItem(),
-                        signOutItem
-                )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -177,6 +169,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .build();
+        if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT) {
+            Log.d("PATIENT", "PATIENCE");
+            result.addItems(adder,patient, new DividerDrawerItem(), signOutItem);
+        } else {
+            Log.d("NOTPATI", "PATIENCE");
+            result.addItems(adder, new DividerDrawerItem(), signOutItem);
+        }
+
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -187,12 +187,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
     }
+    // Set up the input
 
     public void addAlert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MaterialBaseTheme_Light_AlertDialog);
         builder.setTitle("Type in email of person to add");
 
-        // Set up the input
         final EditText input = new EditText(MainActivity.this);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
@@ -205,7 +205,29 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();
                 userManagerEndpoint.pubSubBindingRequest(m_Text);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
 
+        builder.show();
+    }
+
+    public void alert(String message, final String buttonMsg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MaterialBaseTheme_Light_AlertDialog);
+        builder.setTitle(message);
+
+        // Set up the buttons
+        builder.setPositiveButton(buttonMsg, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (buttonMsg.equals("Try Again")) {
+                    addAlert();
+                }
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -242,7 +264,18 @@ public class MainActivity extends AppCompatActivity {
     UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(
             this,
             new UserManager.MainActivityEndpoint.PubSubWorker(){
-                @Override public void work(String msg){
+                @Override public void work(final String msg){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("MEAS", msg);
+                            if (msg.equals("")) {
+                                alert("Succesfully sent request", "OK");
+                            } else {
+                                alert(msg, "Try Again");
+                            }
+                        }
+                    });
                     Log.d("------TEST---------", msg);
                 }
             }
