@@ -226,13 +226,14 @@ var subscriberManager = module.exports = {
 
 
 
-
-                        var query_object = {Email: _subscriber.Email};
-                        var update_values_object = {PatientList: updateValue};
-                        dbMan.models.instance.subscriber.update(query_object, update_values_object, null, function(err) {
-                            if (err) console.log(err);
-                            else console.log('Yuppiie!');
-                        });
+                        found.PatientList = updateValue;
+                        founs.save(function(err){})
+                        // var query_object = {Email: _subscriber.Email};
+                        // var update_values_object = {PatientList: updateValue};
+                        // dbMan.models.instance.subscriber.update(query_object, update_values_object, null, function(err) {
+                        //     if (err) console.log(err);
+                        //     else console.log('Yuppiie!');
+                        // });
                         resolve(found)
                     }
                 })
@@ -270,12 +271,14 @@ var subscriberManager = module.exports = {
                         }
                         //store updated value
                         console.log(updateValue)
-                        var query_object = {Email: _subscriber.Email};
-                        var update_values_object = {PatientList: updateValue};
-                        dbMan.models.instance.subscriber.update(query_object, update_values_object, null, function(err){
-                            if (err) console.log(err);
-                            else console.log('Yuppiie!');
-                        });
+                        found.PatientList = updateValue;
+                        found.save(function(err){});
+                        // var query_object = {Email: _subscriber.Email};
+                        // var update_values_object = {PatientList: updateValue};
+                        // dbMan.models.instance.subscriber.update(query_object, update_values_object, null, function(err){
+                        //     if (err) console.log(err);
+                        //     else console.log('Yuppiie!');
+                        // });
                         resolve(found)
                     }
                 })

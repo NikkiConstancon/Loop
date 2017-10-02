@@ -253,12 +253,14 @@ var patientManager = module.exports = {
 
                         //store updated value
                         console.log(updateValue)
-                        var query_object = {Username: _patient.Username};
-                        var update_values_object = {SubscriberList: updateValue};
-                        dbMan.models.instance.patient.update(query_object, update_values_object, null, function(err){
-                            if(err) console.log(err);
-                            else console.log('Yuppiie!');
-                        });
+                        found.SubscriberList = updateValue;
+                        found.save(function(err){});
+                        // var query_object = {Username: _patient.Username};
+                        // var update_values_object = {SubscriberList: updateValue};
+                        // dbMan.models.instance.patient.update(query_object, update_values_object, null, function(err){
+                        //     if(err) console.log(err);
+                        //     else console.log('Yuppiie!');
+                        // });
                         resolve(found)
                     }
                 })
@@ -304,12 +306,14 @@ var patientManager = module.exports = {
                         }
                         //store updated value
                         console.log(updateValue)
-                        var query_object = {Username: _patient.Username};
-                        var update_values_object = {SubscriberList: updateValue};
-                        dbMan.models.instance.patient.update(query_object, update_values_object, null, function(err){
-                            if(err) console.log(err);
-                            else console.log('Yuppiie!');
-                        });
+                        found.SubscriberList = updateValue;
+                        found.save(function(err){});
+                        // var query_object = {Username: _patient.Username};
+                        // var update_values_object = {SubscriberList: updateValue};
+                        // dbMan.models.instance.patient.update(query_object, update_values_object, null, function(err){
+                        //     if(err) console.log(err);
+                        //     else console.log('Yuppiie!');
+                        // });
                         resolve(found)
                     }
                 })

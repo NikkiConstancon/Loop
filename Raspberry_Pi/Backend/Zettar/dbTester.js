@@ -16,6 +16,8 @@ var CryptoJS = require("crypto-js");
 setTimeout(function() {
 	console.log("Testing");
 
+    //Test Patient
+    // PatientManager.addPatient()
 
     // PatientDataManager.getGraphPoints({
     //    Username: 'nikki'  ,
@@ -23,10 +25,10 @@ setTimeout(function() {
     //    StartTime:  "2017-09-25 15:16:10.051000+0000",
     //    EndTime:  "2017-09-25 15:16:10.481000+0000",
     // })
-    PatientManager.getPatient(
-        {'Username': 'nn'},
-        "Kicks", true
-    )
+    // PatientManager.addToDeviceMap(
+    //     {'Username': 'greg'},
+    //     "Kicks", true
+    // )
 
 
   }, 0);
