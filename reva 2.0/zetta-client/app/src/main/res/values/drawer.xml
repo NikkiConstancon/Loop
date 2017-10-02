@@ -2,4 +2,7 @@
 <resources>
     <string name="drawerNameSignOut">Sign out</string>
     <string name="addSubscriber">Add subscriber</string>
+    <string name="drawerNameAdd">Add Subscriber</string>
+    <string name="drawerNameSettings">Settings</string>
+
 </resources>

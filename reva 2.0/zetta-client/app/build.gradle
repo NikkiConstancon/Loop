@@ -13,7 +13,6 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.1'
 
-
     defaultConfig {
         applicationId "com.zetta.android"
         minSdkVersion 19
@@ -37,6 +36,8 @@ android {
 ext {
     supportLibraryVersion = '26.0.1'
 }
+
+
 
 dependencies {
     compile project(':zettakit')

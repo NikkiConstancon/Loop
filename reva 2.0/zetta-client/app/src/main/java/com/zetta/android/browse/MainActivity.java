@@ -1,12 +1,16 @@
 package com.zetta.android.browse;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private String zettaUser;
 
     private Interval validateUserUidInterval = null;
+    public Context cont = this;
 
 
 
@@ -48,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: Starting.");
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
         userManagerEndpoint.bind(this);
 
@@ -89,8 +95,9 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        PrimaryDrawerItem signOutItem = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.DrawerNameSignOut);
-        signOutItem.withTag(R.string.DrawerNameSignOut);
+        PrimaryDrawerItem signOutItem = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut);
+        signOutItem.withTag(R.string.drawerNameSignOut);
+
 
 
         PrimaryDrawerItem tmpItem = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
@@ -116,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .build();
 
+
         //create the drawer and remember the `Drawer` result object
         Drawer result = new DrawerBuilder().withAccountHeader(headerResult)
                 .withActivity(this)
@@ -124,18 +132,27 @@ public class MainActivity extends AppCompatActivity {
                         signOutItem,
                         tmpItem,
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Settings")
+                        new SecondaryDrawerItem().withName(R.string.drawerNameAdd).withTag(R.string.drawerNameAdd),
+                        new SecondaryDrawerItem().withName(R.string.drawerNameSettings).withTag(R.string.drawerNameSettings)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
                         // do something with the clicked item :D
                         Object tag = drawerItem.getTag();
+
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
                             switch(value){
-                                case R.string.DrawerNameSignOut:{
+                                case R.string.drawerNameSignOut:{
                                     userManagerEndpoint.triggerLoginIntent();
+                                }break;
+                                case R.string.drawerNameAdd:{
+                                    Toast.makeText(cont,drawerItem.getTag().toString(),Toast.LENGTH_SHORT).show();
+                                }break;
+                                case R.string.drawerNameSettings: {
+                                    Toast.makeText(cont, drawerItem.getTag().toString(), Toast.LENGTH_SHORT).show();
                                 }break;
                                 case 123:{
                                     userManagerEndpoint.pubSubBindingRequest("what@sub.com");
