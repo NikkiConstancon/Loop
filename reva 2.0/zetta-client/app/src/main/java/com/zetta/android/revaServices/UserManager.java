@@ -44,6 +44,9 @@ public class UserManager extends RevaService {
 
 
     public static class MainActivityEndpoint extends RevaWebsocketEndpoint {
+        public RevaWebSocketService.USER_TYPE getUserType(){
+            return webService.getUserType();
+        }
         public static abstract class WorkOnUser{
             abstract public void work(String userUid);
         }
