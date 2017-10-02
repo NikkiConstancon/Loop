@@ -133,6 +133,7 @@ module.exports = {
             verifyPassword: function (value) {
                 return decrypt(this.Password) === value
             },
+            getPassword: function () { return this.Password },
             connectDevice: function (deviceKey) {
                 connectDeviceStore[this.Email] || (connectDeviceStore[this.Email] = {})
                 //concurrency problem fix

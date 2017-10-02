@@ -18,6 +18,10 @@ var subscriberManager = require('./subscriberManager');
 var UserManager = module.exports = {
     //All so wrong all the way
     pubSubBindRequest: function (passCb, failCb, requester, target, reqType) {
+        if (target == requester) {
+            failCb({ clientSafe: "You cannot add yourself" })
+            return
+        }
         const successMsg = "Your request has been sent"
         if (reqType === 'patient') {//this shoud not be manage externally, but what can you do???
             patientManager.getPatient({ Username: requester }).then(function (requester) {
@@ -29,7 +33,7 @@ var UserManager = module.exports = {
                         requester.addPubSubRequestAsRequester(target.Email, passCb, failCb)
                         target.addPubSubRequestAsTarget(requester.Username)
                     }).catch(function (e) {
-                        failCb(e)
+                        failCb({ clientSafe: "No such account" })
                     })
                 })
             }).catch(function (e) {
@@ -45,6 +49,8 @@ var UserManager = module.exports = {
                 patientManager.getPatient({ Username: target }).then(function (target) {
                     requester.addPubSubRequestAsRequester(target.Username, passCb, failCb)
                     target.addPubSubRequestAsTarget(requester.Email)
+                }).catch(function () {
+                    failCb({ clientSafe: "You cannot subscribe to this user" })
                 })
             }).catch(function (e) {
                 try {

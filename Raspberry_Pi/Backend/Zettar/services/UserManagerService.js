@@ -95,7 +95,7 @@ webSockMessenger.attach(serviceName, {
                         channel("")
                     },
                     function (errMsg) {
-                        channel(errMsg.clientSafe || "Opps! Something went wrong :(" )
+                        channel(errMsg.message || errMsg.clientSafe || "Opps! Something went wrong :(" )
                     },
                     transmitter.getUserUid(),
                     msg,

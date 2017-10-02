@@ -90,7 +90,7 @@ module.exports = {
             },
             addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
             addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
-            getPassword: function () { return this.Password }//test
+            getPassword: function () { return this.Password }
         },
         after_save: function (instance, options, next) {
             const dbMan = require('../databaseManager')
