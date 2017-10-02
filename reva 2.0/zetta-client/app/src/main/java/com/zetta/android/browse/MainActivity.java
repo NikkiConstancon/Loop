@@ -1,15 +1,21 @@
 package com.zetta.android.browse;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.preference.AndroidResources;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -27,6 +33,8 @@ import com.zetta.android.lib.Interval;
 import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 
+import static com.github.mikephil.charting.charts.Chart.LOG_TAG;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -34,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private SectionsPageAdapter mSectionsPageAdapter;
 
     private ViewPager mViewPager;
+
+    private String m_Text = "";
+
 
     private String zettaUser;
 
@@ -95,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        PrimaryDrawerItem signOutItem = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut);
+        SecondaryDrawerItem signOutItem = new SecondaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut);
         signOutItem.withTag(R.string.drawerNameSignOut);
 
 
@@ -149,10 +160,10 @@ public class MainActivity extends AppCompatActivity {
                                     userManagerEndpoint.triggerLoginIntent();
                                 }break;
                                 case R.string.drawerNameAddUser:{
-                                    Toast.makeText(cont,drawerItem.getTag().toString(),Toast.LENGTH_SHORT).show();
+                                    addAlert();
                                 }break;
                                 case R.string.drawerNameAddSub:{
-                                    Toast.makeText(cont,drawerItem.getTag().toString(),Toast.LENGTH_SHORT).show();
+                                    addAlert();
                                 }break;
                                 case R.string.drawerNameSettings: {
                                     Toast.makeText(cont, drawerItem.getTag().toString(), Toast.LENGTH_SHORT).show();
@@ -176,6 +187,35 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });*/
+    }
+
+    public void addAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MaterialBaseTheme_Light_AlertDialog);
+        builder.setTitle("Type in email of person to add");
+
+        // Set up the input
+        final EditText input = new EditText(MainActivity.this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        input.setHint("jondoe@email.com");
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                m_Text = input.getText().toString();
+                userManagerEndpoint.pubSubBindingRequest(m_Text);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     /**
