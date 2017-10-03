@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/request_title"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimaryText"
+        android:text="Person wanting sub"
+        android:textSize="14sp"
+
+        android:drawableStart="@drawable/ic_person_black_24dp"
+        android:drawableTint="#38ACEC"
+        android:drawablePadding="5dp"
+        android:padding="8dp"
+        tools:ignore="HardcodedText,RtlHardcoded"
+        tools:text="Person wanting sub"
+        android:layout_weight="1.0"/>
+    <Button
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/btn_yes_sub"
+        android:layout_margin="5dp"
+        android:background="@drawable/ic_check_circle_black_24dp"
+        android:backgroundTint="@color/md_green_600"/>
+    <Button
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/btn_no_sub"
+        android:layout_margin="5dp"
+        android:background="@drawable/ic_cancel_black_24dp"
+        android:backgroundTint="@color/md_red_600"/>
+
+</LinearLayout>
