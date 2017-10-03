@@ -72,14 +72,16 @@ module.exports = {
                     const dbMan = require('../databaseManager')
                     var name = this.Email;
                     var context = { c: 'sending', k1: keys.userEmailEncrypt(name), k2: uuidv1() }
-                    mailer.mailEmialConfirmationUrl(this.Email, context.k1, context.k2).then(function () {
-                        context.c = 'awaiting'
-                        dbMan.models.instance.patient.update({ Username: name }, { RegistrationObject: context });
-                    }).catch(function (e) {
-                        logger.error(e)
-                        context.c = 'failed'
-                        dbMan.models.instance.patient.update({ Username: name }, { RegistrationObject: context });
-                    })
+                    //TODO fix this
+                    //mailer.mailEmialConfirmationUrl(this.Email, context.k1, context.k2).then(function () {
+                    //    context.c = 'awaiting'
+                    //    dbMan.models.instance.subscriber.update({ : name }, { RegistrationObject: context });
+                    //}).catch(function (e) {
+                    //    logger.error(e)
+                    //    context.c = 'failed'
+                    //    dbMan.models.instance.subscriber.update({ Username: name }, { RegistrationObject: context });
+                    //})
+
                     return context
                 }
             },
