@@ -29,50 +29,84 @@ var UserManager = module.exports = {
         });
     },
     addToSubscriberList: function(_newPatient){
-         var updateValue;
-
+        var updateValue;
         if (this.SubscriberList == null) {
             updateValue = [_newPatient]
-        } else {
+        }else{
             updateValue = this.SubscriberList
             if (updateValue.indexOf(_newPatient) > -1) {
                 //already on list
                 return false;
-            } else{
-                updateValue.push(_newPatient)
-                //store updated value
-                console.log(updateValue)
-                
-                //Check if password is correct:
-                validatePatient(_newPatient);
+            } 
+            updateValue.push(_newPatient)
+        }   
+        //store updated value
+        // console.log(updateValue)
 
-                this.SubscriberList = updateValue;
-                this.save(function(err){return true})
-            }
-        }
-    }
+        //Check if password is correct:
+        this.SubscriberList = updateValue;
+        this.save(function(err){return true})
+    },
     addToPatientList: function(_newPatient){
         var updateValue;
-
         if (this.PatientList == null) {
             updateValue = [_newPatient]
-        } else {
+        }else{
             updateValue = this.PatientList
             if (updateValue.indexOf(_newPatient) > -1) {
                 //already on list
                 return false;
-            } else{
-                updateValue.push(_newPatient)
-                //store updated value
-                console.log(updateValue)
+            } 
+            updateValue.push(_newPatient)
+        }   
+        //store updated value
+        // console.log(updateValue)
 
-                //Check if password is correct:
-                validatePatient(_newPatient);
-
-                this.PatientList = updateValue;
-                this.save(function(err){return true})
+        //Check if password is correct:
+        this.PatientList = updateValue;
+        this.save(function(err){return true})
+        
+    },
+    removeFromPatientList: function(_oldSubscriber){
+        //is that subscriber on the list?
+        var updateValue;
+        if (this.PatientList == null) {
+            return false;
+        } else {
+            updateValue = this.PatientList
+            if (updateValue.indexOf(_oldSubscriber) < -1) {
+                //not on list
+                return false;
             }
-        },
+            console.log(updateValue.indexOf(_oldSubscriber))
+            
+            updateValue.splice(updateValue.indexOf(_oldSubscriber),1)
+        }
+
+        //store updated value
+        console.log(updateValue)
+        this.PatientList = updateValue;
+        this.save(function(err){return true});
+    },
+    removeFromSubscriberList: function(_oldSubscriber){
+                //is that subscriber on the list?
+        var updateValue;
+        if (this.SubscriberList == null) {
+            return false;
+        } else {
+            updateValue = this.SubscriberList
+            if (updateValue.indexOf(_oldSubscriber) < -1) {
+                //not on list
+                return false;
+            }
+            console.log(updateValue.indexOf(_oldSubscriber))
+            updateValue.splice(updateValue.indexOf(_oldSubscriber),1)
+        }
+        //store updated value
+        console.log(updateValue)
+        this.SubscriberList = updateValue;
+        this.save(function(err){return true});
+    },
     pubSubRequestOnDecision: function (onUserUid, decision) {
         //NOTE: just delete the key value pair for now to minimize serve client state change handshaking
         try {

@@ -164,7 +164,7 @@ var patientManager = module.exports = {
             dbMan.try().then(function () {
                 var q = {}
                 if (_patient.Email) {
-                    q.Email = _patient.Emai
+                    q.Email = _patient.Email
                 } else {
                     q.Username = _patient.Username
                 }

@@ -97,6 +97,8 @@ module.exports = {
             addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
             addToSubscriberList: userManagerUtil.addToSubscriberList,
             addToPatientList: userManagerUtil.addToPatientList,
+            removeFromSubscriberList: userManagerUtil.removeFromSubscriberList,
+            removeFromPatientList: userManagerUtil.removeFromPatientList,
             getPassword: function () { return this.Password },
             pubSubRequestOnDecision: userManagerUtil.pubSubRequestOnDecision
         },
