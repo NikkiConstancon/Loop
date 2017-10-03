@@ -72,7 +72,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/txt_username"
+            android:id="@+id/txt_userName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -112,7 +112,7 @@
             app:layout_constraintRight_toRightOf="parent"
 
             tools:ignore="HardcodedText"
-            app:layout_constraintTop_toBottomOf="@+id/txt_username"/>
+            app:layout_constraintTop_toBottomOf="@+id/txt_userName"/>
 
 
     </android.support.constraint.ConstraintLayout>
