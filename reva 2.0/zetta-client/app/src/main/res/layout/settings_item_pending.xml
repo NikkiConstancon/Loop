@@ -7,7 +7,7 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/txt_incoming"
+        android:id="@+id/txt_pending"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorPrimaryText"
@@ -19,21 +19,7 @@
         android:drawablePadding="5dp"
         android:padding="8dp"
         tools:ignore="HardcodedText,RtlHardcoded"
-        tools:text="Person wanting sub"
+        tools:text="Person pending"
         android:layout_weight="1.0"/>
-    <Button
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:id="@+id/btn_yes_sub"
-        android:layout_margin="5dp"
-        android:background="@drawable/ic_check_circle_black_24dp"
-        android:backgroundTint="@color/md_green_600"/>
-    <Button
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:id="@+id/btn_no_sub"
-        android:layout_margin="5dp"
-        android:background="@drawable/ic_cancel_black_24dp"
-        android:backgroundTint="@color/md_red_600"/>
 
 </LinearLayout>
