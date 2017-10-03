@@ -215,7 +215,7 @@ var patientManager = module.exports = {
      *
      *@return a promise passing the newly added user to the function called back
      */
-    addToSubscriberList: function(_patient,_newSubscriber){
+  /*  addToSubscriberList: function(_patient,_newSubscriber){
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
                 //Validate email:
@@ -269,7 +269,7 @@ var patientManager = module.exports = {
                 reject(err)
             })
         })
-    },
+    },*/
 
 
     /**
@@ -277,7 +277,7 @@ var patientManager = module.exports = {
      *
      *@return a promise passing the newly added user to the function called back
      */
-    removeFromSubscriberList: function(_patient,_oldSubscriber){
+    /*removeFromSubscriberList: function(_patient,_oldSubscriber){
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
                   //Find 
@@ -321,7 +321,7 @@ var patientManager = module.exports = {
                 reject(err)
             })
         })
-    },
+    },*/
     /**
      * @brief bind the patients Zettalet's URI to the specific user
      **/

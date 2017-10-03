@@ -35,7 +35,7 @@ var initializedZetta = zetta('peers').name('Zettar')
 //pass the initialized zetta var to a new hook
 var hook = new Hook(initializedZetta)
     //call listen as you wold on zetta
-    .listen(3009, function (e) {
+    .listen(3010, function (e) {
         if (e) {
             console.log("Zetta error:", e)
         } else {
