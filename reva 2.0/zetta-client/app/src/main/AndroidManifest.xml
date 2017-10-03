@@ -13,10 +13,10 @@
         android:supportsRtl="false"
         android:theme="@style/AppThemeLight">
         <activity
-            android:theme="@style/Form"
             android:name=".browse.login_activity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Form" />
         <activity
             android:name=".device.DeviceDetailsActivity"
             android:parentActivityName=".browse.MainActivity" />
@@ -53,11 +53,12 @@
             android:name=".browse.Registration_Sub"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeLight"></activity>
-        <activity android:name=".browse.AddSimpleStat"
+            android:theme="@style/AppThemeLight" />
+        <activity
+            android:name=".browse.AddSimpleStat"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeLight"></activity>
+            android:theme="@style/AppThemeLight" />
 
         <service android:name=".revawebsocketservice.RevaWebSocketService" />
 
@@ -70,7 +71,16 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".MoreGraph"></activity>
+        <activity android:name=".MoreGraph" />
+        <activity
+            android:name=".settings.settingsPage"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".browse.MainActivity"
+            android:theme="@style/AppThemeLight">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zetta.android.browse.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

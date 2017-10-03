@@ -1,6 +1,5 @@
 package com.zetta.android.browse;
 
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 
 import com.novoda.notils.logger.simple.Log;

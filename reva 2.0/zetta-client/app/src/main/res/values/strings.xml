@@ -58,4 +58,5 @@
         <item>Earth</item>
         <item>Mars</item>
     </string-array>
+    <string name="title_activity_settings">settings</string>
 </resources>

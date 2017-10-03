@@ -42,7 +42,6 @@ public class StatFragment extends android.support.v4.app.Fragment
     private StatListAdapter statListAdapter;
     private List<StatItem> cards = new ArrayList<>();
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
