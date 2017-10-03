@@ -86,17 +86,22 @@ public class settingsPage extends AppCompatActivity {
             },
             new UserManager.PubSubBinderEndpoint.PubSubInfoWorker(){
                 @Override public void onConnect(Map<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> infoMap){
+                    List<SettingsItem> tmp = new ArrayList<>();
+                    tmp.add(settings.get(0));
+                    int count = 0;
                     for(Map.Entry<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> entry : infoMap.entrySet()){
                         UserManager.PubSubBinderEndpoint.pubSubReqInfo info =  entry.getValue();
                         Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
+                        reqList.add(new RequestItem(info.userUid));
+                        count++;
                     }
+                    tmp.addAll(reqList);
+                    settingsListAdapter.updateList(tmp);
                 }
                 @Override public void newReq(UserManager.PubSubBinderEndpoint.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
 
-                    List<SettingsItem> tmp = new ArrayList<>();
-                    tmp.add(settings.get(0));
-                    
+
 
                 }
                 @Override public void onPatientList(List<String> patientList){
@@ -120,7 +125,7 @@ public class settingsPage extends AppCompatActivity {
                     for (int i = 1; i < settings.size(); i++) {
                         tmp.add(settings.get(i));
                     }
-                    settingsListAdapter.updateList(patList);
+                    settingsListAdapter.updateList(tmp);
                 }
             }
     );
