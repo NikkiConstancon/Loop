@@ -93,11 +93,15 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public void updateList (List<SettingsItem> items) {
-        if (items != null && items.size() > 0) {
+
+        if (settings != null) {
             settings.clear();
             settings.addAll(items);
-            notifyDataSetChanged();
         }
+        else {
+            settings = items;
+        }
+        notifyDataSetChanged();
     }
 
     /**

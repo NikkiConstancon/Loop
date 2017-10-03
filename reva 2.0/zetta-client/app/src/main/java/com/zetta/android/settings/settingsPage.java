@@ -20,7 +20,9 @@ import java.util.Map;
 public class settingsPage extends AppCompatActivity {
     RecyclerView settingsList;
     SettingsListAdapter settingsListAdapter;
-    private List<SettingsItem> settings = new ArrayList<>();;
+    private List<SettingsItem> settings = new ArrayList<>();
+    private List<SettingsItem> patList = new ArrayList<>();
+    private List<SettingsItem> reqList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +35,6 @@ public class settingsPage extends AppCompatActivity {
 
         settings.add(new TitleItem("Subscriber Requests"));
         settings.add(new TitleItem("Current Subscribers"));
-        settings.add(new ExistingItem("Some guy"));
 
         settingsList = (RecyclerView) findViewById(R.id.settings_recycler);
 
@@ -92,15 +93,34 @@ public class settingsPage extends AppCompatActivity {
                 }
                 @Override public void newReq(UserManager.PubSubBinderEndpoint.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
+
+                    List<SettingsItem> tmp = new ArrayList<>();
+                    tmp.add(settings.get(0));
+                    
+
                 }
                 @Override public void onPatientList(List<String> patientList){
                     Log.d("----sub-list---", patientList.toString());
-                    for (int i =0; i < patientList.size(); i++) {
-                        settings.add(new ExistingItem(patientList.get(i)));
-                    }
-                    List<SettingsItem> tmp = settings;
-                    settingsListAdapter.updateList(tmp );
 
+                    List<SettingsItem> tmp = new ArrayList<>();
+                    for (int i =0; i < patientList.size(); i++) {
+                        patList.add(new ExistingItem(patientList.get(i)));
+                    }
+
+                    tmp.add(settings.get(0));
+                    for (int count = 1; count < settings.size(); count++) {
+                        tmp.add(settings.get(count));
+                        if (settings.get(count) instanceof TitleItem) {
+                            tmp.add(settings.get(count));
+                            break;
+                        }
+                    }
+
+                    tmp.addAll(patList);
+                    for (int i = 1; i < settings.size(); i++) {
+                        tmp.add(settings.get(i));
+                    }
+                    settingsListAdapter.updateList(patList);
                 }
             }
     );
