@@ -37,6 +37,7 @@ import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.settingsPage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Interval validateUserUidInterval = null;
     public Context cont = this;
+
+    private List<String> subbedTo = new ArrayList<String>();
 
 
     /**
@@ -143,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 .withName("tmpItemForDecline");
 
         PrimaryDrawerItem greg = new PrimaryDrawerItem().withIdentifier(1).withName("greg").withTag(60);
+        PrimaryDrawerItem subTo = new PrimaryDrawerItem().withIdentifier(2).withName("Subscribed to").withTag("Subscribed to");
 
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -163,18 +167,6 @@ public class MainActivity extends AppCompatActivity {
         Drawer result = new DrawerBuilder().withAccountHeader(headerResult)
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .addDrawerItems(
-                        greg,
-                        adder,
-
-                        new DividerDrawerItem(),
-                        signOutItem,
-                        tmpItemForNikki,
-                        tmpItemForAccept,
-                        tmpItemForDecline,
-                        settings
-                )
-
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -230,8 +222,28 @@ public class MainActivity extends AppCompatActivity {
 
                         return true;
                     }
-                })
-                .build();
+                }).build();
+
+        result.addItems(
+                greg,
+                adder,
+                new DividerDrawerItem(),
+                subTo
+        );
+
+        for(String name : subbedTo)
+        {
+            result.addItem(new PrimaryDrawerItem().withName(name).withTag(name));
+        }
+
+        result.addItems(
+                new DividerDrawerItem(),
+                signOutItem,
+                tmpItemForNikki,
+                tmpItemForAccept,
+                tmpItemForDecline,
+                settings
+        );
 
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -350,6 +362,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 @Override public void onPatientList(List<String> patientList){
                     Log.d("----sub-list---", patientList.toString());
+
+                    for(String names : patientList)
+                    {
+                        subbedTo.add(names);
+                    }
                 }
             }
     );
