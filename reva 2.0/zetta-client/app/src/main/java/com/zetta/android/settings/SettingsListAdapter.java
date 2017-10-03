@@ -92,6 +92,14 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
+    public void updateList (List<SettingsItem> items) {
+        if (items != null && items.size() > 0) {
+            settings.clear();
+            settings.addAll(items);
+            notifyDataSetChanged();
+        }
+    }
+
     /**
      * OnBindViewHolder is called by the RecyclerView to display the data at the specified
      * position. In this method, we update the contents of the ViewHolder to display the correct
