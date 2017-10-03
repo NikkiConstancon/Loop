@@ -75,8 +75,6 @@ public class Registration_Cont extends AppCompatActivity{
                     }
                 });
 
-        Pattern p2 = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$");
-
         if(address.length() < 1 || username.length() < 1)
         {
             AlertDialog alertWarning = builder1.create();
