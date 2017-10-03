@@ -29,7 +29,7 @@ public class settingsPage extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
+        settings.add(new TitleItem("Subscriber Requests"));
         settings.add(new RequestItem("Its me"));
         settings.add(new RequestItem("Your Brother"));
 

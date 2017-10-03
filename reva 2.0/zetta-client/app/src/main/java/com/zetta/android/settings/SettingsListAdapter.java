@@ -104,9 +104,9 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case SettingsItem.TYPE_REQUEST:
                 ((RequestViewHolder) holder).bind((RequestItem) settings.get(position));
                 break;
-//            case StatItem.TYPE_SIMPLE_STAT:
-//                ((StatListAdapter.NumberViewHolder) holder).bind((SimpleStatItem) cards.get(position));
-//                break;
+            case SettingsItem.TYPE_TITLE:
+                ((TitleViewHolder) holder).bind((TitleItem) settings.get(position));
+                break;
             default:
                 throw new IllegalStateException("Attempted to bind a type you haven't coded for: " + holder.getItemViewType());
         }
