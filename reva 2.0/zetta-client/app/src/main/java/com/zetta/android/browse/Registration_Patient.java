@@ -35,6 +35,7 @@ public class Registration_Patient extends AppCompatActivity {
     RadioGroup rg3;
     boolean checkedRad = false;
     boolean age = false, illness = false, accident = false, disability = false;
+    String reason = "";
 
     /**
      * Overridden on create method to load activity_register_continue_patient view
@@ -102,6 +103,7 @@ public class Registration_Patient extends AppCompatActivity {
                     illness = false;
                     accident = false;
                     disability = false;
+                    reason = "age";
 
                 } else if (checkedId == R.id.rad_illness) {
                     checkedRad = true;
@@ -109,6 +111,7 @@ public class Registration_Patient extends AppCompatActivity {
                     age = false;
                     accident = false;
                     disability = false;
+                    reason = "illness";
                 }
             }
         }
@@ -138,6 +141,7 @@ public class Registration_Patient extends AppCompatActivity {
                     illness = false;
                     accident = true;
                     disability = false;
+                    reason = "accident";
 
                 } else if (checkedId == R.id.rad_disability) {
                     checkedRad = true;
@@ -145,6 +149,7 @@ public class Registration_Patient extends AppCompatActivity {
                     age = false;
                     accident = false;
                     disability = true;
+                    reason = "disability";
                 }
             }
         }
@@ -213,7 +218,7 @@ public class Registration_Patient extends AppCompatActivity {
                     getIntent().getStringExtra("regPass"),
                     getIntent().getStringExtra("address"),
                     getIntent().getStringExtra("username"),
-                    getIntent().getStringExtra("subPass")
+                    reason
             );
         }
     }

@@ -33,28 +33,6 @@
         app:layout_constraintBottom_toTopOf="@+id/input_userName" />
 
     <EditText
-        android:id="@+id/txt_confirmSubPass"
-        android:layout_width="262dp"
-        android:layout_height="35dp"
-        android:textSize="12sp"
-        android:ems="10"
-        android:inputType="none"
-        android:labelFor="@+id/input_confirmPassReg"
-        android:text="Confirm Password:"
-        android:textColor="@android:color/background_dark"
-        tools:ignore="HardcodedText,LabelFor,RtlHardcoded"
-        tools:text="Confirm Password:"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/input_confSubPass" />
-
-    <EditText
         android:id="@+id/input_userName"
         android:layout_width="262dp"
         android:layout_height="35dp"
@@ -72,51 +50,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginBottom="12dp"
-        app:layout_constraintBottom_toTopOf="@+id/txt_subpass" />
-
-    <EditText
-        android:id="@+id/input_subsPass"
-        android:layout_width="262dp"
-        android:layout_height="35dp"
-        android:textSize="12sp"
-        android:ems="10"
-        android:hint="************"
-        android:textColorHint="@color/textColorTertiary"
-        android:inputType="textPassword"
-        tools:ignore="HardcodedText,RtlHardcoded"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginRight="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginBottom="15dp"
-        app:layout_constraintBottom_toTopOf="@+id/txt_confirmSubPass" />
-
-    <EditText
-        android:id="@+id/input_confSubPass"
-        android:layout_width="262dp"
-        android:layout_height="35dp"
-        android:textSize="12sp"
-        android:ems="10"
-        android:hint="************"
-        android:textColorHint="@color/textColorTertiary"
-        android:inputType="textPassword"
-        tools:ignore="HardcodedText,RtlHardcoded"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        android:layout_marginStart="31dp"
-        android:layout_marginEnd="34dp"
-        tools:layout_constraintLeft_creator="1"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginBottom="43dp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_patRegCont" />
+        tools:layout_editor_absoluteY="241dp" />
 
     <EditText
         android:id="@+id/txt_addr"
@@ -190,29 +124,6 @@
         android:layout_marginLeft="8dp"
         android:layout_marginBottom="11dp"
         app:layout_constraintBottom_toTopOf="@+id/txt_userName" />
-
-    <EditText
-        android:id="@+id/txt_subpass"
-        android:layout_width="262dp"
-        android:layout_height="35dp"
-        android:textSize="12sp"
-        android:ems="10"
-        android:inputType="none"
-        android:labelFor="@+id/input_passwordReg"
-        android:text="Please Pick a Subscriber Password:"
-        android:textColor="@android:color/background_dark"
-        tools:ignore="HardcodedText,LabelFor,RtlHardcoded"
-        tools:text="Please Pick a Subscriber Password:"
-        tools:layout_constraintBottom_creator="1"
-        android:layout_marginStart="31dp"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/input_subsPass" />
-
 
 
     <Button
