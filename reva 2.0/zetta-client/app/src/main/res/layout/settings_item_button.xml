@@ -1,26 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/txt_settings_item_title"
+    <Button
+        android:id="@+id/btn_settings"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#38ACEC"
-        android:text="Settings"
+        android:background="@android:color/holo_blue_dark"
         android:textSize="14sp"
-        android:layout_marginLeft="20dp"
-        android:padding="8dp"
+        android:text="Change my info"
         tools:ignore="HardcodedText,RtlHardcoded"
-        tools:text="Settings" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginLeft="10dp"
-        android:background="@color/lightGray"/>
+        tools:text="Change my info" />
 
 </LinearLayout>

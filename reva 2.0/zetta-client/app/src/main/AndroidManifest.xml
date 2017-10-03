@@ -49,13 +49,8 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeLight" />
-        <activity
-            android:name=".browse.Registration_Sub"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeLight" />
-        <activity
-            android:name=".browse.AddSimpleStat"
+
+        <activity android:name=".browse.AddSimpleStat"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeLight" />

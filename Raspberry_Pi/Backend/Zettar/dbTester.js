@@ -7,7 +7,7 @@
 
 // var dbManager = require("./databaseManager");
 // var dbManager1 = require("./dataManager");
-var PatientManager = require("./patientManager");
+var patientManager = require("./patientManager");
 var subscriberManager = require("./subscriberManager")
 var PatientDataManager = require("./patientDataManager")
 
@@ -29,6 +29,10 @@ setTimeout(function() {
     //     {'Username': 'greg'},
     //     "Kicks", true
     // )
+    (subscriberManager.getsubscriber({Email:"what@sub.com"})).then(function(hu){hu.removeFromPatientList("greg")});
+    // (subscriberManager.getsubscriber({Email:"what@sub.com"})).then(function(hu){hu.addToPatientList("rinus")})
+    // Patient.addToPatientList("no.@e");
+    
 
 
   }, 0);

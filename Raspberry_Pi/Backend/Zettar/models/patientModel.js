@@ -47,6 +47,10 @@ module.exports = {
                 type: "list",
                 typeDef: "<text>"
             },
+            PatientList     : {
+                    type: "list",
+                    typeDef: "<text>"
+            },
             ZettaletUuid: {
                 type: 'text'
             },
@@ -166,6 +170,10 @@ module.exports = {
             },
             addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
             addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
+            addToSubscriberList: userManagerUtil.addToSubscriberList,
+            addToPatientList: userManagerUtil.addToPatientList,
+            removeFromPatientList: userManagerUtil.removeFromPatientList,
+            removeFromSubscriberList: userManagerUtil.removeFromSubscriberList,
             pubSubRequestOnDecision: userManagerUtil.pubSubRequestOnDecision
         },
         before_save: function (instance, options, next) {

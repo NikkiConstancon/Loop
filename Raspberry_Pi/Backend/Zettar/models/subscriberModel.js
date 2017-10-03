@@ -51,7 +51,11 @@ module.exports = {
 	                    },
 	                    message: 'Relation is not included in the set of reasons.'
 	                }
-	            },
+            },
+            SubscriberList: {
+                type: "list",
+                typeDef: "<text>"
+            },
 	        PatientList     : {
 	                type: "list",
 	                typeDef: "<text>"
@@ -91,6 +95,11 @@ module.exports = {
             getPassword: function () { return this.Password },
             addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
             addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
+            addToSubscriberList: userManagerUtil.addToSubscriberList,
+            addToPatientList: userManagerUtil.addToPatientList,
+            removeFromSubscriberList: userManagerUtil.removeFromSubscriberList,
+            removeFromPatientList: userManagerUtil.removeFromPatientList,
+            getPassword: function () { return this.Password },
             pubSubRequestOnDecision: userManagerUtil.pubSubRequestOnDecision
         },
         after_save: function (instance, options, next) {

@@ -87,7 +87,6 @@ public class RevaWebSocketService extends Service {
     public void atLoginValidation(final Runnable pass, final Runnable fail, Integer nextTryTimeout, Integer maxTrys) {
         new Interval(nextTryTimeout, maxTrys) {
             boolean passed = false;
-
             @Override
             public void work() {
                 if (isLoggedIn()) {
