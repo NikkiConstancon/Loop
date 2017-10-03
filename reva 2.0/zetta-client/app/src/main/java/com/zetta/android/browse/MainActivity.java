@@ -26,12 +26,14 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.zetta.android.MoreGraph;
 import com.zetta.android.R;
 import com.zetta.android.lib.Interval;
 import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
+import com.zetta.android.settings.settingsPage;
 
 import java.util.List;
 import java.util.Map;
@@ -114,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem signOutItem = new SecondaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut);
         signOutItem.withTag(R.string.drawerNameSignOut);
 
+        SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1).withName("Settings");
+        settings.withTag(5);
 
         PrimaryDrawerItem adder;
 
@@ -165,7 +169,8 @@ public class MainActivity extends AppCompatActivity {
                         signOutItem,
                         tmpItemForNikki,
                         tmpItemForAccept,
-                        tmpItemForDecline
+                        tmpItemForDecline,
+                        settings
                 )
 
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -192,6 +197,10 @@ public class MainActivity extends AppCompatActivity {
                                 case 60: {
                                     dList.setUser("greg");
                                     setupViewPager(mViewPager);
+                                }break;
+                                case 5: {
+                                    Intent intent = new Intent(MainActivity.this, settingsPage.class);
+                                    startActivity(intent);
                                 }break;
                                 case R.string.drawerNameSignOut:{
                                     userManagerEndpoint.triggerLoginIntent();

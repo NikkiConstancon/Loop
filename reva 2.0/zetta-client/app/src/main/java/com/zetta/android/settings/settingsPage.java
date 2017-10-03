@@ -5,17 +5,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.zetta.android.R;
 import com.zetta.android.browse.StatListAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class settingsPage extends AppCompatActivity {
     RecyclerView settingsList;
     SettingsListAdapter settingsListAdapter;
-    private List<SettingsItem> settings;
+    private List<SettingsItem> settings = new ArrayList<>();;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +42,12 @@ public class settingsPage extends AppCompatActivity {
 
         settingsListAdapter = new SettingsListAdapter(settings, new SettingsListAdapter.MyAdapterListener() {
             @Override
-            public void moreInfoOnClick(View v, int position) {
-
+            public void buttonYesOnClick(View v, int position) {
+                Log.d("here", "buttonYesOnClick at position "+position);
+            }
+            @Override
+            public void buttonNoOnClick(View v, int position) {
+                Log.d("here", "buttonNoOnClick at position "+position);
             }
         });
 

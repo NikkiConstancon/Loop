@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,7 +28,8 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public SettingsListAdapter.MyAdapterListener onClickListener;
 
     public interface MyAdapterListener {
-        void moreInfoOnClick(View v, int position);
+        void buttonYesOnClick(View v, int position);
+        void buttonNoOnClick(View v, int position);
     }
 
     private static final String TAG = SettingsListAdapter.class.getSimpleName();
@@ -75,11 +77,11 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
                 return new RequestViewHolder(view);
-//            case SettingsItem.TYPE_:
-//                layoutIdForListItem = R.layout.stat_item_simple;
-//
-//                view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
-//                return new StatListAdapter.NumberViewHolder(view);
+            case SettingsItem.TYPE_TITLE:
+                layoutIdForListItem = R.layout.settings_item_title;
+
+                view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+                return new TitleViewHolder(view);
             default:
                 throw new IllegalStateException("Attempted to create view holder for a type you haven't coded for: " + viewType);
         }
@@ -126,11 +128,10 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
      * Cache of the children views for a list item.
      */
     class RequestViewHolder extends RecyclerView.ViewHolder {
-
-        //private final
-
         @NonNull
         private final TextView request_title;
+        private Button yes;
+        private Button no;
 
         /**
          * Constructor for our ViewHolder. Within this constructor, we get a reference to our
@@ -143,7 +144,25 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             super(itemView);
 
             request_title = (TextView) itemView.findViewById(R.id.request_title);
+            yes = (Button) itemView.findViewById(R.id.btn_yes_sub);
+            no = (Button) itemView.findViewById(R.id.btn_no_sub);
+
+            yes.setOnClickListener(new View.OnClickListener() {
+               @Override
+                public void onClick(View v) {
+                   onClickListener.buttonYesOnClick(v, getAdapterPosition());
+               }
+            });
+
+            no.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickListener.buttonNoOnClick(v, getAdapterPosition());
+                }
+            });
         }
+
+
 
         /**
          * A method we wrote for convenience. This method will take an integer as input and
@@ -152,6 +171,32 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
          */
         void bind(RequestItem item) {
             request_title.setText("" + item.getTitle());
+        }
+    }
+
+    class TitleViewHolder extends RecyclerView.ViewHolder {
+        @NonNull
+        private final TextView title;
+        /**
+         * Constructor for our ViewHolder. Within this constructor, we get a reference to our
+         * TextViews and set an onClickListener to listen for clicks. Those will be handled in the
+         * onClick method below.
+         * @param itemView The View that you inflated in
+         *                 {@link StatListAdapter#onCreateViewHolder(ViewGroup, int)}
+         */
+        public TitleViewHolder(View itemView) {
+            super(itemView);
+
+            title = (TextView) itemView.findViewById(R.id.txt_settings_item_title);
+        }
+
+        /**
+         * A method we wrote for convenience. This method will take an integer as input and
+         * use that integer to display the appropriate text within a list item.
+         * @param item The simplestatitem that needs to be displayed
+         */
+        void bind(TitleItem item) {
+            title.setText("" + item.getTitle());
         }
     }
 
