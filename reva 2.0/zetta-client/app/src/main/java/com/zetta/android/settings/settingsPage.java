@@ -11,9 +11,11 @@ import android.widget.Toast;
 
 import com.zetta.android.R;
 import com.zetta.android.browse.StatListAdapter;
+import com.zetta.android.revaServices.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class settingsPage extends AppCompatActivity {
     RecyclerView settingsList;
@@ -29,16 +31,14 @@ public class settingsPage extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
-        settings.add(new RequestItem("Its me"));
-        settings.add(new RequestItem("Your Brother"));
+        settings.add(new TitleItem("Subscriber Requests"));
+        settings.add(new TitleItem("Current Subscribers"));
         settings.add(new ExistingItem("Some guy"));
 
         settingsList = (RecyclerView) findViewById(R.id.settings_recycler);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         settingsList.setLayoutManager(layoutManager);
-
         settingsList.setHasFixedSize(true);
 
         settingsListAdapter = new SettingsListAdapter(settings, new SettingsListAdapter.MyAdapterListener() {
@@ -57,6 +57,51 @@ public class settingsPage extends AppCompatActivity {
         });
 
         settingsList.setAdapter(settingsListAdapter);
+        pubSubBinderEndpoint.bind(this);
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        pubSubBinderEndpoint.unbind(this);
+    }
+
+    UserManager.PubSubBinderEndpoint pubSubBinderEndpoint = new UserManager.PubSubBinderEndpoint(this,
+            new UserManager.PubSubBinderEndpoint.PubSubWorker(){
+                @Override public void sendRequestCallback(final String msg){
+                    //You no longer need to do the ugly runOnUiThread
+                    Log.d("MEAS", msg);
+                    if (msg.equals("")) {
+                        //alert("Succesfully sent request", "OK");
+                    } else {
+                        //alert(msg, "Try Again");
+                    }
+                    Log.d("------TEST---------", msg);
+                }
+                @Override public void sendReplyActionCallback(boolean sucsess){
+
+                }
+            },
+            new UserManager.PubSubBinderEndpoint.PubSubInfoWorker(){
+                @Override public void onConnect(Map<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> infoMap){
+                    for(Map.Entry<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> entry : infoMap.entrySet()){
+                        UserManager.PubSubBinderEndpoint.pubSubReqInfo info =  entry.getValue();
+                        Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
+                    }
+                }
+                @Override public void newReq(UserManager.PubSubBinderEndpoint.pubSubReqInfo info){
+                    Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
+                }
+                @Override public void onPatientList(List<String> patientList){
+                    Log.d("----sub-list---", patientList.toString());
+                    for (int i =0; i < patientList.size(); i++) {
+                        settings.add(new ExistingItem(patientList.get(i)));
+                    }
+                    List<SettingsItem> tmp = settings;
+                    settingsListAdapter.updateList(tmp );
+
+                }
+            }
+    );
 }
