@@ -9,6 +9,9 @@ public class Interval {
     public void end() { }
     public void work(){ }
 
+    public void interrupt(){
+        worker.interrupt();
+    }
     public void clearInterval() {
         callEnd();
         sleepDuration = 0;

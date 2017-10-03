@@ -17,6 +17,33 @@ var subscriberManager = require('./subscriberManager');
 
 var UserManager = module.exports = {
     //All so wrong all the way
+    doOnUser: function (userUid, then, error, hint) {
+        if (hint) {
+            if (transmitter.getUserType() === 'patient') {
+                patientManager.getPatient({ Username: transmitter.getUserUid() }).then(function (pat) {
+                    then && then(pat)
+                }).catch(function (e) {
+                    error && error(e)
+                })
+            } else {
+                subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (sub) {
+                    then && then(sub)
+                }).catch(function (e) {
+                    error && error(e)
+                })
+            }
+        } else {
+            patientManager.getPatient({ Username: transmitter.getUserUid() }).then(function (pat) {
+                then && then(pat)
+            }).catch(function (e) {
+                subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (sub) {
+                    then && then(sub)
+                }).catch(function (e) {
+                    error && error(e)
+                })
+            })
+        }
+    },
     pubSubBindRequest: function (passCb, failCb, requester, target, reqType) {
         if (target == requester) {
             failCb({ clientSafe: "You cannot add yourself" })
@@ -61,5 +88,25 @@ var UserManager = module.exports = {
                 failCb(e)
             })
         }
+    },
+    pubSubBindRequestOnDecision: function (acceptor, requester, decision) {
+        patientManager.getPatient({ Username: acceptor }).then(function (acc) {
+            patientManager.getPatient({ Username: requester }).then(function (req) {
+                req.pubSubRequestOnDecision(acceptor, decision)
+                acc.pubSubRequestOnDecision(requester, decision)
+            }).catch(function () {
+                subscriberManager.getsubscriber({ Email: requester }).then(function (req) {
+                    req.pubSubRequestOnDecision(acceptor, decision)
+                    acc.pubSubRequestOnDecision(requester, decision)
+                })
+            })
+        }).catch(function () {
+            subscriberManager.getsubscriber({ Email: acceptor }).then(function (acc) {
+                patientManager.getPatient({ Username: requester }).then(function (req) {
+                    req.pubSubRequestOnDecision(acceptor, decision)
+                    acc.pubSubRequestOnDecision(requester, decision)
+                })
+            })
+        })
     }
 }

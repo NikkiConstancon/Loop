@@ -172,6 +172,7 @@ module.exports = {
             addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
             addToSubscriberList: userManagerUtil.addToSubscriberList,
             addToPatientList: userManagerUtil.addToPatientList,
+            pubSubRequestOnDecision: userManagerUtil.pubSubRequestOnDecision
         },
         before_save: function (instance, options, next) {
             //instance.Password = encrypt(instance.Password)

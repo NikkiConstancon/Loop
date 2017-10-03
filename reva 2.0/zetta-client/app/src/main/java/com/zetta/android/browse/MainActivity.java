@@ -36,6 +36,8 @@ import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.mikephil.charting.charts.Chart.LOG_TAG;
@@ -131,6 +133,13 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem tmpItemForNikki = new PrimaryDrawerItem().withIdentifier(1).withName("For Nikki");
         tmpItemForNikki.withTag(1234);
 
+        final int tmpItemForAcceptId = 521;
+        PrimaryDrawerItem tmpItemForAccept = new PrimaryDrawerItem().withIdentifier(tmpItemForAcceptId)
+                .withName("tmpItemForAccept");
+        final int tmpItemForDeclineId = 522;
+        PrimaryDrawerItem tmpItemForDecline = new PrimaryDrawerItem().withIdentifier(tmpItemForDeclineId)
+                .withName("tmpItemForDecline");
+
         PrimaryDrawerItem greg = new PrimaryDrawerItem().withIdentifier(1).withName("greg").withTag(60);
 
         AccountHeader headerResult = new AccountHeaderBuilder()
@@ -158,16 +167,29 @@ public class MainActivity extends AppCompatActivity {
 
                         new DividerDrawerItem(),
                         signOutItem,
-                        tmpItemForNikki
+                        tmpItemForNikki,
+                        tmpItemForAccept,
+                        tmpItemForDecline
                 )
 
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 
+                        switch ((int)drawerItem.getIdentifier()){
+                            case tmpItemForAcceptId:{
+                                userManagerEndpoint.pubSubRequestReply(
+                                        "rinus", UserManager.MainActivityEndpoint.pubSubReqInfo.REPLY.ACCEPT
+                                );
+                            }
+                            case tmpItemForDeclineId:{
+                                userManagerEndpoint.pubSubRequestReply(
+                                        "rinus", UserManager.MainActivityEndpoint.pubSubReqInfo.REPLY.DECLINE
+                                );
+                            }
+                        }
                         // do something with the clicked item :D
                         Object tag = drawerItem.getTag();
-
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
                             switch(value){
@@ -293,19 +315,18 @@ public class MainActivity extends AppCompatActivity {
     UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(
             this,
             new UserManager.MainActivityEndpoint.PubSubWorker(){
-                @Override public void work(final String msg){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d("MEAS", msg);
-                            if (msg.equals("")) {
-                                alert("Succesfully sent request", "OK");
-                            } else {
-                                alert(msg, "Try Again");
-                            }
-                        }
-                    });
+                @Override public void sendRequestCallback(final String msg){
+                    //You no longer need to do the ugly runOnUiThread
+                    Log.d("MEAS", msg);
+                    if (msg.equals("")) {
+                        alert("Succesfully sent request", "OK");
+                    } else {
+                        alert(msg, "Try Again");
+                    }
                     Log.d("------TEST---------", msg);
+                }
+                @Override public void sendReplyActionCallback(boolean sucsess){
+
                 }
             },
             new UserManager.MainActivityEndpoint.PubSubInfoWorker(){
@@ -317,6 +338,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 @Override public void newReq(UserManager.MainActivityEndpoint.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
+                }
+                @Override public void onPatientList(List<String> patientList){
+                    Log.d("----sub-list---", patientList.toString());
                 }
             }
     );
