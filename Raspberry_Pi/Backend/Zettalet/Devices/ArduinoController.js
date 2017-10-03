@@ -14,7 +14,7 @@ var ArduinoController = module.exports = function()
 		baudRate: 115200
 	});
 	this.port.pipe(parser);
-console.log("in controller constructor");
+//console.log("in controller constructor");
 	
 	
 }
@@ -29,15 +29,15 @@ ArduinoController.prototype.onChange = function(cb)
 	
 	var self = this;
 	
-	console.log("\tin onChange: " + self.data);
+//	console.log("\tin onChange: " + self.data);
 	parser.on('data', function (data) {
-		console.log('\tgot something:', data);
-		if (data.length > 5)
+		console.log('Data from arduino:', data);
+		if (data.length > 5 && data.length < 10)
 		{
 			self.toMonitor = data.substr(0, 5);
 			console.log('\tTo Monitor:', self.toMonitor);
 			self.data = parseFloat(data.substr(5));
-			console.log("Data recieved: " + parseFloat(data.substr(5)));
+			console.log("\tData to Change: " + parseFloat(data.substr(5)));
 			for (var i = 0; i < self.devices.length; i++) {
 				self.devices[i].setVitals(self.toMonitor, self.data);
 			};
