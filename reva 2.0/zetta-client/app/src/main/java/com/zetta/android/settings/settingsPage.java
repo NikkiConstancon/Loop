@@ -29,9 +29,10 @@ public class settingsPage extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        settings.add(new TitleItem("Subscriber Requests"));
+
         settings.add(new RequestItem("Its me"));
         settings.add(new RequestItem("Your Brother"));
+        settings.add(new ExistingItem("Some guy"));
 
         settingsList = (RecyclerView) findViewById(R.id.settings_recycler);
 
@@ -48,6 +49,10 @@ public class settingsPage extends AppCompatActivity {
             @Override
             public void buttonNoOnClick(View v, int position) {
                 Log.d("here", "buttonNoOnClick at position "+position);
+            }
+            @Override
+            public void deleteOnClick(View v, int position) {
+                Log.d("here", "deleteOnClick at position"+position);
             }
         });
 
