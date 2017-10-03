@@ -30,6 +30,7 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public interface MyAdapterListener {
         void buttonYesOnClick(View v, int position);
         void buttonNoOnClick(View v, int position);
+        void deleteOnClick(View v, int position);
     }
 
     private static final String TAG = SettingsListAdapter.class.getSimpleName();
@@ -53,7 +54,6 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     /**
-     *
      * This gets called when each new ViewHolder is created. This happens when the RecyclerView
      * is laid out. Enough ViewHolders will be created to fill the screen and allow for scrolling.
      *
@@ -82,6 +82,11 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
                 return new TitleViewHolder(view);
+            case SettingsItem.TYPE_EXISTING:
+                layoutIdForListItem = R.layout.settings_item_existing;
+
+                view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+                return new ExistingViewHolder(view);
             default:
                 throw new IllegalStateException("Attempted to create view holder for a type you haven't coded for: " + viewType);
         }
@@ -104,9 +109,12 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case SettingsItem.TYPE_REQUEST:
                 ((RequestViewHolder) holder).bind((RequestItem) settings.get(position));
                 break;
-//            case StatItem.TYPE_SIMPLE_STAT:
-//                ((StatListAdapter.NumberViewHolder) holder).bind((SimpleStatItem) cards.get(position));
-//                break;
+            case SettingsItem.TYPE_TITLE:
+                ((TitleViewHolder) holder).bind((TitleItem) settings.get(position));
+                break;
+            case SettingsItem.TYPE_EXISTING:
+                ((ExistingViewHolder) holder).bind((ExistingItem) settings.get(position));
+                break;
             default:
                 throw new IllegalStateException("Attempted to bind a type you haven't coded for: " + holder.getItemViewType());
         }
@@ -162,8 +170,6 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             });
         }
 
-
-
         /**
          * A method we wrote for convenience. This method will take an integer as input and
          * use that integer to display the appropriate text within a list item.
@@ -196,6 +202,41 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
          * @param item The simplestatitem that needs to be displayed
          */
         void bind(TitleItem item) {
+            title.setText("" + item.getTitle());
+        }
+    }
+
+    class ExistingViewHolder extends RecyclerView.ViewHolder {
+        @NonNull
+        private final TextView title;
+
+        Button delete = (Button) itemView.findViewById(R.id.btn_delete_existing);
+        /**
+         * Constructor for our ViewHolder. Within this constructor, we get a reference to our
+         * TextViews and set an onClickListener to listen for clicks. Those will be handled in the
+         * onClick method below.
+         * @param itemView The View that you inflated in
+         *                 {@link StatListAdapter#onCreateViewHolder(ViewGroup, int)}
+         */
+        public ExistingViewHolder(View itemView) {
+            super(itemView);
+
+            title = (TextView) itemView.findViewById(R.id.txt_existing);
+
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickListener.deleteOnClick(v, getAdapterPosition());
+                }
+            });
+        }
+
+        /**
+         * A method we wrote for convenience. This method will take an integer as input and
+         * use that integer to display the appropriate text within a list item.
+         * @param item The simplestatitem that needs to be displayed
+         */
+        void bind(ExistingItem item) {
             title.setText("" + item.getTitle());
         }
     }
