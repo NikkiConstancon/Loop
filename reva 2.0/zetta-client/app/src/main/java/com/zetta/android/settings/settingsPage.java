@@ -10,12 +10,13 @@ import android.view.View;
 import com.zetta.android.R;
 import com.zetta.android.browse.StatListAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class settingsPage extends AppCompatActivity {
     RecyclerView settingsList;
     SettingsListAdapter settingsListAdapter;
-    private List<SettingsItem> settings;
+    private List<SettingsItem> settings = new ArrayList<>();;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
