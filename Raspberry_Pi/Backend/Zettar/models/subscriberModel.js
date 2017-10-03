@@ -101,8 +101,9 @@ module.exports = {
             addToPatientList: userManagerUtil.addToPatientList,
             removeFromSubscriberList: userManagerUtil.removeFromSubscriberList,
             removeFromPatientList: userManagerUtil.removeFromPatientList,
+            pubSubRequestOnDecision: userManagerUtil.pubSubRequestOnDecision,
             getPassword: function () { return this.Password },
-            pubSubRequestOnDecision: userManagerUtil.pubSubRequestOnDecision
+            getType: function () { return userManagerUtil.enum.userType.subscriber }
         },
         after_save: function (instance, options, next) {
             const dbMan = require('../databaseManager')

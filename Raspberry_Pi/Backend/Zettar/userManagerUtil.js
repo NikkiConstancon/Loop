@@ -3,11 +3,12 @@ var logger = require('./revaLog');
 
 
 var UserManager = module.exports = {
-    addPubSubRequestAsRequester: function (userUid, passCb, failCb) {
+    addPubSubRequestAsRequester: function (userUid, isTargetPatient, passCb, failCb) {
         var map = this.PubSubBindingConfirmationMap || {}
         var info = {}
         info.type = UserManager.enum.pubSubReq.type.request
         info.state = UserManager.enum.pubSubReq.state.pending
+        info.isTargetPatient = (isTargetPatient || false)
         map[userUid] = JSON.stringify(info)
         this.PubSubBindingConfirmationMap = map
         this.save(function (err) {
@@ -15,12 +16,13 @@ var UserManager = module.exports = {
             else passCb && passCb(info)
         });
     },
-    addPubSubRequestAsTarget: function (userUid, passCb, failCb) {
+    addPubSubRequestAsTarget: function (userUid, isTargetPatient, passCb, failCb) {
         var ffs = this.getPassword()//WTF?? if I dont do this it complains that Password has to be set!
         var map = this.PubSubBindingConfirmationMap || {}
         var info = {}
         info.type = UserManager.enum.pubSubReq.type.target
         info.state = UserManager.enum.pubSubReq.state.pending
+        info.isTargetPatient = (isTargetPatient || false)
         map[userUid] = JSON.stringify(info)
         this.PubSubBindingConfirmationMap = map
         this.save(function (err) {
@@ -108,6 +110,7 @@ var UserManager = module.exports = {
         this.save(function(err){});
     },
     pubSubRequestOnDecision: function (onUserUid, decision) {
+        const patientManager = require("./patientManager")
         //NOTE: just delete the key value pair for now to minimize serve client state change handshaking
         try {
             var map = this.PubSubBindingConfirmationMap
@@ -116,8 +119,9 @@ var UserManager = module.exports = {
             }
             var obj = JSON.parse(map[onUserUid])
             if (decision) {
-                if (obj.type == UserManager.enum.pubSubReq.type.target) {
+                if (this.getType() == UserManager.enum.userType.patient && obj.isTargetPatient) {
                     this.addToSubscriberList(onUserUid)
+                    patientManager.triggerUpdateForSubscriberListInfoHook(this, onUserUid)
                 } else {
                     this.addToPatientList(onUserUid)
                     obj.state = UserManager.enum.pubSubReq.state.accepted
@@ -145,7 +149,7 @@ UserManager.enum = {
     pubSubReq: {
         type: {
             request: "request",
-            target: "target"//i.e. patient
+            target: "target"
         },
         state: {
             pending: "pending",
