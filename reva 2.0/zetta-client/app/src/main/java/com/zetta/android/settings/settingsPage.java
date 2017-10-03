@@ -45,11 +45,15 @@ public class settingsPage extends AppCompatActivity {
         settingsListAdapter = new SettingsListAdapter(settings, new SettingsListAdapter.MyAdapterListener() {
             @Override
             public void buttonYesOnClick(View v, int position) {
-                Log.d("here", "buttonYesOnClick at position "+position);
+                pubSubBinderEndpoint.pubSubRequestReply(
+                        ((RequestItem)settingsListAdapter.getSettings().get(position)).getTitle(),PubSubBindingService.pubSubReqInfo.REPLY.ACCEPT
+                );
             }
             @Override
             public void buttonNoOnClick(View v, int position) {
-                Log.d("here", "buttonNoOnClick at position "+position);
+                pubSubBinderEndpoint.pubSubRequestReply(
+                        ((RequestItem)settingsListAdapter.getSettings().get(position)).getTitle(),PubSubBindingService.pubSubReqInfo.REPLY.DECLINE
+                );
             }
             @Override
             public void deleteOnClick(View v, int position) {

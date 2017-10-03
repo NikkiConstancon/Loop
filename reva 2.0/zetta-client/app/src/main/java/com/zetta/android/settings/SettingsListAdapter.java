@@ -37,6 +37,11 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private List<SettingsItem> settings;
 
+    public List<SettingsItem> getSettings() {
+        return settings;
+    }
+
+
     /**
      * Constructor for SettingsListAdapter that accepts a number of items to display and the specification
      * for the ListItemClickListener.
