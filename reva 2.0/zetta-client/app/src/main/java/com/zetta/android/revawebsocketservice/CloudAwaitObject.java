@@ -105,7 +105,7 @@ public abstract class CloudAwaitObject {
                     };
                     awaiting = false;
                     if(notifyWait != null) {
-                        notifyWait.dismiss();
+                        notifyWait.dismiss(false);
                     }
                 }
             };
@@ -143,8 +143,8 @@ public abstract class CloudAwaitObject {
     private Object localMsg;
 
 
-    final static int RESEND_INTERVAL = 3000;
-    final static int MAX_RESEND = 4;
+    final static int RESEND_INTERVAL = 8000;
+    final static int MAX_RESEND = 1;
 
     private boolean silent = false;
 }

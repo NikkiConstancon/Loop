@@ -69,6 +69,8 @@ public class RevaWebSocketService extends Service {
         if (isConnected()) {
             revaWebSocket.close();
         }
+        connectInterval.interrupt();
+        scoutThread.interrupt();
         if (prefs == null) {
             Log.v(TAG, "#setLogin: prefs is null");
             return false;
@@ -320,8 +322,10 @@ public class RevaWebSocketService extends Service {
 
     //call this at socket connect
     private static void rccPublishServiceBindings() {
-        for (String key : serviceBoundList) {
-            rccPushServiceBinding(key, true);
+        synchronized (RevaWebSocketService.class) {
+            for (String key : serviceBoundList) {
+                rccPushServiceBinding(key, true);
+            }
         }
     }
 
@@ -543,16 +547,17 @@ public class RevaWebSocketService extends Service {
         }
         return client;
     }
-
+    Interval connectInterval;
     private synchronized void initScout() {
         //NOTE !! scout now also sends messages in message pool!
         if (!scoutRunning) {
-            new Interval(256, Integer.MAX_VALUE) {
+            connectInterval = new Interval(256, Integer.MAX_VALUE) {
                 @Override
                 public void work() {
                     if (shouldReconnect()) {
                         buildAndConnect();
                     }
+                    scoutSleep();
                 }
             };
             scoutRunning = true;
@@ -609,8 +614,8 @@ public class RevaWebSocketService extends Service {
             if (shouldReconnect()) {
                 long delta = Math.abs(connectThrashingGuardLastOpen - (new Date()).getTime());
                 delta = (delta / 100) + 1;
-                double threshhold = 40000;
-                double expRatio = 0.95 * Math.abs((threshhold) / (threshhold + delta * 0.2 * threshhold));
+                double threshhold = 60000;
+                double expRatio = 0.98 * Math.abs((threshhold) / (threshhold + delta * 0.2 * threshhold));
                 connectThrashingGuardLastDelay = (long) (expRatio * connectThrashingGuardLastDelay)
                         + (long) ((1 - expRatio) * (threshhold / delta));
                 try {

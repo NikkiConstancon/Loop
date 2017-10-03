@@ -77,6 +77,12 @@ public class login_activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
 
+        loginEndpoint.bind(this);
+        loginEndpoint.setEditText(
+                (EditText)findViewById(R.id.input_emailLogin),
+                (EditText)findViewById(R.id.input_passwordLogin)
+        );
+
         registerButton = (Button) findViewById(R.id.btn_register);
         loginButton = (Button) findViewById(R.id.btn_login);
 
@@ -106,8 +112,7 @@ public class login_activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //if(attemptLogin()) {
-                loginEndpoint.getService().setLogin(user.getText().toString(), passw.getText().toString());
-                loginEndpoint.buildLoginAwaitObject(login_activity.this);
+                loginEndpoint.tryLogin(user.getText().toString(), passw.getText().toString());
                 //}
             }
         });
@@ -137,12 +142,6 @@ public class login_activity extends AppCompatActivity {
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         });
-        loginEndpoint = new UserManager.LoginEndpoint(
-                this,
-                (EditText)findViewById(R.id.input_emailLogin),
-                (EditText)findViewById(R.id.input_passwordLogin)
-        );
-        loginEndpoint.bind(this);
     }
 
 
@@ -206,5 +205,5 @@ public class login_activity extends AppCompatActivity {
         }
         return false;
     }
-    UserManager.LoginEndpoint loginEndpoint = null;
+    UserManager.LoginEndpoint loginEndpoint = new UserManager.LoginEndpoint(this);
 }

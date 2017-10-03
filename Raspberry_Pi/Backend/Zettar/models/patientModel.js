@@ -165,7 +165,8 @@ module.exports = {
                 return ret
             },
             addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
-            addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget
+            addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
+            pubSubRequestOnDecision: userManagerUtil.pubSubRequestOnDecision
         },
         before_save: function (instance, options, next) {
             //instance.Password = encrypt(instance.Password)

@@ -114,12 +114,13 @@ public class UserManager extends RevaService {
         }
 
         public void pubSubBindingRequest(String target){
-            attachCloudAwaitObject(null,pubSubCAO).send(activity, "REQ_BIND", target);
+            attachCloudAwaitObject(null, pubSubReqCAO).send(activity, "REQ_BIND", target);
         }
 
         static public class pubSubReqInfo{
             public enum TYPE {REQUESTER, TARGET};
             public enum STATE {PENDING, DELIVERED, ACCEPTED};
+            public enum REPLY {ACCEPT, DECLINE};
             public final String userUid;
             public final TYPE type;
             public final STATE state;
@@ -164,55 +165,78 @@ public class UserManager extends RevaService {
 
         final Activity activity;
         @Override
-        public void onMessage(LinkedTreeMap obj){
-            Map<String, Object> gotMapKeys = obj;
-            for(Map.Entry<String, Object> entry : gotMapKeys.entrySet()){
-                switch (entry.getKey()){
-                    case "BINDING_CONFIRMATION_REQ":{
-                        Map<String, Map<String, String>> gotMap = (Map<String, Map<String, String>>)entry.getValue();
-                        for(Map.Entry<String, Map<String, String>> entryInfo : gotMap.entrySet()){
-                            Map<String, String> info = entryInfo.getValue();
-                            pubSubInfoMap.put(entryInfo.getKey(), new pubSubReqInfo(entryInfo.getKey(), info.get("type"), info.get("state")));
-                        }
-                        pubSubInfoWorker.onConnect(pubSubInfoMap);
-                    }break;
-                    case "NEW_BINDING_CONFIRMATION_REQ":{
-                        Map<String, String> entryInfo = (Map<String, String>)entry.getValue();
-                        pubSubReqInfo info =
-                                new pubSubReqInfo(
-                                        entryInfo.get("userUid"),
-                                        entryInfo.get("type"),
-                                        entryInfo.get("state")
-                                );
+        public void onMessage(final LinkedTreeMap obj){
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Map<String, Object> gotMapKeys = obj;
+                    for(Map.Entry<String, Object> entry : gotMapKeys.entrySet()){
+                        switch (entry.getKey()){
+                            case "BINDING_CONFIRMATION_REQ":{
+                                Map<String, Map<String, String>> gotMap = (Map<String, Map<String, String>>)entry.getValue();
+                                for(Map.Entry<String, Map<String, String>> entryInfo : gotMap.entrySet()){
+                                    Map<String, String> info = entryInfo.getValue();
+                                    pubSubInfoMap.put(entryInfo.getKey(), new pubSubReqInfo(entryInfo.getKey(), info.get("type"), info.get("state")));
+                                }
+                                pubSubInfoWorker.onConnect(pubSubInfoMap);
+                            }break;
+                            case "NEW_BINDING_CONFIRMATION_REQ":{
+                                Map<String, String> entryInfo = (Map<String, String>)entry.getValue();
+                                pubSubReqInfo info =
+                                        new pubSubReqInfo(
+                                                entryInfo.get("userUid"),
+                                                entryInfo.get("type"),
+                                                entryInfo.get("state")
+                                        );
 
-                        pubSubInfoMap.put(entryInfo.get("userUid"),info);
-                        pubSubInfoWorker.newReq(info);
-                    }break;
-                    case "PATIENT_LIST":{
-                        patientList = (ArrayList<String>)entry.getValue();
-                        pubSubInfoWorker.onPatientList(patientList);
-                    }break;
+                                pubSubInfoMap.put(entryInfo.get("userUid"),info);
+                                pubSubInfoWorker.newReq(info);
+                            }break;
+                            case "PATIENT_LIST":{
+                                patientList = (ArrayList<String>)entry.getValue();
+                                pubSubInfoWorker.onPatientList(patientList);
+                            }break;
+                        }
+                    }
                 }
-            }
+            });
         }
         @Override
         public void onServiceConnect(RevaWebSocketService service) {
             webService = service;
         }
         RevaWebSocketService webService = null;
-        CloudAwaitObject pubSubCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
+        CloudAwaitObject pubSubReqCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
             @Override
-            public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
-                pubSubWorker.work((String)obj);
+            public Object get(final Object obj, Object localMsg, CloudAwaitObject cao) {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        pubSubWorker.sendRequestCallback((String)obj);
+                    }
+                });
                 return null;
             }
         };
+
+
+        public void pubSubRequestReply(String userUid, pubSubReqInfo.REPLY reply){
+            attachCloudAwaitObject(null, pubSubReqReplyCAO).send(activity, reply.toString(), userUid);
+        }
+        final CloudAwaitObject pubSubReqReplyCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
+            @Override
+            public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
+                pubSubWorker.sendReplyActionCallback((boolean)obj);
+                return null;
+            }
+        };
+
+
         public static abstract class PubSubWorker{
-            abstract public void work(String msg);
+            abstract public void sendRequestCallback(String msg);
+            abstract public void sendReplyActionCallback(boolean sucsess);
         }
         final PubSubWorker pubSubWorker;
-
-
         public static abstract class PubSubInfoWorker{
             abstract public void onConnect(Map<String, pubSubReqInfo> infoMap);
             abstract public void newReq(pubSubReqInfo info);
@@ -402,22 +426,28 @@ public class UserManager extends RevaService {
     }
 
     public static class LoginEndpoint extends RevaWebsocketEndpoint {
-        public LoginEndpoint(Activity activity_, EditText userUid_, EditText password_) {
-            activity = activity_;
+        public void setEditText(EditText userUid_, EditText password_){
             userUidEditText = userUid_;
             passwordEditText = password_;
+        }
+        public LoginEndpoint(Activity activity_) {
+            activity = activity_;
         }
 
         NotifyCloudAwait notifyWait = null;
 
-        public void buildLoginAwaitObject(final Context context) {
+        public void tryLogin(String userUid, String password){
+            getService().setLogin(userUid, password);
+            buildLoginAwaitObject();
+        }
+        public void buildLoginAwaitObject() {
             if (notifyWait == null) {
-                notifyWait = new NotifyCloudAwait(context, false,
+                notifyWait = new NotifyCloudAwait(activity, false,
                         750, " ... validating your input ... ", 5000) {
                     @Override
                     public void end(NotifyCloudAwait.DISMISS_TYPE type) {
                         if (type == DISMISS_TYPE.TIMEOUT) {
-                            AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+                            AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);
                             builder1.setTitle("Could not connect to the cloud");
                             builder1.setMessage("try again ?");
                             builder1.setCancelable(true);
@@ -425,7 +455,7 @@ public class UserManager extends RevaService {
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             notifyWait = null;
-                                            buildLoginAwaitObject(context);
+                                            buildLoginAwaitObject();
                                             dialog.dismiss();
                                         }
                                     });
@@ -456,7 +486,7 @@ public class UserManager extends RevaService {
             //TODO move this to
             final String USER_MANAGER_KEY_CONNECTED = "CONNECTED";
             if (obj.containsKey(USER_MANAGER_KEY_CONNECTED)) {
-                notifyWait.dismiss();
+                notifyWait.dismiss(true);
                 notifyWait = null;
                 Map<String, Object> info = (Map<String, Object>) obj.get(USER_MANAGER_KEY_CONNECTED);
                 String userUid = (String) info.get("USER_UID");
@@ -486,6 +516,6 @@ public class UserManager extends RevaService {
             }
         }
 
-        final EditText userUidEditText, passwordEditText;
+        EditText userUidEditText, passwordEditText;
     }
 }

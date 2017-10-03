@@ -19,7 +19,7 @@ public abstract class DelayedUiAction {
                     ((Activity) ct).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            work();
+                            work(ct);
                         }
                     });
                 }
@@ -27,5 +27,5 @@ public abstract class DelayedUiAction {
         }.start();
     }
 
-    public abstract void work();
+    public abstract void work(Context ct);
 }

@@ -88,9 +88,10 @@ module.exports = {
 		    verifyPassword: function (value) {
 		        return decrypt(this.Password) === value
             },
+            getPassword: function () { return this.Password },
             addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
             addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
-            getPassword: function () { return this.Password }
+            pubSubRequestOnDecision: userManagerUtil.pubSubRequestOnDecision
         },
         after_save: function (instance, options, next) {
             const dbMan = require('../databaseManager')
