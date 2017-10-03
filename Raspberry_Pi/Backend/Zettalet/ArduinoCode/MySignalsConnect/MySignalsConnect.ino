@@ -26,6 +26,8 @@
 
 #include <MySignals.h>
 #include <MySignals_BLE.h>
+#include "Wire.h"
+#include "SPI.h" 
 
 
 // Write here the MAC address of BLE device to find
@@ -306,8 +308,20 @@ void loop()
     MySignals_BLE.initialize_BLE_values();
     delay(100);
 
-  }
-  delay(1000);
+  }  
+  delay(500);
+  float ECG = MySignals.getECG(VOLTAGE);
+  delay(10);
+  digitalWrite(ENABLE, HIGH);
+  delay(10);
+  
+  Serial.print("ECGSG");
+  Serial.println(ECG, 2);
+
+  delay(10);
+  digitalWrite(ENABLE, LOW);
+  delay(10);
+  delay(500);
 }
 
     
