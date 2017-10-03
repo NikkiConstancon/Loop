@@ -14,12 +14,12 @@
         android:text="Person wanting sub"
         android:textSize="14sp"
 
-        android:drawableStart="@drawable/ic_person_black_24dp"
-        android:drawableTint="#38ACEC"
+        android:drawableStart="@drawable/subs"
         android:drawablePadding="5dp"
         android:padding="8dp"
         tools:ignore="HardcodedText,RtlHardcoded"
         tools:text="Person pending"
-        android:layout_weight="1.0"/>
+        android:layout_weight="1.0"
+        tools:targetApi="m" />
 
 </LinearLayout>
