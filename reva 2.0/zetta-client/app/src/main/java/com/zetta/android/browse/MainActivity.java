@@ -1,16 +1,13 @@
 package com.zetta.android.browse;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.preference.AndroidResources;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.InputType;
@@ -38,11 +35,8 @@ import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.settingsPage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.github.mikephil.charting.charts.Chart.LOG_TAG;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -75,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
         userManagerEndpoint.bind(this);
+        pubSubBinderEndpoint.bind(this);
         statTmpForNikkiEndpoint.bind(this);
 
         userManagerEndpoint.hardGuardActivityByVerifiedUser(workOnUser);
@@ -84,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         userManagerEndpoint.unbind(this);
+        pubSubBinderEndpoint.unbind(this);
         statTmpForNikkiEndpoint.unbind(this);
     }
 
@@ -183,13 +179,13 @@ public class MainActivity extends AppCompatActivity {
 
                         switch ((int)drawerItem.getIdentifier()){
                             case tmpItemForAcceptId:{
-                                userManagerEndpoint.pubSubRequestReply(
-                                        "rinus", UserManager.MainActivityEndpoint.pubSubReqInfo.REPLY.ACCEPT
+                                pubSubBinderEndpoint.pubSubRequestReply(
+                                        "rinus", UserManager.PubSubBinderEndpoint.pubSubReqInfo.REPLY.ACCEPT
                                 );
                             }
                             case tmpItemForDeclineId:{
-                                userManagerEndpoint.pubSubRequestReply(
-                                        "rinus", UserManager.MainActivityEndpoint.pubSubReqInfo.REPLY.DECLINE
+                                pubSubBinderEndpoint.pubSubRequestReply(
+                                        "rinus", UserManager.PubSubBinderEndpoint.pubSubReqInfo.REPLY.DECLINE
                                 );
                             }
                         }
@@ -219,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(cont, drawerItem.getTag().toString(), Toast.LENGTH_SHORT).show();
                                 }break;
                                 case 123:{
-                                    userManagerEndpoint.pubSubBindingRequest("what@sub.com");
+                                    pubSubBinderEndpoint.pubSubBindingRequest("what@sub.com");
                                 }break;
                                 case 1234:{
                                     statTmpForNikkiEndpoint.attachCloudAwaitObject(
@@ -262,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();
-                userManagerEndpoint.pubSubBindingRequest(m_Text);
+                pubSubBinderEndpoint.pubSubBindingRequest(m_Text);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -321,9 +317,11 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
     }
 
-    UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(
-            this,
-            new UserManager.MainActivityEndpoint.PubSubWorker(){
+    UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(this);
+
+
+    UserManager.PubSubBinderEndpoint pubSubBinderEndpoint = new UserManager.PubSubBinderEndpoint(this,
+            new UserManager.PubSubBinderEndpoint.PubSubWorker(){
                 @Override public void sendRequestCallback(final String msg){
                     //You no longer need to do the ugly runOnUiThread
                     Log.d("MEAS", msg);
@@ -338,14 +336,14 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             },
-            new UserManager.MainActivityEndpoint.PubSubInfoWorker(){
-                @Override public void onConnect(Map<String, UserManager.MainActivityEndpoint.pubSubReqInfo> infoMap){
-                    for(Map.Entry<String, UserManager.MainActivityEndpoint.pubSubReqInfo> entry : infoMap.entrySet()){
-                        UserManager.MainActivityEndpoint.pubSubReqInfo info =  entry.getValue();
+            new UserManager.PubSubBinderEndpoint.PubSubInfoWorker(){
+                @Override public void onConnect(Map<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> infoMap){
+                    for(Map.Entry<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> entry : infoMap.entrySet()){
+                        UserManager.PubSubBinderEndpoint.pubSubReqInfo info =  entry.getValue();
                         Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                     }
                 }
-                @Override public void newReq(UserManager.MainActivityEndpoint.pubSubReqInfo info){
+                @Override public void newReq(UserManager.PubSubBinderEndpoint.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                 }
                 @Override public void onPatientList(List<String> patientList){
@@ -353,7 +351,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
     );
-
 
 
 

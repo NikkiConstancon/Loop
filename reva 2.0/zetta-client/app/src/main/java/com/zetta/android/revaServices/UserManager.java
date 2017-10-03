@@ -44,7 +44,6 @@ public class UserManager extends RevaService {
     }
 
 
-
     public static class MainActivityEndpoint extends RevaWebsocketEndpoint {
         public RevaWebSocketService.USER_TYPE getUserType(){
             return webService.getUserType();
@@ -57,13 +56,9 @@ public class UserManager extends RevaService {
             return "UserManager";
         }
         public MainActivityEndpoint(
-                Activity activity_,
-                PubSubWorker pubSubWorker_,
-                PubSubInfoWorker pubSubInfoWorker_
+                Activity activity_
         ){
             activity = activity_;
-            pubSubWorker = pubSubWorker_;
-            pubSubInfoWorker = pubSubInfoWorker_;
         }
 
         Interval validateUserUidInterval;
@@ -112,6 +107,37 @@ public class UserManager extends RevaService {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             activity.startActivity(intent);
         }
+
+        final Activity activity;
+        @Override
+        public void onServiceConnect(RevaWebSocketService service) {
+            webService = service;
+        }
+        RevaWebSocketService webService = null;
+    }
+
+
+    public static class PubSubBinderEndpoint extends RevaWebsocketEndpoint {
+        public RevaWebSocketService.USER_TYPE getUserType(){
+            return webService.getUserType();
+        }
+        public static abstract class WorkOnUser{
+            abstract public void work(String userUid);
+        }
+        @Override
+        public String key() {
+            return "UserManager";
+        }
+        public PubSubBinderEndpoint(
+                Activity activity_,
+                PubSubWorker pubSubWorker_,
+                PubSubInfoWorker pubSubInfoWorker_
+        ){
+            activity = activity_;
+            pubSubWorker = pubSubWorker_;
+            pubSubInfoWorker = pubSubInfoWorker_;
+        }
+
 
         public void pubSubBindingRequest(String target){
             attachCloudAwaitObject(null, pubSubReqCAO).send(activity, "REQ_BIND", target);
