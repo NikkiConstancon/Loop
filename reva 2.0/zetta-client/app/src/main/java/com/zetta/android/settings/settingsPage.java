@@ -34,8 +34,7 @@ public class settingsPage extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        settings.add(new TitleItem("Subscriber Requests"));
-        settings.add(new TitleItem("Current Subscribers"));
+
 
         settingsList = (RecyclerView) findViewById(R.id.settings_recycler);
 
@@ -60,6 +59,14 @@ public class settingsPage extends AppCompatActivity {
 
         settingsList.setAdapter(settingsListAdapter);
         pubSubBinderEndpoint.bind(this);
+    }
+
+    private void updateAdapter() {
+        List<SettingsItem> tmp = new ArrayList<>();
+        tmp.addAll(reqList);
+        tmp.addAll(patList);
+
+        settingsListAdapter.updateList(tmp);
     }
 
 
@@ -88,17 +95,17 @@ public class settingsPage extends AppCompatActivity {
             new PubSubBindingService.PubSubInfoWorker(){
                 @Override public void onConnect(Map<String, PubSubBindingService.pubSubReqInfo> infoMap){
                     List<SettingsItem> tmp = new ArrayList<>();
-                    tmp.add(settings.get(0));
-                    int count = 0;
+                    reqList.clear();
+                    reqList.add(new TitleItem("Subscriber Requests"));
                     for(Map.Entry<String, PubSubBindingService.pubSubReqInfo> entry : infoMap.entrySet()){
                         PubSubBindingService.pubSubReqInfo info =  entry.getValue();
                         Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                         reqList.add(new RequestItem(info.userUid));
-                        count++;
                     }
-                    tmp.addAll(reqList);
-                    settingsListAdapter.updateList(tmp);
+
+                    updateAdapter();
                 }
+
                 @Override public void newReq(PubSubBindingService.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
 
@@ -106,27 +113,15 @@ public class settingsPage extends AppCompatActivity {
 
                 }
                 @Override public void onPatientList(List<String> patientList){
-                    Log.d("----sub-list---", patientList.toString());
+                    Log.d("--setsub-list---", patientList.toString());
 
-                    List<SettingsItem> tmp = new ArrayList<>();
+                    patList.clear();
+                    patList.add(new TitleItem("Current Subscribers"));
                     for (int i =0; i < patientList.size(); i++) {
                         patList.add(new ExistingItem(patientList.get(i)));
                     }
 
-                    tmp.add(settings.get(0));
-                    for (int count = 1; count < settings.size(); count++) {
-                        tmp.add(settings.get(count));
-                        if (settings.get(count) instanceof TitleItem) {
-                            tmp.add(settings.get(count));
-                            break;
-                        }
-                    }
-
-                    tmp.addAll(patList);
-                    for (int i = 1; i < settings.size(); i++) {
-                        tmp.add(settings.get(i));
-                    }
-                    settingsListAdapter.updateList(tmp);
+                    updateAdapter();
                 }
             }
     );
