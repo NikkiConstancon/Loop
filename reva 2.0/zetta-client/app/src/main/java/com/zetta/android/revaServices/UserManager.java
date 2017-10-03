@@ -1,6 +1,7 @@
 package com.zetta.android.revaServices;
 
 import android.app.Activity;
+import android.support.annotation.IntegerRes;
 import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.browse.MainActivity;
 import com.zetta.android.browse.Registration_Cont;
+import com.zetta.android.browse.Registration_Patient;
 import com.zetta.android.browse.login_activity;
 import com.zetta.android.lib.Interval;
 import com.zetta.android.lib.NotifyCloudAwait;
@@ -166,7 +168,7 @@ public class UserManager extends RevaService {
                     if ((boolean) got.get("PASS")) {
                         if (patient) {
                             /////////////////////////////////////////change intent to Registration_cont
-                            Intent toReg = new Intent(activity, Registration_Cont.class);
+                            Intent toReg = new Intent(activity, Registration_Patient.class);
                             toReg.putExtra("regEmail", regEmail);
                             toReg.putExtra("regPass", regPass);
                             activity.startActivityForResult(toReg, 0);
@@ -342,10 +344,10 @@ public class UserManager extends RevaService {
         NotifyCloudAwait notifyWait = null;
 
         public void tryLogin(String userUid, String password){
-            getService().setLogin(userUid, password);
-            buildLoginAwaitObject();
+            buildLoginAwaitObject(userUid, password);
         }
-        public void buildLoginAwaitObject() {
+        public void buildLoginAwaitObject(final String userUid, final String password) {
+            getService().setLogin(userUid, password);
             if (notifyWait == null) {
                 notifyWait = new NotifyCloudAwait(activity, false,
                         750, " ... validating your input ... ", 5000) {
@@ -360,7 +362,7 @@ public class UserManager extends RevaService {
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             notifyWait = null;
-                                            buildLoginAwaitObject();
+                                            buildLoginAwaitObject(userUid, password);
                                             dialog.dismiss();
                                         }
                                     });
@@ -387,40 +389,69 @@ public class UserManager extends RevaService {
 
         Activity activity;
 
-        public final void onMessage(LinkedTreeMap obj) {
-            //TODO move this to
-            final String USER_MANAGER_KEY_CONNECTED = "CONNECTED";
-            if (obj.containsKey(USER_MANAGER_KEY_CONNECTED)) {
-                notifyWait.dismiss(true);
-                notifyWait = null;
-                Map<String, Object> info = (Map<String, Object>) obj.get(USER_MANAGER_KEY_CONNECTED);
-                String userUid = (String) info.get("USER_UID");
-                if (userUid.compareTo(RevaWebSocketService.SPECIAL_USER_ANONYMOUS) != 0) {
-                    Intent intent = new Intent(activity, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra("Username", userUid.toString());
-                    activity.startActivity(intent);
-                } else {
-                    final Map<String, String> errorMap = (Map<String, String>) info.get("ERROR");
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (errorMap != null) {
-                                String error = errorMap.get("text");
-                                if (errorMap.get("field").compareTo("password") == 0) {
-                                    passwordEditText.setError(error);
-                                } else {
-                                    userUidEditText.setError(error);
+        public final void onMessage(final LinkedTreeMap obj) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    final String USER_MANAGER_KEY_CONNECTED = "CONNECTED";
+                    if (notifyWait != null && obj.containsKey(USER_MANAGER_KEY_CONNECTED)) {
+                        notifyWait.dismiss(true);
+                        notifyWait = null;
+                        if (tryLoginInterval == null) {
+                            tryLoginInterval = new Interval(1, Integer.MAX_VALUE) {
+                                @Override
+                                public void work() {
+                                    activity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (tryLoginInterval != null && getService().isLoggedIn()) {
+                                                tryLoginInterval.clearInterval();
+                                                tryLoginInterval = null;
+                                            }
+                                        }
+                                    });
                                 }
-                            } else {
-                                userUidEditText.setError("You must specify a username");
-                            }
+                                @Override
+                                public void end() {
+                                    activity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Intent intent = new Intent(activity, MainActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            intent.putExtra("Username", getService().getAuthId());
+                                            activity.startActivity(intent);
+                                        }
+                                    });
+                                }
+                            };
                         }
-                    });
+                        Map<String, Object> info = (Map<String, Object>) obj.get(USER_MANAGER_KEY_CONNECTED);
+                        String userUid = (String) info.get("USER_UID");
+                        if (userUid.compareTo(RevaWebSocketService.SPECIAL_USER_ANONYMOUS) != 0) {
+                        } else {
+                            final Map<String, String> errorMap = (Map<String, String>) info.get("ERROR");
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (errorMap != null) {
+                                        String error = errorMap.get("text");
+                                        if (errorMap.get("field").compareTo("password") == 0) {
+                                            passwordEditText.setError(error);
+                                        } else {
+                                            userUidEditText.setError(error);
+                                        }
+                                    } else {
+                                        userUidEditText.setError("You must specify a username");
+                                    }
+                                }
+                            });
+                        }
+                    }
                 }
-            }
+            });
         }
 
         EditText userUidEditText, passwordEditText;
+        Interval tryLoginInterval = null;
     }
 }
