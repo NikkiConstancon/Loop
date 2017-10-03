@@ -392,14 +392,14 @@ public class UserManager extends RevaService {
                 final String regPass,
                 final String address,
                 final String username,
-                final String subPass
+                final String reason
         ) {
             Map<String, String> sendMap = new TreeMap<>();
             sendMap.put("Email", regEmail);
             sendMap.put("Password", regPass);
             sendMap.put("Address", address);
             sendMap.put("Username", username);
-            sendMap.put("AccessPassword", subPass);
+            sendMap.put("Reason", reason);
 
             attachCloudAwaitObject(true, new CloudAwaitObject("REGISTER") {
                 @Override
@@ -409,7 +409,7 @@ public class UserManager extends RevaService {
                         final LinkedTreeMap<String, Object> got = (LinkedTreeMap<String, Object>) obj;
                         if ((boolean) got.get("PATIENT_PASS")) {
                             ret = true;
-                            getService().setLogin(username, subPass);
+                            getService().setLogin(username, reason);
                             activity.runOnUiThread(new Runnable() {
                                 public void run() {
                                     Toast.makeText(activity, "Welcome " + username, Toast.LENGTH_LONG).show();
