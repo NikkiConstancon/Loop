@@ -45,7 +45,7 @@ var UserManager = module.exports = {
 
         //Check if password is correct:
         this.SubscriberList = updateValue;
-        this.save(function(err){return true})
+        this.save(function(err){})
     },
     addToPatientList: function(_newPatient){
         var updateValue;
@@ -64,7 +64,7 @@ var UserManager = module.exports = {
 
         //Check if password is correct:
         this.PatientList = updateValue;
-        this.save(function(err){return true})
+        this.save(function(err){})
         
     },
     removeFromPatientList: function(_oldSubscriber){
@@ -79,14 +79,14 @@ var UserManager = module.exports = {
                 return false;
             }
             console.log(updateValue.indexOf(_oldSubscriber))
-            
+
             updateValue.splice(updateValue.indexOf(_oldSubscriber),1)
         }
 
         //store updated value
         console.log(updateValue)
         this.PatientList = updateValue;
-        this.save(function(err){return true});
+        this.save(function(err){});
     },
     removeFromSubscriberList: function(_oldSubscriber){
                 //is that subscriber on the list?
@@ -105,7 +105,7 @@ var UserManager = module.exports = {
         //store updated value
         console.log(updateValue)
         this.SubscriberList = updateValue;
-        this.save(function(err){return true});
+        this.save(function(err){});
     },
     pubSubRequestOnDecision: function (onUserUid, decision) {
         //NOTE: just delete the key value pair for now to minimize serve client state change handshaking

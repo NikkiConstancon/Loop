@@ -74,7 +74,7 @@ module.exports = {
     key:["Email"]        
 }
 */
- var validatePatient = function(_userName_Password){
+ /*var validatePatient = function(_userName_Password){
                         
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
@@ -98,7 +98,7 @@ module.exports = {
                 reject(err)
             })
         })
-    }
+    }*/
 
 
 
@@ -183,7 +183,7 @@ var subscriberManager = module.exports = {
             })
         })
     },
-    addToPatientList: function(_subscriber,_newPatient){
+   /* addToPatientList: function(_subscriber,_newPatient){
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
                 //Validate email:
@@ -286,7 +286,7 @@ var subscriberManager = module.exports = {
                 reject(err)
             })
         })
-    },
+    },*/
     validateEmail: function (key1, key2) {
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {

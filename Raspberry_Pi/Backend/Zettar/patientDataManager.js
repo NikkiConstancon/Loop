@@ -118,7 +118,7 @@ TimeStamp*/
                     });
 
                     //need to find averages according to the interval
-                    // console.log(result);
+                    console.log(result);
 
 
                  /*   var endInterval = new Date(_info.StartTime) //marks the end of the current interval

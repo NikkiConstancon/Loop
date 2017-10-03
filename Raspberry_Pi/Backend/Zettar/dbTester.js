@@ -29,7 +29,7 @@ setTimeout(function() {
     //     {'Username': 'greg'},
     //     "Kicks", true
     // )
-    (subscriberManager.getsubscriber({Email:"what@sub.com"})).then(function(hu){hu.removeFromPatientList("greg")});
+    (patientManager.getPatient({Username:"greg"})).then(function(hu){hu.addToPatientList("NEW1")});
     // (subscriberManager.getsubscriber({Email:"what@sub.com"})).then(function(hu){hu.addToPatientList("rinus")})
     // Patient.addToPatientList("no.@e");
     
