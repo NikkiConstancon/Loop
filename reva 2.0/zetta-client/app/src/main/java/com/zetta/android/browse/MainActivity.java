@@ -30,6 +30,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zetta.android.MoreGraph;
 import com.zetta.android.R;
 import com.zetta.android.lib.Interval;
+import com.zetta.android.revaServices.PubSubBindingService;
 import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
@@ -181,12 +182,12 @@ public class MainActivity extends AppCompatActivity {
                         switch ((int)drawerItem.getIdentifier()){
                             case tmpItemForAcceptId:{
                                 pubSubBinderEndpoint.pubSubRequestReply(
-                                        "rinus", UserManager.PubSubBinderEndpoint.pubSubReqInfo.REPLY.ACCEPT
+                                        "rinus",PubSubBindingService.pubSubReqInfo.REPLY.ACCEPT
                                 );
                             }
                             case tmpItemForDeclineId:{
                                 pubSubBinderEndpoint.pubSubRequestReply(
-                                        "rinus", UserManager.PubSubBinderEndpoint.pubSubReqInfo.REPLY.DECLINE
+                                        "rinus",PubSubBindingService.pubSubReqInfo.REPLY.DECLINE
                                 );
                             }
                         }
@@ -321,8 +322,8 @@ public class MainActivity extends AppCompatActivity {
     UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(this);
 
 
-    UserManager.PubSubBinderEndpoint pubSubBinderEndpoint = new UserManager.PubSubBinderEndpoint(this,
-            new UserManager.PubSubBinderEndpoint.PubSubWorker(){
+   PubSubBindingService pubSubBinderEndpoint = new PubSubBindingService(this,
+            new PubSubBindingService.PubSubWorker(){
                 @Override public void sendRequestCallback(final String msg){
                     //You no longer need to do the ugly runOnUiThread
                     Log.d("MEAS", msg);
@@ -337,14 +338,14 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             },
-            new UserManager.PubSubBinderEndpoint.PubSubInfoWorker(){
-                @Override public void onConnect(Map<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> infoMap){
-                    for(Map.Entry<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> entry : infoMap.entrySet()){
-                        UserManager.PubSubBinderEndpoint.pubSubReqInfo info =  entry.getValue();
+            new PubSubBindingService.PubSubInfoWorker(){
+                @Override public void onConnect(Map<String,PubSubBindingService.pubSubReqInfo> infoMap){
+                    for(Map.Entry<String,PubSubBindingService.pubSubReqInfo> entry : infoMap.entrySet()){
+                       PubSubBindingService.pubSubReqInfo info =  entry.getValue();
                         Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                     }
                 }
-                @Override public void newReq(UserManager.PubSubBinderEndpoint.pubSubReqInfo info){
+                @Override public void newReq(PubSubBindingService.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                 }
                 @Override public void onPatientList(List<String> patientList){

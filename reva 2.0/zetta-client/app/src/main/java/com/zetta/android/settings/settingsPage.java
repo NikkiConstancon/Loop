@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.zetta.android.R;
 import com.zetta.android.browse.StatListAdapter;
+import com.zetta.android.revaServices.PubSubBindingService;
 import com.zetta.android.revaServices.UserManager;
 
 import java.util.ArrayList;
@@ -67,8 +68,8 @@ public class settingsPage extends AppCompatActivity {
         pubSubBinderEndpoint.unbind(this);
     }
 
-    UserManager.PubSubBinderEndpoint pubSubBinderEndpoint = new UserManager.PubSubBinderEndpoint(this,
-            new UserManager.PubSubBinderEndpoint.PubSubWorker(){
+    PubSubBindingService pubSubBinderEndpoint = new PubSubBindingService(this,
+            new PubSubBindingService.PubSubWorker(){
                 @Override public void sendRequestCallback(final String msg){
                     //You no longer need to do the ugly runOnUiThread
                     Log.d("MEAS", msg);
@@ -83,14 +84,14 @@ public class settingsPage extends AppCompatActivity {
 
                 }
             },
-            new UserManager.PubSubBinderEndpoint.PubSubInfoWorker(){
-                @Override public void onConnect(Map<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> infoMap){
-                    for(Map.Entry<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> entry : infoMap.entrySet()){
-                        UserManager.PubSubBinderEndpoint.pubSubReqInfo info =  entry.getValue();
+            new PubSubBindingService.PubSubInfoWorker(){
+                @Override public void onConnect(Map<String, PubSubBindingService.pubSubReqInfo> infoMap){
+                    for(Map.Entry<String, PubSubBindingService.pubSubReqInfo> entry : infoMap.entrySet()){
+                        PubSubBindingService.pubSubReqInfo info =  entry.getValue();
                         Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                     }
                 }
-                @Override public void newReq(UserManager.PubSubBinderEndpoint.pubSubReqInfo info){
+                @Override public void newReq(PubSubBindingService.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                 }
                 @Override public void onPatientList(List<String> patientList){
