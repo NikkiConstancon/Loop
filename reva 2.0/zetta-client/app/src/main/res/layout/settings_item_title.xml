@@ -13,14 +13,14 @@
         android:textColor="#38ACEC"
         android:text="Settings"
         android:textSize="14sp"
-        android:layout_marginLeft="20dp"
+
         android:padding="8dp"
         tools:ignore="HardcodedText,RtlHardcoded"
         tools:text="Settings" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="10dp"
+
         android:background="@color/lightGray"/>
 
 </LinearLayout>
