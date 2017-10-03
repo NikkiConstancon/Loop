@@ -331,10 +331,26 @@ public class UserManager extends RevaService {
                         activity.runOnUiThread(new Runnable() {
                             public void run() {
                                 Toast.makeText(activity, "Welcome " + regEmail, Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(activity, MainActivity.class);
+                                final Intent intent = new Intent(activity, MainActivity.class);
                                 intent.putExtra("Username", regEmail.toString());
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                activity.startActivity(intent);
+
+                                getService().atLoginValidation(
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                activity.startActivity(intent);
+                                            }
+                                        },
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                activity.startActivity(intent);
+                                            }
+                                        },
+                                        100,
+                                        19
+                                );
                             }
                         });
                     } else {
@@ -397,10 +413,25 @@ public class UserManager extends RevaService {
                             activity.runOnUiThread(new Runnable() {
                                 public void run() {
                                     Toast.makeText(activity, "Welcome " + username, Toast.LENGTH_LONG).show();
-                                    Intent intent = new Intent(activity, MainActivity.class);
+                                    final Intent intent = new Intent(activity, MainActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     intent.putExtra("Username", username.toString());
-                                    activity.startActivity(intent);
+                                    getService().atLoginValidation(
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    activity.startActivity(intent);
+                                                }
+                                            },
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    activity.startActivity(intent);
+                                                }
+                                            },
+                                            100,
+                                            19
+                                    );
                                 }
                             });
                         } else {
