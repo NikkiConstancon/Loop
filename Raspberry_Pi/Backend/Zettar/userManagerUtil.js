@@ -26,6 +26,52 @@ var UserManager = module.exports = {
             if (err) failCb && failCb({systemError: err })
             else passCb && passCb(info)
         });
+    },
+    addToSubscriberList: function(_newPatient){
+         var updateValue;
+
+        if (this.SubscriberList == null) {
+            updateValue = [_newPatient]
+        } else {
+            updateValue = this.SubscriberList
+            if (updateValue.indexOf(_newPatient) > -1) {
+                //already on list
+                return false;
+            } else{
+                updateValue.push(_newPatient)
+                //store updated value
+                console.log(updateValue)
+                
+                //Check if password is correct:
+                validatePatient(_newPatient);
+
+                this.SubscriberList = updateValue;
+                this.save(function(err){return true})
+            }
+        }
+    }
+    addToPatientList: function(_newPatient){
+        var updateValue;
+
+        if (this.PatientList == null) {
+            updateValue = [_newPatient]
+        } else {
+            updateValue = this.PatientList
+            if (updateValue.indexOf(_newPatient) > -1) {
+                //already on list
+                return false;
+            } else{
+                updateValue.push(_newPatient)
+                //store updated value
+                console.log(updateValue)
+
+                //Check if password is correct:
+                validatePatient(_newPatient);
+
+                this.PatientList = updateValue;
+                this.save(function(err){return true})
+            }
+        }
     }
 }
 

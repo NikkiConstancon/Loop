@@ -47,6 +47,10 @@ module.exports = {
                 type: "list",
                 typeDef: "<text>"
             },
+            PatientList     : {
+                    type: "list",
+                    typeDef: "<text>"
+            },
             ZettaletUuid: {
                 type: 'text'
             },
@@ -165,7 +169,9 @@ module.exports = {
                 return ret
             },
             addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
-            addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget
+            addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
+            addToSubscriberList: userManagerUtil.addToSubscriberList,
+            addToPatientList: userManagerUtil.addToPatientList,
         },
         before_save: function (instance, options, next) {
             //instance.Password = encrypt(instance.Password)
