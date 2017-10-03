@@ -117,9 +117,9 @@ var UserManager = module.exports = {
             var obj = JSON.parse(map[onUserUid])
             if (decision) {
                 if (obj.type == UserManager.enum.pubSubReq.type.target) {
-                    //TODO add to subList
+                    this.addToSubscriberList(onUserUid)
                 } else {
-                    //TODO add to patList
+                    this.addToPatientList(onUserUid)
                     obj.state = UserManager.enum.pubSubReq.state.accepted
                 }
             } else {
