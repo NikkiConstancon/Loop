@@ -6,6 +6,12 @@
     android:layout_height="wrap_content"
     android:padding="16dp">
 
+    <Button
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_margin="5dp"
+        android:background="@drawable/subs"/>
+
     <TextView
         android:id="@+id/txt_pending"
         android:layout_width="0dp"
@@ -13,9 +19,6 @@
         android:textColor="@color/colorPrimaryText"
         android:text="Person wanting sub"
         android:textSize="14sp"
-
-        android:drawableStart="@drawable/subs"
-        android:drawablePadding="5dp"
         android:padding="8dp"
         tools:ignore="HardcodedText,RtlHardcoded"
         tools:text="Person pending"
