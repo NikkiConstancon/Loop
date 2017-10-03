@@ -25,8 +25,8 @@ var deviceLibrary = [];
 //Electrocardiograph
 */	var Electrocardiograph = require('./Devices/Electrocardiograph.js');
 	deviceLibrary.push(require('./Devices/Electrocardiograph.js'));
-	var ECGPulse = require('./Devices/ECGPulse.js');
-	deviceLibrary.push(require('./Devices/ECGPulse.js'));
+//	var ECGPulse = require('./Devices/ECGPulse.js');
+//	deviceLibrary.push(require('./Devices/ECGPulse.js'));
 /*
 //Electromygraphy
 	var Electromyograph = require('./Devices/Electromyograph.js');
@@ -44,18 +44,25 @@ var deviceLibrary = [];
 */
 	var scaleWeight = require('./Devices/ScaleWeight.js');
 	deviceLibrary.push(require('./Devices/ScaleWeight.js'));
+	console.log("required library");
 	var scaleBone = require('./Devices/ScaleBone.js');
 	deviceLibrary.push(require('./Devices/ScaleBone.js'));
+	console.log("required library");
 	var scaleBodyFat = require('./Devices/ScaleBodyFat.js');
 	deviceLibrary.push(require('./Devices/ScaleBodyFat.js'));
+	console.log("required library");
 	var scaleMuscleMass = require('./Devices/ScaleMuscleMass.js');
 	deviceLibrary.push(require('./Devices/ScaleMuscleMass.js'));
+	console.log("required library");
 	var scaleBodyWater = require('./Devices/ScaleBodyWater.js');
 	deviceLibrary.push(require('./Devices/ScaleBodyWater.js'));
+	console.log("required library");
 	var scaleVisceralFat = require('./Devices/ScaleVisceralFat.js');
 	deviceLibrary.push(require('./Devices/ScaleVisceralFat.js'));
+	console.log("required library");
 	var scaleCalories = require('./Devices/ScaleCalories.js');
 	deviceLibrary.push(require('./Devices/ScaleCalories.js'));
+	console.log("required library");
 /*
 //Mock Devices
 */
@@ -71,17 +78,20 @@ util.inherits(DeviceController, Scout);
 
 DeviceController.prototype.init = function(next) {
 
-	var self = this;
-	var tempDevice;
-	for (var i = 0; i < deviceLibrary.length; i++) 
-	{
-		tempDevice = self.discover(deviceLibrary[i]);
-		if (tempDevice != null)
-			arduinoController.addDevice(tempDevice);
-	}
 
 
+
+			console.log("before settimeout: ");
 	setTimeout(function(){
+		var self = this;
+		var tempDevice;
+		for (var i = 0; i < deviceLibrary.length; i++) 
+		{
+			console.log("discovering device: ");
+			tempDevice = self.discover(deviceLibrary[i]);
+			if (tempDevice != null)
+				arduinoController.addDevice(tempDevice);
+		}
 	  	arduinoController.onChange(function(){console.log("just got data");});
 
 
