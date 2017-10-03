@@ -46,7 +46,7 @@ void loop()
   Serial.println(ECG, 2);
   
   // wait for a millisecond
-  delay(100);  
+  delay(1000);  
  
 }
 

@@ -8,19 +8,19 @@ uint8_t pulsioximeter_state = 0;
 
 void setup() 
 {
-
   Serial.begin(19200);
   MySignals.begin();
-  
+ 
   MySignals.initSensorUART();
   MySignals.enableSensorUART(PULSIOXIMETER);
 }
 
 void loop() 
 {
-
+  //while (Serial.available() > 0)
+  Serial.println(Serial.read(), HEX); 
   // First way of getting sensor data
-  MySignals.enableSensorUART(PULSIOXIMETER);
+  //MySignals.enableSensorUART(PULSIOXIMETER);
   
     Serial.print(F("Try this anyway:"));
     Serial.print(MySignals.pulsioximeterData.BPM);

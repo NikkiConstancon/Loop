@@ -11,7 +11,7 @@ var ArduinoController = module.exports = function()
 	this.toMonitor = 0;
 	this.devices = [];
 	this.port = new SerialPort(portName, {
-		baudRate: 19200
+		baudRate: 115200
 	});
 	this.port.pipe(parser);
 console.log("in controller constructor");
@@ -42,7 +42,7 @@ ArduinoController.prototype.onChange = function(cb)
 				self.devices[i].setVitals(self.toMonitor, self.data);
 			};
 			//self.devices[0].setVitals(self.toMonitor, self.data);
-			console.log("device data changed to: " + self.devices[0].vitals);
+			//console.log("device data changed to: " + self.devices[0].vitals);
 		}
 		cb();
 	});	

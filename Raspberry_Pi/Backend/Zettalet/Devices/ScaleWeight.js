@@ -22,6 +22,12 @@ ScaleWeight.prototype.init = function(config)
 
 ScaleWeight.prototype.setVitals = function(toMonitor, newVitals)
 {
-  if (toMonitor == this.toMonitor && !isNaN(newVitals))    
-    this.vitals = newVitals;
+	console.log("in weight setvitals toMonitor is: " + toMonitor);
+	console.log("in weight setvitals newVitals is: " + newVitals);
+	console.log("in weight setvitals newVitals is NAN?: " + !isNaN(newVitals));
+	if (toMonitor == this.toMonitor && !isNaN(newVitals))  
+	{  
+	    this.vitals = newVitals;
+		console.log("device data (weight) changed to: " + this.vitals);
+	}
 }
