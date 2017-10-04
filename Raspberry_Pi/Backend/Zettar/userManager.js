@@ -94,12 +94,12 @@ var UserManager = module.exports = {
         const tmpErrorMsg = "GREG! the person sending the request should not be able to accept"
         patientManager.getPatient({ Username: acceptor }).then(function (acc) {
             patientManager.getPatient({ Username: requester }).then(function (req) {
-                if (JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type != userManagerUtil.enum.pubSubReq.type.request) {
-                    req.pubSubRequestOnDecision(acceptor, decision)
-                    acc.pubSubRequestOnDecision(requester, decision)
-                } else {
+                if (decision && JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type != userManagerUtil.enum.pubSubReq.type.request) {
                     logger.error(tmpErrorMsg)
+                    return
                 }
+                req.pubSubRequestOnDecision(acceptor, decision)
+                acc.pubSubRequestOnDecision(requester, decision)
             }).catch(function () {
                 subscriberManager.getsubscriber({ Email: requester }).then(function (req) {
                     if (JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type != userManagerUtil.enum.pubSubReq.type.request) {

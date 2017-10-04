@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                             dList.setUser(((PatientTag)tag).name);
                             setupViewPager(mViewPager);
                         }
-                        
+
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
                             switch(value){
@@ -382,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     Log.d("------TEST---------", msg);
                 }
-                @Override public void sendReplyActionCallback(boolean sucsess){
+                @Override public void sendReplyActionCallback(String username){
 
                 }
             },

@@ -7,6 +7,7 @@ package com.zetta.android.browse;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -44,8 +45,21 @@ public class Registration extends AppCompatActivity {
             }
         });
 
-        EditText text = (EditText) findViewById(R.id.txt_patientCheck);
-        text.setEnabled(false);
+        EditText text1 = (EditText) findViewById(R.id.txt_patientCheck);
+        text1.setEnabled(false);
+
+        final EditText text = (EditText) findViewById(R.id.input_emailReg);
+
+        text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    text.setHint("johndoe@example.com");
+                } else {
+                    text.setHint("");
+                }
+            }
+        });
 
 
         checkedRad = false;
@@ -104,9 +118,7 @@ public class Registration extends AppCompatActivity {
 
     boolean checkedRad = false;
     boolean patient = false;
-    String regEmail = "", regPass = "", confPass = "", address = "", username = "", subPass = "", confSubPass = "";
-    int ageVal = 0;
-    double weight = 0, height = 0;
+    String regEmail = "", regPass = "", confPass = "";
     final Context context = this;
 
 
@@ -181,8 +193,13 @@ public class Registration extends AppCompatActivity {
                     emailText.setError(null);
                 }
             });
-            registerEndpoint.sendRequest(patient, regEmail, regPass, (EditText) findViewById(R.id.input_emailReg), builder1);
+            //registerEndpoint.sendRequest(patient, regEmail, regPass, (EditText) findViewById(R.id.input_emailReg), builder1);
+            Intent toRegPat = new Intent(context, Registration_Cont.class);
+            toRegPat.putExtra("regEmail", regEmail);
+            toRegPat.putExtra("regPass", regPass);
+            startActivityForResult(toRegPat, 0);
         }
     }
+
     UserManager.RegisterEndpoint registerEndpoint = new UserManager.RegisterEndpoint(this);
 }
