@@ -214,6 +214,9 @@ public class settingsPage extends AppCompatActivity {
 
                     updateAdapter();
                 }
+                @Override public void onSubscriberList(List<String> subscriberList) {
+                    Log.d("--onSubscriberList---", subscriberList.toString());
+                }
             }
     );
 }

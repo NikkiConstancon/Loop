@@ -90,6 +90,7 @@ import java.util.TreeMap;
     }
 
     List<String> patientList = new ArrayList<>();
+    List<String> subscriberList = new ArrayList<>();
     Map<String, pubSubReqInfo> pubSubInfoMap = new TreeMap<>();
 
     public ArrayList<String> getPubSubList() {
@@ -137,10 +138,15 @@ import java.util.TreeMap;
                             patientList = (ArrayList<String>) entry.getValue();
                             pubSubInfoWorker.onPatientList(patientList);
                         }
+                        case "SUBSCRIBER_LIST":{
+                            subscriberList = (ArrayList<String>) entry.getValue();
+                            pubSubInfoWorker.onSubscriberList(subscriberList);
+                        }
                         break;
                         case "DONE":{
                             pubSubInfoWorker.doneCallback();
                         }
+                        break;
                     }
                 }
             }
@@ -196,6 +202,7 @@ import java.util.TreeMap;
         abstract public void newReq(pubSubReqInfo info);
 
         abstract public void onPatientList(List<String> patientList);
+        public void onSubscriberList(List<String> subscriberList){}
         public void doneCallback(){}
     }
 

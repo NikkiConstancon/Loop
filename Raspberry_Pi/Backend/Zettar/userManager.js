@@ -90,37 +90,47 @@ var UserManager = module.exports = {
             })
         }
     },
-    pubSubBindRequestOnDecision: function (acceptor, requester, decision) {
+    pubSubBindRequestOnDecision: function (acceptor, requester, decision, then) {
         const tmpErrorMsg = "GREG! the person sending the request should not be able to accept"
         patientManager.getPatient({ Username: acceptor }).then(function (acc) {
             patientManager.getPatient({ Username: requester }).then(function (req) {
-                if (decision && JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type != userManagerUtil.enum.pubSubReq.type.request) {
+                if (decision && JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type == userManagerUtil.enum.pubSubReq.type.request) {
                     logger.error(tmpErrorMsg)
-                    return
+                    then(false)
                 }
                 req.pubSubRequestOnDecision(acceptor, decision)
                 acc.pubSubRequestOnDecision(requester, decision)
+                then(true)
             }).catch(function () {
                 subscriberManager.getsubscriber({ Email: requester }).then(function (req) {
-                    if (JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type != userManagerUtil.enum.pubSubReq.type.request) {
-                        req.pubSubRequestOnDecision(acceptor, decision)
-                        acc.pubSubRequestOnDecision(requester, decision)
-                    } else {
+                    if (decision && JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type == userManagerUtil.enum.pubSubReq.type.request) {
                         logger.error(tmpErrorMsg)
+                        then(false)
                     }
+                    req.pubSubRequestOnDecision(acceptor, decision)
+                    acc.pubSubRequestOnDecision(requester, decision)
+                    then(true)
                 })
             })
         }).catch(function () {
             subscriberManager.getsubscriber({ Email: acceptor }).then(function (acc) {
                 patientManager.getPatient({ Username: requester }).then(function (req) {
-                    if (JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type != userManagerUtil.enum.pubSubReq.type.request) {
-                        req.pubSubRequestOnDecision(acceptor, decision)
-                        acc.pubSubRequestOnDecision(requester, decision)
-                    } else {
+                    if (decision && JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type == userManagerUtil.enum.pubSubReq.type.request) {
                         logger.error(tmpErrorMsg)
+                        then(false)
                     }
+                    req.pubSubRequestOnDecision(acceptor, decision)
+                    acc.pubSubRequestOnDecision(requester, decision)
+                    then(true)
                 })
             })
+        })
+    },
+    dropPubSubBinding: function (patient, sub) {
+        patientManager.getPatient({ Username: patient }).then(function (pat) {
+
+        }).catch(function () {
+
         })
     }
 }

@@ -43,7 +43,6 @@ import com.zetta.android.settings.settingsPage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -123,7 +122,9 @@ public class MainActivity extends AppCompatActivity {
 
     void bootstrap(final String userUid) {
         zettaUser = userUid;//getIntent().getStringExtra("Username");
+        UserManager.setViewedUser(userUid);//view self at start
 
+        Log.d("--for stats--", UserManager.getViewedUser());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarMain);
         setSupportActionBar(toolbar);
@@ -177,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(userUid)/*.withEmail("nikki@gmail.com")*/.withIcon(getResources().getDrawable(R.drawable.ic_person_black_24dp))
+                        new ProfileDrawerItem().withName(userUid).withEmail(R.string.serverURL).withIcon(getResources().getDrawable(R.drawable.ic_person_black_24dp))
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
@@ -233,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
                         if(tag instanceof PatientTag){
                             dList.setUser(((PatientTag)tag).name);
                             setupViewPager(mViewPager);
+                            UserManager.setViewedUser(((PatientTag)tag).name);
                         }
 
                         if(tag != null && tag instanceof Integer){

@@ -33,6 +33,14 @@ import java.util.TreeMap;
 public class UserManager extends RevaService {
     public static final String SERVICE_KEY = "UserManager";
 
+    static String viewedUser = "";
+
+    static public void setViewedUser(String viewedUser_){
+        viewedUser = viewedUser_;
+    }
+    static public String getViewedUser(){
+        return viewedUser;
+    }
     private UserManager() {
     }
 
