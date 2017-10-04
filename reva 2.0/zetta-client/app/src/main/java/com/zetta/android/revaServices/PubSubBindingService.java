@@ -45,11 +45,17 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
         attachCloudAwaitObject(null, pubSubReqCAO).send(activity, "REQ_BIND", target);
     }
     public void dropPubSubBindingAsSubscriber(String target){
-        attachCloudAwaitObject(null, pubSubReqCAO).send(activity, "DROP_PUB_SUB_BINDING_AS_SUB", target);
+        attachCloudAwaitObject(null, pubSubReqDropBindingCAO).send(activity, "DROP_PUB_SUB_BINDING_AS_SUB", target);
     }
     public void dropPubSubBindingAsPatient(String target){
-        attachCloudAwaitObject(null, pubSubReqCAO).send(activity, "DROP_PUB_SUB_BINDING_AS_PAT", target);
+        attachCloudAwaitObject(null, pubSubReqDropBindingCAO).send(activity, "DROP_PUB_SUB_BINDING_AS_PAT", target);
     }
+    final CloudAwaitObject pubSubReqDropBindingCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
+        @Override
+        public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
+            return null;
+        }
+    };
 
     static public class pubSubReqInfo {
         public enum TYPE {REQUESTER, TARGET}
