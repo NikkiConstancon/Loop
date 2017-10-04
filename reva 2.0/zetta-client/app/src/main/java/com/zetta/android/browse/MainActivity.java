@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(userUid)/*.withEmail("nikki@gmail.com")*/.withIcon(getResources().getDrawable(R.drawable.ic_person_black_24dp))
+                        new ProfileDrawerItem().withName(userUid).withEmail(R.string.serverURL).withIcon(getResources().getDrawable(R.drawable.ic_person_black_24dp))
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
