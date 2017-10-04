@@ -1,5 +1,6 @@
 package com.zetta.android.browse;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,7 +15,9 @@ import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -39,7 +42,10 @@ import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.settingsPage;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +54,7 @@ import java.util.TreeSet;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-
+    private ProgressDialog dialog;
     private SectionsPageAdapter mSectionsPageAdapter;
 
     private ViewPager mViewPager;
@@ -74,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Loading your patients and stats..");
+        dialog.show();
         Log.d(TAG, "onCreate: Starting.");
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
@@ -123,7 +132,18 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPageAdapter);
-        dList.setUser(getUser());
+
+        PrimaryDrawerItem adder;
+        PrimaryDrawerItem patient = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
+        if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
+            patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
+            adder = new PrimaryDrawerItem().withName(userUid).withTag(new PatientTag(userUid));
+            dList.setUser(getUser());
+
+        }else{
+            adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
+        }
+
         setupViewPager(mViewPager);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -135,15 +155,9 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1).withName("Settings");
         settings.withTag(5);
 
-        PrimaryDrawerItem adder;
 
-        PrimaryDrawerItem patient = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
-        if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
-            patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
-             adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddSub).withTag(R.string.drawerNameAddSub);
-        }else{
-            adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
-        }
+
+
 
         SectionDrawerItem header = new SectionDrawerItem().withName("Patients");
         PrimaryDrawerItem tmpItemForNikki = new PrimaryDrawerItem().withIdentifier(1).withName("For Nikki");
@@ -195,12 +209,16 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                         //Nikki
+
+                        long start = new java.util.Date().getTime() - 1000;
+                        long end = new java.util.Date().getTime();
+
                         JSONObject obj = new JSONObject();
                         try {
                             obj.put("Username", "greg");
                             obj.put("DeviceId", "thermometer");
-                            obj.put("StartTime", "2017-10-03 12:49:03");
-                            obj.put("EndTime", "2017-10-03 12:49:04");
+                            obj.put("StartTime", start);
+                            obj.put("EndTime", end);
                         } catch (JSONException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
@@ -285,24 +303,33 @@ public class MainActivity extends AppCompatActivity {
     // Set up the input
 
     public void addAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MaterialBaseTheme_Light_AlertDialog);
-        builder.setTitle("Type in email of person to add");
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.ThemeOverlay_AppCompat_Dialog_Alert);
+        builder.setTitle(Html.fromHtml("<font color='#38ACEC'>Type in the email of the person you wish to add</font>"));
 
         final EditText input = new EditText(MainActivity.this);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
         input.setHint("jondoe@email.com");
-        builder.setView(input);
+        input.setHintTextColor(getResources().getColor(R.color.md_blue_grey_500));
+        FrameLayout container = new FrameLayout(this);
+        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogLeft);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogRight);
+        params.topMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogTop);
+        input.setLayoutParams(params);
+        container.addView(input);
+        builder.setView(container);
 
         // Set up the buttons
-        builder.setPositiveButton(Html.fromHtml("<font color='black'>OK</font>"), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(Html.fromHtml("<font color='#38ACEC'>OK</font>"), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();
                 pubSubBinderEndpoint.pubSubBindingRequest(m_Text);
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(Html.fromHtml("<font color='#38ACEC'>Cancel</font>"), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -397,6 +424,15 @@ public class MainActivity extends AppCompatActivity {
                 }
                 @Override public void doneCallback(){
                     Log.d("----doneCallback---", "--done--");
+                    if(userManagerEndpoint.getUserType() != RevaWebSocketService.USER_TYPE.PATIENT){
+                        dList.setUser(subbedTo.iterator().next());
+                    }
+
+                    userManagerEndpoint.resumeGuardActivityByVerifiedUser(workOnUser);
+
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
                 }
             }
     );

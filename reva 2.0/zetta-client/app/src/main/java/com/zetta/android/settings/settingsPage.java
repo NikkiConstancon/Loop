@@ -25,6 +25,9 @@ public class settingsPage extends AppCompatActivity {
     private List<SettingsItem> patList = new ArrayList<>();
     private List<SettingsItem> reqList = new ArrayList<>();
 
+
+
+    //TODO: check for when a list is empty, so you can still display the header and a message
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,8 +80,8 @@ public class settingsPage extends AppCompatActivity {
 
     private void updateAdapter() {
         List<SettingsItem> tmp = new ArrayList<>();
-        tmp.addAll(reqList);
         tmp.addAll(patList);
+        tmp.addAll(reqList);
 
         settingsListAdapter.updateList(tmp);
     }

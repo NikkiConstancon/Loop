@@ -105,7 +105,32 @@ var patientManager = module.exports = {
             })
         })
     },
-
+    getDeviceMap: function(_patient){
+        return new Promise((resolve, reject) => {
+            dbMan.try().then(function () {
+                var q = {}
+                if (_patient.Email) {
+                    q.Email = _patient.Email
+                } else {
+                    q.Username = _patient.Username
+                }
+                dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
+                    if (err || !found) {
+                        err = err || { clientSafe: 'Could not find ' + _patient.Username }
+                        logger.error(err)
+                        reject(err)
+                    } else {
+                        logger.debug('Found patient: ' + found.Username)
+                        console.log(found.DeviceMap);
+                        resolve(found.DeviceMap)
+                    }
+                })
+            }).catch((err) => {
+                reject(err)
+            })
+        })
+        
+    },
     addToDeviceMap: function(_patient, deviceName, On){
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
