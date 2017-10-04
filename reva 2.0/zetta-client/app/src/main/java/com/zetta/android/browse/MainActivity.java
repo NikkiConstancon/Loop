@@ -192,13 +192,12 @@ public class MainActivity extends AppCompatActivity {
                         }
                         // do something with the clicked item :D
                         Object tag = drawerItem.getTag();
-                        String name = drawerItem.toString();
-                        Log.d("--Name of name", name);
+
                         if(tag instanceof PatientTag){
                             dList.setUser(((PatientTag)tag).name);
                             setupViewPager(mViewPager);
                         }
-                        
+
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
                             switch(value){

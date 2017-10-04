@@ -47,14 +47,8 @@ public class Registration_Patient extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_continue_patient);
 
-        EditText textHold = (EditText) findViewById(R.id.txt_age);
-        textHold.setEnabled(false);
-        textHold = (EditText) findViewById(R.id.txt_height);
-        textHold.setEnabled(false);
-        textHold = (EditText) findViewById(R.id.txt_weight);
-        textHold.setEnabled(false);
-        textHold = (EditText) findViewById(R.id.txt_reason);
-        textHold.setEnabled(false);
+        EditText text = (EditText) findViewById(R.id.txt_reason);
+        text.setEnabled(false);
 
         checkedRad = false;
 

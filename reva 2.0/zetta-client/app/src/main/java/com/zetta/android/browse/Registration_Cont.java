@@ -33,12 +33,6 @@ public class Registration_Cont extends AppCompatActivity{
 
         Button btnRegPat = (Button) findViewById(R.id.btn_patRegCont);
 
-        EditText text = (EditText) findViewById(R.id.txt_addr);
-        text.setEnabled(false);
-
-        text = (EditText) findViewById(R.id.txt_userName);
-        text.setEnabled(false);
-
         btnRegPat.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v)
             {
