@@ -80,7 +80,10 @@ public class settingsPage extends AppCompatActivity {
             @Override
             public void deleteOnClick(View v, int position) {
                 Log.d("here", "deleteOnClick at position"+position);
+<<<<<<< HEAD
                 pubSubBinderEndpoint.dropPubSubBindingAsSubscriber(((ExistingItem)settingsListAdapter.getSettings().get(position)).getTitle());
+=======
+>>>>>>> 8309b810948e5a7d0c5288d6b8dc667c57ec6705
             }
 
             @Override
@@ -208,10 +211,8 @@ public class settingsPage extends AppCompatActivity {
 
                 @Override public void newReq(PubSubBindingService.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
-
-
-
                 }
+
                 @Override public void onPatientList(List<String> patientList){
                     Log.d("--setsub-list---", patientList.toString());
 
@@ -223,6 +224,7 @@ public class settingsPage extends AppCompatActivity {
 
                     updateAdapter();
                 }
+
                 @Override public void onSubscriberList(List<String> subscriberList) {
                     Log.d("--onSubscriberList---", subscriberList.toString());
                 }
