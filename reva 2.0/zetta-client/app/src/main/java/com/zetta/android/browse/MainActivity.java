@@ -38,7 +38,10 @@ import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.settingsPage;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -192,12 +195,16 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                         //Nikki
+
+                        long start = new java.util.Date().getTime() - 1000;
+                        long end = new java.util.Date().getTime();
+
                         JSONObject obj = new JSONObject();
                         try {
                             obj.put("Username", "greg");
                             obj.put("DeviceId", "thermometer");
-                            obj.put("StartTime", "2017-10-03 12:49:03");
-                            obj.put("EndTime", "2017-10-03 12:49:04");
+                            obj.put("StartTime", start);
+                            obj.put("EndTime", end);
                         } catch (JSONException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
