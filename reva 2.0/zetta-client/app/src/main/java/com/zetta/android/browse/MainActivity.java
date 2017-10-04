@@ -133,15 +133,13 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPageAdapter);
 
-        PrimaryDrawerItem adder;
+        PrimaryDrawerItem adder = null;
         PrimaryDrawerItem patient = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
         if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
             patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
             adder = new PrimaryDrawerItem().withName(userUid).withTag(new PatientTag(userUid));
             dList.setUser(getUser());
 
-        }else{
-            adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
         }
 
         setupViewPager(mViewPager);
@@ -265,8 +263,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).build();
 
-        result.addItems(
-                adder,
+        if (adder != null) {
+            result.addItem(adder);
+        }
+
+        result.addItem(
                 header
         );
 
@@ -366,7 +367,6 @@ public class MainActivity extends AppCompatActivity {
                         else {
                             dList.setUser(subbedTo.iterator().next());
                         }
-
                     }
 
                     userManagerEndpoint.resumeGuardActivityByVerifiedUser(workOnUser);

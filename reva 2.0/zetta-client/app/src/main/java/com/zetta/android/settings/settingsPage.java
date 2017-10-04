@@ -32,6 +32,7 @@ public class settingsPage extends AppCompatActivity {
     private List<SettingsItem> settings = new ArrayList<>();
     private List<SettingsItem> patList = new ArrayList<>();
     private List<SettingsItem> reqList = new ArrayList<>();
+    private List<SettingsItem> pendList = new ArrayList<>();
 
 
 
@@ -84,7 +85,6 @@ public class settingsPage extends AppCompatActivity {
 
             @Override
             public void settingsButtonOnClick(View v, int position) {
-                Log.d("but", "right in the but!"+position);
                 addAlert();
             }
         });
@@ -98,6 +98,8 @@ public class settingsPage extends AppCompatActivity {
         tmp.addAll(patList);
         tmp.add(new ButtonItem("ADD PATIENT"));
         tmp.addAll(reqList);
+        tmp.add(new TitleItem("Pending Requests"));
+        tmp.addAll(pendList);
 
         settingsListAdapter.updateList(tmp);
     }
@@ -188,13 +190,19 @@ public class settingsPage extends AppCompatActivity {
                 @Override public void onConnect(Map<String, PubSubBindingService.pubSubReqInfo> infoMap){
                     List<SettingsItem> tmp = new ArrayList<>();
                     reqList.clear();
+                    pendList.clear();
                     reqList.add(new TitleItem("Subscriber Requests"));
                     for(Map.Entry<String, PubSubBindingService.pubSubReqInfo> entry : infoMap.entrySet()){
                         PubSubBindingService.pubSubReqInfo info =  entry.getValue();
                         Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
-                        reqList.add(new RequestItem(info.userUid));
-                    }
 
+                        if(info.type.toString().equals("REQUESTER")){
+                            pendList.add(new PendingItem(info.userUid));
+                        } else {
+                            reqList.add(new RequestItem(info.userUid));
+                        }
+
+                    }
                     updateAdapter();
                 }
 
