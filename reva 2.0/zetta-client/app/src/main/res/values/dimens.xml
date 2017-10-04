@@ -8,6 +8,9 @@
     <dimen name="spacing_double">16dp</dimen>
     <dimen name="spacing_triple">24dp</dimen>
     <dimen name="spacing_quadruple">32dp</dimen>
+    <dimen name="inputDialogLeft">15dp</dimen>
+    <dimen name="inputDialogRight">30dp</dimen>
+    <dimen name="inputDialogTop">10dp</dimen>
 
     <dimen name="font_small">12sp</dimen>
     <dimen name="font_medium">14sp</dimen>

@@ -84,7 +84,6 @@ public class StatFragment extends android.support.v4.app.Fragment
                 statTmpForNikki
         ).send(view.getContext(), "RAW", obj);
 
-
         //getFab(StatFragment.this.getContext(), (ViewGroup)view.getParent());
         // MOCK DATA STARTS HERE
         String timeStamp = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date());

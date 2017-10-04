@@ -7,14 +7,13 @@
     android:padding="16dp">
 
     <Button
-        android:id="@+id/btn_settings"
-        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/holo_blue_dark"
-        android:textSize="14sp"
-        android:text="Change my info"
-        tools:ignore="HardcodedText,RtlHardcoded"
-        tools:text="Change my info" />
+        android:layout_height="64dp"
+        android:id="@+id/btn_settings"
+        android:text="REGISTER NOW"
+        android:textColor="@color/white"
+
+        tools:ignore="HardcodedText"
+        />
 
 </LinearLayout>

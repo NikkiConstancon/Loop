@@ -20,6 +20,7 @@ public interface ListItem {
     int TYPE_STATE = 11;
     int TYPE_LOADING = 12;
     int TYPE_PROMOTED = 13;
+    int TYPE_NEW = 14;
 
     int getType();
 

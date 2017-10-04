@@ -12,6 +12,7 @@ public interface SettingsItem {
     int TYPE_PENDING = 2;
     int TYPE_EXISTING = 3;
     int TYPE_STD_SETTINGS = 4;
+    int TYPE_BUTTON = 5;
 
     int getType();
 }
