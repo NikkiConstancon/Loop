@@ -60,6 +60,7 @@ function refreshInfo(transmitter) {
                 transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(pat.PubSubBindingConfirmationMap[user]) } })
             }
             transmitter.transmit({ PATIENT_LIST: pat.PatientList || [] })
+            transmitter.transmit({ DONE:true })
         });
     } else {
         subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (sub) {
@@ -67,6 +68,7 @@ function refreshInfo(transmitter) {
                 transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(sub.PubSubBindingConfirmationMap[user]) } })
             }
             transmitter.transmit({ PATIENT_LIST: sub.PatientList || [] })
+            transmitter.transmit({ DONE: true })
         });
     }
 }

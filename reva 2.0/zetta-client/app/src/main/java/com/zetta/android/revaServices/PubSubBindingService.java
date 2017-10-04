@@ -138,6 +138,9 @@ import java.util.TreeMap;
                             pubSubInfoWorker.onPatientList(patientList);
                         }
                         break;
+                        case "DONE":{
+                            pubSubInfoWorker.doneCallback();
+                        }
                     }
                 }
             }
@@ -162,6 +165,8 @@ import java.util.TreeMap;
             return null;
         }
     };
+
+
 
 
     public void pubSubRequestReply(String userUid, pubSubReqInfo.REPLY reply) {
@@ -191,6 +196,7 @@ import java.util.TreeMap;
         abstract public void newReq(pubSubReqInfo info);
 
         abstract public void onPatientList(List<String> patientList);
+        public void doneCallback(){}
     }
 
     final PubSubInfoWorker pubSubInfoWorker;
