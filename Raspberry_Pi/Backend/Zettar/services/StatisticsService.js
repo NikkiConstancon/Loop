@@ -69,10 +69,10 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                         console.log(endResult);
                         channel(endResult);
                         
-                    }).catch(function () {
+                    }).catch(function (e) {
                         logger.error('GraphRetievalError', e)
                     }) 
-                }).catch(function () {
+                }).catch(function (e) {
                     logger.error('DeviceMapRetievalError', e)
                 }) 
                 

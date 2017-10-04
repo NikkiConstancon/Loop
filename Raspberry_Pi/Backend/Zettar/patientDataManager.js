@@ -20,7 +20,7 @@ var patientDataManager = module.exports = {
                         logger.error(err)
                         reject(err)
                     } else {
-                        logger.debug('Instance Added Successfully!')
+                        //logger.debug('Instance Added Successfully!')
                         resolve(newUser)
                     }
                 })
