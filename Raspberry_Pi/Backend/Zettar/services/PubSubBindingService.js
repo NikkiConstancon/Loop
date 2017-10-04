@@ -59,6 +59,9 @@ webSockMessenger.attach(serviceName, {
                 for (var devId in getTransmitters(msg)) {
                     refreshInfo(otherTransmitters[devId])
                 }
+            },
+            DROP_PATIENT_AND_SUBSCRIBER: function () {
+
             }
         }
     }

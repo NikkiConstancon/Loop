@@ -125,5 +125,12 @@ var UserManager = module.exports = {
                 })
             })
         })
+    },
+    dropPubSubBinding: function (patient, sub) {
+        patientManager.getPatient({ Username: patient }).then(function (pat) {
+
+        }).catch(function () {
+
+        })
     }
 }
