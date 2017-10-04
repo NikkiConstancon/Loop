@@ -14,7 +14,9 @@ import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -285,24 +287,33 @@ public class MainActivity extends AppCompatActivity {
     // Set up the input
 
     public void addAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MaterialBaseTheme_Light_AlertDialog);
-        builder.setTitle("Type in email of person to add");
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.ThemeOverlay_AppCompat_Dialog_Alert);
+        builder.setTitle(Html.fromHtml("<font color='#38ACEC'>Type in the email of the person you wish to add</font>"));
 
         final EditText input = new EditText(MainActivity.this);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
         input.setHint("jondoe@email.com");
-        builder.setView(input);
+        input.setHintTextColor(getResources().getColor(R.color.md_blue_grey_500));
+        FrameLayout container = new FrameLayout(this);
+        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogSides);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogSides);
+        params.topMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogTop);
+        input.setLayoutParams(params);
+        container.addView(input);
+        builder.setView(container);
 
         // Set up the buttons
-        builder.setPositiveButton(Html.fromHtml("<font color='black'>OK</font>"), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(Html.fromHtml("<font color='#38ACEC'>OK</font>"), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();
                 pubSubBinderEndpoint.pubSubBindingRequest(m_Text);
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(Html.fromHtml("<font color='#38ACEC'>Cancel</font>"), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
