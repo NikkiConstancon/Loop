@@ -48,12 +48,22 @@ public class settingsPage extends AppCompatActivity {
                 pubSubBinderEndpoint.pubSubRequestReply(
                         ((RequestItem)settingsListAdapter.getSettings().get(position)).getTitle(),PubSubBindingService.pubSubReqInfo.REPLY.ACCEPT
                 );
+
+                SettingsItem item = settingsListAdapter.getSettings().get(position);
+                reqList.remove(item);
+
+                updateAdapter();
             }
             @Override
             public void buttonNoOnClick(View v, int position) {
                 pubSubBinderEndpoint.pubSubRequestReply(
                         ((RequestItem)settingsListAdapter.getSettings().get(position)).getTitle(),PubSubBindingService.pubSubReqInfo.REPLY.DECLINE
                 );
+
+                SettingsItem item = settingsListAdapter.getSettings().get(position);
+                reqList.remove(item);
+
+                updateAdapter();
             }
             @Override
             public void deleteOnClick(View v, int position) {
@@ -94,8 +104,8 @@ public class settingsPage extends AppCompatActivity {
                     }
                     Log.d("------TEST---------", msg);
                 }
-                @Override public void sendReplyActionCallback(boolean sucsess){
-
+                @Override public void sendReplyActionCallback(String userUid){
+                    Log.d("--sendReplyActionCall--", userUid);
                 }
             },
             new PubSubBindingService.PubSubInfoWorker(){

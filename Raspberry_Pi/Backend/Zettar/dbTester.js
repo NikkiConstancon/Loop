@@ -18,18 +18,18 @@ setTimeout(function() {
 
     //Test Patient
     // PatientManager.addPatient()
-
-    // PatientDataManager.getGraphPoints({
-    //    Username: 'nikki'  ,
-    //    DeviceId: "thermometer" ,
-    //    StartTime:  "2017-09-25 15:16:10.051000+0000",
-    //    EndTime:  "2017-09-25 15:16:10.481000+0000",
-    // })
+    //console.log(PatientDataManager.getInstance("greg"));
+     PatientDataManager.getGraphPoints({
+        Username: 'greg'  ,
+        DeviceId: "thermometer" ,
+        StartTime:  parseFloat(1507101299972),
+        EndTime:  parseFloat(1507101300500),
+     })
     // PatientManager.addToDeviceMap(
     //     {'Username': 'greg'},
     //     "Kicks", true
     // )
-    (patientManager.getPatient({Username:"greg"})).then(function(hu){hu.addToPatientList("NEW1")});
+    //(patientManager.getPatient({Username:"greg"})).then(function(hu){hu.addToPatientList("NEW1")});
     // (subscriberManager.getsubscriber({Email:"what@sub.com"})).then(function(hu){hu.addToPatientList("rinus")})
     // Patient.addToPatientList("no.@e");
     

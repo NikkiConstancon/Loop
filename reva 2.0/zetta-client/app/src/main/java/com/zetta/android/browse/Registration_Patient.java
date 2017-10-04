@@ -47,14 +47,46 @@ public class Registration_Patient extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_continue_patient);
 
-        EditText textHold = (EditText) findViewById(R.id.txt_age);
-        textHold.setEnabled(false);
-        textHold = (EditText) findViewById(R.id.txt_height);
-        textHold.setEnabled(false);
-        textHold = (EditText) findViewById(R.id.txt_weight);
-        textHold.setEnabled(false);
-        textHold = (EditText) findViewById(R.id.txt_reason);
-        textHold.setEnabled(false);
+        EditText text = (EditText) findViewById(R.id.txt_reason);
+        text.setEnabled(false);
+
+        final EditText text2 = (EditText) findViewById(R.id.input_height);
+        final EditText text3 = (EditText) findViewById(R.id.input_weight);
+        final EditText text4 = (EditText) findViewById(R.id.input_age);
+
+        text2.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    text2.setHint("1.78");
+                } else {
+                    text2.setHint("");
+                }
+            }
+        });
+
+        text3.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    text3.setHint("65");
+                } else {
+                    text3.setHint("");
+                }
+            }
+        });
+
+        text4.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    text4.setHint("53");
+                } else {
+                    text4.setHint("");
+                }
+            }
+        });
+
 
         checkedRad = false;
 

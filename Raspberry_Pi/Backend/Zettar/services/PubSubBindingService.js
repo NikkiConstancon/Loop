@@ -42,12 +42,12 @@ webSockMessenger.attach(serviceName, {
             ACCEPT: function (transmitter, msg, key, channel) {
                 userManager.pubSubBindRequestOnDecision(transmitter.getUserUid(), msg, true)
                 refreshInfo(transmitter)
-                channel(true)//for now
+                channel(msg)//for now
             },
             DECLINE: function (transmitter, msg, key, channel) {
                 userManager.pubSubBindRequestOnDecision(transmitter.getUserUid(), msg, false)
                 refreshInfo(transmitter)
-                channel(true)//for now
+                channel(msg)//for now
             }
         }
     }

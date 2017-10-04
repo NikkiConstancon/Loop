@@ -37,7 +37,8 @@ import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.settingsPage;
-
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -193,6 +194,19 @@ public class MainActivity extends AppCompatActivity {
                                 );
                             }
                         }
+                        //Nikki
+                        JSONObject obj = new JSONObject();
+                        try {
+                            obj.put("Username", "greg");
+                            obj.put("DeviceId", "thermometer");
+                            obj.put("StartTime", "2017-10-03 12:49:03");
+                            obj.put("EndTime", "2017-10-03 12:49:04");
+                        } catch (JSONException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        //
+
                         // do something with the clicked item :D
                         Object tag = drawerItem.getTag();
 
@@ -202,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                             dList.setUser(((PatientTag)tag).name);
                             setupViewPager(mViewPager);
                         }
-                        
+
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
                             switch(value){
@@ -229,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
                                     statTmpForNikkiEndpoint.attachCloudAwaitObject(
                                             null,
                                             statTmpForNikki
-                                    ).send(MainActivity.this, "RAW", "THE MSG");
+                                    ).send(MainActivity.this, "RAW", obj);
                                 }break;
                             }
                         }
@@ -359,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     Log.d("------TEST---------", msg);
                 }
-                @Override public void sendReplyActionCallback(boolean sucsess){
+                @Override public void sendReplyActionCallback(String username){
 
                 }
             },
@@ -397,6 +411,7 @@ public class MainActivity extends AppCompatActivity {
     public CloudAwaitObject statTmpForNikki = new CloudAwaitObject("GRAPH_POINTS") {
         @Override
         public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
+            Log.d("object", obj.toString());
             return null;
         }
     };

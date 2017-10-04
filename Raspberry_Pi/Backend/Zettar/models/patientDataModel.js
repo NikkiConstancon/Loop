@@ -7,7 +7,7 @@ module.exports = {
     fields:{
         PatientUsername    : "text",
         DeviceID : "text",
-        TimeStamp     : "timestamp",
+        TimeStamp     : "double",
 	Value : "float"
     },
     key:["TimeStamp","PatientUsername","DeviceID"]

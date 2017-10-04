@@ -33,11 +33,30 @@ public class Registration_Cont extends AppCompatActivity{
 
         Button btnRegPat = (Button) findViewById(R.id.btn_patRegCont);
 
-        EditText text = (EditText) findViewById(R.id.txt_addr);
-        text.setEnabled(false);
+        final EditText text = (EditText) findViewById(R.id.input_addr);
+        final EditText text3 = (EditText) findViewById(R.id.input_userName);
 
-        text = (EditText) findViewById(R.id.txt_userName);
-        text.setEnabled(false);
+        text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    text.setHint("83 Marais Street");
+                } else {
+                    text.setHint("");
+                }
+            }
+        });
+
+        text3.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    text3.setHint("John Doe");
+                } else {
+                    text3.setHint("");
+                }
+            }
+        });
 
         btnRegPat.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v)
@@ -52,10 +71,10 @@ public class Registration_Cont extends AppCompatActivity{
      */
     public void contPatReg()
     {
-        EditText text = (EditText) findViewById((R.id.input_addr));
-        String address = text.getText().toString();
-        text = (EditText) findViewById(R.id.input_userName);
-        String username = text.getText().toString();
+        EditText text1 = (EditText) findViewById((R.id.input_addr));
+        String address = text1.getText().toString();
+        text1 = (EditText) findViewById(R.id.input_userName);
+        String username = text1.getText().toString();
 
         Context context = this;
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
