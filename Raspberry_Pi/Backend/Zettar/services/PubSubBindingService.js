@@ -72,21 +72,29 @@ webSockMessenger.attach(serviceName, {
 function refreshInfo(transmitter) {
     if (transmitter.getUserType() === 'patient') {
         patientManager.getPatient({ Username: transmitter.getUserUid() }).then(function (pat) {
-            for (var user in pat.PubSubBindingConfirmationMap) {
-                transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(pat.PubSubBindingConfirmationMap[user]) } })
+            try {
+                for (var user in pat.PubSubBindingConfirmationMap) {
+                    transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(pat.PubSubBindingConfirmationMap[user]) } })
+                }
+                transmitter.transmit({ PATIENT_LIST: pat.PatientList || [] })
+                transmitter.transmit({ SUBSCRIBER_LIST: pat.SubscriberList || [] })
+                transmitter.transmit({ DONE: true })
+            } catch (e) {
+                logger.error(e)
             }
-            transmitter.transmit({ PATIENT_LIST: pat.PatientList || [] })
-            transmitter.transmit({ SUBSCRIBER_LIST: pat.SubscriberList || [] })
-            transmitter.transmit({ DONE:true })
         });
     } else {
         subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (sub) {
-            for (var user in sub.PubSubBindingConfirmationMap) {
-                transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(sub.PubSubBindingConfirmationMap[user]) } })
+            try {
+                for (var user in sub.PubSubBindingConfirmationMap) {
+                    transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(sub.PubSubBindingConfirmationMap[user]) } })
+                }
+                transmitter.transmit({ PATIENT_LIST: sub.PatientList || [] })
+                transmitter.transmit({ SUBSCRIBER_LIST: sub.SubscriberList || [] })
+                transmitter.transmit({ DONE: true })
+            } catch (e) {
+                logger.error(e)
             }
-            transmitter.transmit({ PATIENT_LIST: sub.PatientList || [] })
-            transmitter.transmit({ SUBSCRIBER_LIST: pat.SubscriberList || [] })
-            transmitter.transmit({ DONE: true })
         });
     }
 }

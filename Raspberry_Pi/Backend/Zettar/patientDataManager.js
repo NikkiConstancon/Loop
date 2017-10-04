@@ -82,12 +82,12 @@ TimeStamp*/
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
 
+console.log("Getting Graph Points");
                 var minimum = Number.POSITIVE_INFINITY;
                 var maximum = Number.NEGATIVE_INFINITY;
                 var avg = 0.0;
                 var count = 0;
                 var result = []
-console.log("Getting Graph Points");
                 var start = _info.StartTime;
                 var end = _info.EndTime;
                 console.log(start);
@@ -123,6 +123,7 @@ console.log("Getting Graph Points");
                     //need to find averages according to the interval
                     //console.log("Result: ");
                     //console.log(result);
+                    console.log("END")
                     resolve(result);
 
                 }, function(err){

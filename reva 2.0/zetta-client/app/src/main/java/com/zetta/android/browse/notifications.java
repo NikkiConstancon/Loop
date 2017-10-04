@@ -71,6 +71,7 @@ public class notifications extends android.support.v4.app.Fragment
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(context);
         rv.setLayoutManager(linearLayout);
+        Toast.makeText(context, "Hello we here", Toast.LENGTH_SHORT).show();
 
         return view;
     }
@@ -128,7 +129,9 @@ public class notifications extends android.support.v4.app.Fragment
             adapter.notifyItemInserted(list.size()-1);
         }
 
-        Intent dismissIntent = new Intent(context, notifications.class);
+        adapter.notifyDataSetChanged();
+
+        Intent dismissIntent = new Intent(context, MainActivity.class);
         dismissIntent.setAction(Intent.ACTION_DEFAULT);
         dismissIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -141,8 +144,6 @@ public class notifications extends android.support.v4.app.Fragment
                         .setDefaults(Notification.DEFAULT_ALL) // must requires VIBRATE permission
                         .setPriority(NotificationCompat.PRIORITY_HIGH)//must give priority to High, Max which will considered as heads-up notification
                         .setAutoCancel(true);
-
-
 
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
                 dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);

@@ -111,6 +111,8 @@ var UserManager = module.exports = {
                     acc.pubSubRequestOnDecision(requester, decision)
                     then(true)
                 })
+            }).catch(function (e) {
+                try { throw e } catch (e) { logger.error(e) }
             })
         }).catch(function () {
             subscriberManager.getsubscriber({ Email: acceptor }).then(function (acc) {
@@ -123,7 +125,11 @@ var UserManager = module.exports = {
                     acc.pubSubRequestOnDecision(requester, decision)
                     then(true)
                 })
+            }).catch(function (e) {
+                try { throw e } catch (e) { logger.error(e) }
             })
+        }).catch(function (e) {
+            try { throw e } catch (e) { logger.error(e) }
         })
     },
     dropPubSubBinding: function (patient, sub) {
