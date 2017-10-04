@@ -33,14 +33,14 @@ var patientDataManager = module.exports = {
     getInstance: function (name) {
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
-                dbMan.models.instance.patientData.findOne({ name: name }, function (err, found) {
+                dbMan.models.instance.patientData.findOne({ PatientUsername: name }, function (err, found) {
                     if (err) {
                         logger.error(err)
                         reject(err)
                     } else {
                         //Note that returned variable john here is an instance of your model,
                         //so you can also do john.delete(), john.save() type operations on the instance.
-                        logger.debug('Found Instance: ' + found.name)
+                        logger.debug('Found Instance: ' + found.PatientUsername)
                         resolve(found)
                     }
                 })
@@ -87,13 +87,24 @@ TimeStamp*/
                 var avg = 0.0;
                 var count = 0;
                 var result = []
-
+console.log("Getting Graph Points");
+//console.log(_info.keys);
+                var start = _info.StartTime;
+                var end = _info.EndTime;
+                
+                //if(start.length <= 19){
+                 //   start += ".000000+0000";
+                //}
+               // if(end.length <= 19){
+               //     end += ".000000+0000";
+              // }
+                console.log(start);
+                console.log(end);
                 var query = {
                     PatientUsername: _info.Username,
                     DeviceID: _info.DeviceId,
-                    TimeStamp : { '$gt':_info.StartTime, '$lte':_info.EndTime }
+                    TimeStamp : { '$gt':start, '$lte':end}
                 }
-
                 dbMan.models.instance.patientData.stream(query, {raw: true, allow_filtering: true}, function(data){
                     //data is an array of plain objects satisfying the query conditions above
                     var row;
@@ -118,6 +129,7 @@ TimeStamp*/
                     });
 
                     //need to find averages according to the interval
+                    console.log("Result: ");
                     console.log(result);
 
 

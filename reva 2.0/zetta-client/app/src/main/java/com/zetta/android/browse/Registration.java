@@ -45,8 +45,21 @@ public class Registration extends AppCompatActivity {
             }
         });
 
-        EditText text = (EditText) findViewById(R.id.txt_patientCheck);
-        text.setEnabled(false);
+        EditText text1 = (EditText) findViewById(R.id.txt_patientCheck);
+        text1.setEnabled(false);
+
+        final EditText text = (EditText) findViewById(R.id.input_emailReg);
+
+        text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    text.setHint("johndoe@example.com");
+                } else {
+                    text.setHint("");
+                }
+            }
+        });
 
 
         checkedRad = false;

@@ -46,15 +46,41 @@ public class Registration_Cont extends AppCompatActivity{
      */
     public void contPatReg()
     {
-        EditText text = (EditText) findViewById((R.id.input_addr));
-        String address = text.getText().toString();
-        text = (EditText) findViewById(R.id.input_userName);
-        String username = text.getText().toString();
+        EditText text1 = (EditText) findViewById((R.id.input_addr));
+        String address = text1.getText().toString();
+        text1 = (EditText) findViewById(R.id.input_userName);
+        String username = text1.getText().toString();
 
         Context context = this;
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage("Please fill in all details.");
         builder1.setCancelable(true);
+
+
+        final EditText text = (EditText) findViewById(R.id.input_addr);
+        final EditText text3 = (EditText) findViewById(R.id.input_userName);
+
+        text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    text.setHint("83 Marais Street");
+                } else {
+                    text.setHint("");
+                }
+            }
+        });
+
+        text3.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    text3.setHint("John Doe");
+                } else {
+                    text3.setHint("");
+                }
+            }
+        });
 
         builder1.setPositiveButton(
                 "OK",
