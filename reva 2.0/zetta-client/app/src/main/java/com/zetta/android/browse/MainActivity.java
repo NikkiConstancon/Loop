@@ -305,8 +305,8 @@ public class MainActivity extends AppCompatActivity {
         input.setHintTextColor(getResources().getColor(R.color.md_blue_grey_500));
         FrameLayout container = new FrameLayout(this);
         FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogSides);
-        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogSides);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogLeft);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogRight);
         params.topMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogTop);
         input.setLayoutParams(params);
         container.addView(input);
