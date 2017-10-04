@@ -375,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     Log.d("------TEST---------", msg);
                 }
-                @Override public void sendReplyActionCallback(boolean sucsess){
+                @Override public void sendReplyActionCallback(String username){
 
                 }
             },
