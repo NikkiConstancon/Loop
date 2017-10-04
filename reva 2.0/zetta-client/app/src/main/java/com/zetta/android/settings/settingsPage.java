@@ -102,8 +102,8 @@ public class settingsPage extends AppCompatActivity {
                     }
                     Log.d("------TEST---------", msg);
                 }
-                @Override public void sendReplyActionCallback(boolean sucsess){
-
+                @Override public void sendReplyActionCallback(String userUid){
+                    Log.d("--sendReplyActionCall--", userUid);
                 }
             },
             new PubSubBindingService.PubSubInfoWorker(){

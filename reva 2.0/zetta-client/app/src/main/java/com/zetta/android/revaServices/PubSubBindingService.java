@@ -171,7 +171,7 @@ import java.util.TreeMap;
     final CloudAwaitObject pubSubReqReplyCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
         @Override
         public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
-            pubSubWorker.sendReplyActionCallback((boolean) obj);
+            pubSubWorker.sendReplyActionCallback((String) obj);
             return null;
         }
     };
@@ -180,7 +180,7 @@ import java.util.TreeMap;
     public static abstract class PubSubWorker {
         abstract public void sendRequestCallback(String msg);
 
-        abstract public void sendReplyActionCallback(boolean sucsess);
+        abstract public void sendReplyActionCallback(String userUid);
     }
 
     final PubSubWorker pubSubWorker;
