@@ -168,6 +168,7 @@ module.exports = {
                 }
                 return ret
             },
+            getType: function () { return userManagerUtil.enum.userType.patient },
             addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
             addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
             addToSubscriberList: userManagerUtil.addToSubscriberList,

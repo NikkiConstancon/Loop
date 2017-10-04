@@ -71,7 +71,7 @@ public class NotifyCloudAwait {
     }
 
     private void doEnd(final DISMISS_TYPE type, boolean force) {
-        if(force){
+        if(force && connectToCloudWaitDialog != null){
             connectToCloudWaitDialog.dismiss();
         }
         dismissed = true;

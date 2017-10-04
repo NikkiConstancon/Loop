@@ -101,8 +101,15 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    void bootstrap(String zettaUser_) {
-        zettaUser = zettaUser_;//getIntent().getStringExtra("Username");
+    static class PatientTag{
+        PatientTag(String name_) {
+            name = name_;
+        }
+        public final String name;
+    }
+
+    void bootstrap(final String userUid) {
+        zettaUser = userUid;//getIntent().getStringExtra("Username");
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarMain);
@@ -152,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName("Nikki").withEmail("nikki@gmail.com").withIcon(getResources().getDrawable(R.drawable.ic_person_black_24dp))
+                        new ProfileDrawerItem().withName(userUid)/*.withEmail("nikki@gmail.com")*/.withIcon(getResources().getDrawable(R.drawable.ic_person_black_24dp))
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
@@ -188,6 +195,11 @@ public class MainActivity extends AppCompatActivity {
 
                         String name = drawerItem.toString();
                         Log.d("--Name of name", name);
+                        if(tag instanceof PatientTag){
+                            dList.setUser(((PatientTag)tag).name);
+                            setupViewPager(mViewPager);
+                        }
+                        
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
                             switch(value){
@@ -236,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
 
         for(String name : subbedTo)
         {
-            result.addItem(new PrimaryDrawerItem().withName(name).withTag("subbedTo"));
+            result.addItem(new PrimaryDrawerItem().withName(name).withTag(new PatientTag(name)));
         }
 
         result.addItems(
