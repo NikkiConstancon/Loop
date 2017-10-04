@@ -1,15 +1,23 @@
 package com.zetta.android.settings;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.zetta.android.R;
+import com.zetta.android.browse.MainActivity;
 import com.zetta.android.browse.StatListAdapter;
 import com.zetta.android.revaServices.PubSubBindingService;
 import com.zetta.android.revaServices.UserManager;
@@ -72,6 +80,12 @@ public class settingsPage extends AppCompatActivity {
             public void deleteOnClick(View v, int position) {
                 Log.d("here", "deleteOnClick at position"+position);
             }
+
+            @Override
+            public void settingsButtonOnClick(View v, int position) {
+                Log.d("but", "right in the but!"+position);
+                addAlert();
+            }
         });
 
         settingsList.setAdapter(settingsListAdapter);
@@ -81,12 +95,70 @@ public class settingsPage extends AppCompatActivity {
     private void updateAdapter() {
         List<SettingsItem> tmp = new ArrayList<>();
         tmp.addAll(patList);
+        tmp.add(new ButtonItem("ADD PATIENT"));
         tmp.addAll(reqList);
 
         settingsListAdapter.updateList(tmp);
     }
 
+    public void addAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ThemeOverlay_AppCompat_Dialog_Alert);
+        builder.setTitle(Html.fromHtml("<font color='#38ACEC'>Type in the email of the person you wish to add</font>"));
 
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
+        input.setHint("jondoe@email.com");
+        input.setHintTextColor(getResources().getColor(R.color.md_blue_grey_500));
+        FrameLayout container = new FrameLayout(this);
+        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogLeft);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogRight);
+        params.topMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogTop);
+        input.setLayoutParams(params);
+        container.addView(input);
+        builder.setView(container);
+
+        // Set up the buttons
+        builder.setPositiveButton(Html.fromHtml("<font color='#38ACEC'>OK</font>"), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                pubSubBinderEndpoint.pubSubBindingRequest(input.getText().toString());
+            }
+        });
+        builder.setNegativeButton(Html.fromHtml("<font color='#38ACEC'>Cancel</font>"), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    public void alert(String message, final String buttonMsg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MaterialBaseTheme_Light_AlertDialog);
+        builder.setTitle(message);
+
+        // Set up the buttons
+        builder.setPositiveButton(buttonMsg, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (buttonMsg.equals("Try Again")) {
+                    addAlert();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
 
 
     @Override
@@ -101,9 +173,9 @@ public class settingsPage extends AppCompatActivity {
                     //You no longer need to do the ugly runOnUiThread
                     Log.d("MEAS", msg);
                     if (msg.equals("")) {
-                        //alert("Succesfully sent request", "OK");
+                        alert("Succesfully sent request", "OK");
                     } else {
-                        //alert(msg, "Try Again");
+                        alert(msg, "Try Again");
                     }
                     Log.d("------TEST---------", msg);
                 }

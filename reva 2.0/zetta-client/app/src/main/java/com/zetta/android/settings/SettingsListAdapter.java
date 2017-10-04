@@ -31,6 +31,7 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         void buttonYesOnClick(View v, int position);
         void buttonNoOnClick(View v, int position);
         void deleteOnClick(View v, int position);
+        void settingsButtonOnClick(View v, int position);
     }
 
     private static final String TAG = SettingsListAdapter.class.getSimpleName();
@@ -92,6 +93,11 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
                 return new ExistingViewHolder(view);
+            case SettingsItem.TYPE_BUTTON:
+                layoutIdForListItem = R.layout.settings_item_button;
+
+                view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+                return new ButtonViewHolder(view);
             default:
                 throw new IllegalStateException("Attempted to create view holder for a type you haven't coded for: " + viewType);
         }
@@ -131,6 +137,9 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 break;
             case SettingsItem.TYPE_EXISTING:
                 ((ExistingViewHolder) holder).bind((ExistingItem) settings.get(position));
+                break;
+            case SettingsItem.TYPE_BUTTON:
+                ((ButtonViewHolder) holder).bind((ButtonItem) settings.get(position));
                 break;
             default:
                 throw new IllegalStateException("Attempted to bind a type you haven't coded for: " + holder.getItemViewType());
@@ -255,6 +264,38 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
          */
         void bind(ExistingItem item) {
             title.setText("" + item.getTitle());
+        }
+    }
+
+    class ButtonViewHolder extends RecyclerView.ViewHolder {
+
+        Button but = (Button) itemView.findViewById(R.id.btn_settings);
+        /**
+         * Constructor for our ViewHolder. Within this constructor, we get a reference to our
+         * TextViews and set an onClickListener to listen for clicks. Those will be handled in the
+         * onClick method below.
+         * @param itemView The View that you inflated in
+         *                 {@link StatListAdapter#onCreateViewHolder(ViewGroup, int)}
+         */
+        public ButtonViewHolder(View itemView) {
+            super(itemView);
+
+
+            but.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickListener.settingsButtonOnClick(v, getAdapterPosition());
+                }
+            });
+        }
+
+        /**
+         * A method we wrote for convenience. This method will take an integer as input and
+         * use that integer to display the appropriate text within a list item.
+         * @param item The simplestatitem that needs to be displayed
+         */
+        void bind(ButtonItem item) {
+            but.setText("" + item.getName());
         }
     }
 

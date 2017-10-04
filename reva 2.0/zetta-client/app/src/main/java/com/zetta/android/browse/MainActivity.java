@@ -245,12 +245,6 @@ public class MainActivity extends AppCompatActivity {
                                 case R.string.drawerNameSignOut:{
                                     userManagerEndpoint.triggerLoginIntent();
                                 }break;
-                                case R.string.drawerNameAddPatient:{
-                                    addAlert();
-                                }break;
-                                case R.string.drawerNameAddSub:{
-                                    addAlert();
-                                }break;
                                 case R.string.drawerNameSettings: {
                                     Toast.makeText(cont, drawerItem.getTag().toString(), Toast.LENGTH_SHORT).show();
                                 }break;
@@ -302,66 +296,6 @@ public class MainActivity extends AppCompatActivity {
     }
     // Set up the input
 
-    public void addAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.ThemeOverlay_AppCompat_Dialog_Alert);
-        builder.setTitle(Html.fromHtml("<font color='#38ACEC'>Type in the email of the person you wish to add</font>"));
-
-        final EditText input = new EditText(MainActivity.this);
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-
-        input.setHint("jondoe@email.com");
-        input.setHintTextColor(getResources().getColor(R.color.md_blue_grey_500));
-        FrameLayout container = new FrameLayout(this);
-        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogLeft);
-        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogRight);
-        params.topMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogTop);
-        input.setLayoutParams(params);
-        container.addView(input);
-        builder.setView(container);
-
-        // Set up the buttons
-        builder.setPositiveButton(Html.fromHtml("<font color='#38ACEC'>OK</font>"), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                m_Text = input.getText().toString();
-                pubSubBinderEndpoint.pubSubBindingRequest(m_Text);
-            }
-        });
-        builder.setNegativeButton(Html.fromHtml("<font color='#38ACEC'>Cancel</font>"), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-    }
-
-    public void alert(String message, final String buttonMsg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MaterialBaseTheme_Light_AlertDialog);
-        builder.setTitle(message);
-
-        // Set up the buttons
-        builder.setPositiveButton(buttonMsg, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (buttonMsg.equals("Try Again")) {
-                    addAlert();
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-    }
-
     /**
      * Function to get user from server
      *
@@ -394,9 +328,9 @@ public class MainActivity extends AppCompatActivity {
                     //You no longer need to do the ugly runOnUiThread
                     Log.d("MEAS", msg);
                     if (msg.equals("")) {
-                        alert("Succesfully sent request", "OK");
+                        //alert("Succesfully sent request", "OK");
                     } else {
-                        alert(msg, "Try Again");
+                        //alert(msg, "Try Again");
                     }
                     Log.d("------TEST---------", msg);
                 }
