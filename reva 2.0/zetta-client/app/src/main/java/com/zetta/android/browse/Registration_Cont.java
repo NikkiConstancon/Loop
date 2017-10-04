@@ -33,30 +33,6 @@ public class Registration_Cont extends AppCompatActivity{
 
         Button btnRegPat = (Button) findViewById(R.id.btn_patRegCont);
 
-        btnRegPat.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v)
-            {
-                contPatReg();
-            }
-        });
-    }
-
-    /**
-     * Method that continues the registration of patients (Validation and intent change)
-     */
-    public void contPatReg()
-    {
-        EditText text1 = (EditText) findViewById((R.id.input_addr));
-        String address = text1.getText().toString();
-        text1 = (EditText) findViewById(R.id.input_userName);
-        String username = text1.getText().toString();
-
-        Context context = this;
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
-        builder1.setMessage("Please fill in all details.");
-        builder1.setCancelable(true);
-
-
         final EditText text = (EditText) findViewById(R.id.input_addr);
         final EditText text3 = (EditText) findViewById(R.id.input_userName);
 
@@ -81,6 +57,29 @@ public class Registration_Cont extends AppCompatActivity{
                 }
             }
         });
+
+        btnRegPat.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v)
+            {
+                contPatReg();
+            }
+        });
+    }
+
+    /**
+     * Method that continues the registration of patients (Validation and intent change)
+     */
+    public void contPatReg()
+    {
+        EditText text1 = (EditText) findViewById((R.id.input_addr));
+        String address = text1.getText().toString();
+        text1 = (EditText) findViewById(R.id.input_userName);
+        String username = text1.getText().toString();
+
+        Context context = this;
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+        builder1.setMessage("Please fill in all details.");
+        builder1.setCancelable(true);
 
         builder1.setPositiveButton(
                 "OK",
