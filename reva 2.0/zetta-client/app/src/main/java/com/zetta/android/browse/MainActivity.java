@@ -78,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setOffscreenPageLimit(2);
+
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading your patients and stats..");
         dialog.show();
@@ -152,9 +156,6 @@ public class MainActivity extends AppCompatActivity {
 
         SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1).withName("Settings");
         settings.withTag(5);
-
-
-
 
 
         SectionDrawerItem header = new SectionDrawerItem().withName("Patients");
@@ -249,12 +250,6 @@ public class MainActivity extends AppCompatActivity {
                                 }break;
                                 case 123:{
                                     pubSubBinderEndpoint.pubSubBindingRequest("what@sub.com");
-                                }break;
-                                case 1234:{
-                                    statTmpForNikkiEndpoint.attachCloudAwaitObject(
-                                            null,
-                                            statTmpForNikki
-                                    ).send(MainActivity.this, "RAW", obj);
                                 }break;
                             }
                         }
@@ -368,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
                             dList.setUser(subbedTo.iterator().next());
                         }
                     }
+
 
                     userManagerEndpoint.resumeGuardActivityByVerifiedUser(workOnUser);
 

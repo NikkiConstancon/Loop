@@ -53,7 +53,7 @@ public class StatFragment extends android.support.v4.app.Fragment
         View view = inflater.inflate(R.layout.stat_hist_fragment, container, false);
         super.onCreate(savedInstanceState);
         final FloatingActionButton myFab = (FloatingActionButton) view.findViewById(R.id.myFAB);
-        statTmpForNikkiEndpoint.bind(view.getContext());
+        //statTmpForNikkiEndpoint.bind(view.getContext());
 
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -79,10 +79,10 @@ public class StatFragment extends android.support.v4.app.Fragment
             e.printStackTrace();
         }
         //
-        statTmpForNikkiEndpoint.attachCloudAwaitObject(
+        /*statTmpForNikkiEndpoint.attachCloudAwaitObject(
                 null,
                 statTmpForNikki
-        ).send(view.getContext(), "RAW", obj);
+        ).send(view.getContext(), "RAW", obj);*/
 
         //getFab(StatFragment.this.getContext(), (ViewGroup)view.getParent());
         // MOCK DATA STARTS HERE
@@ -144,8 +144,8 @@ public class StatFragment extends android.support.v4.app.Fragment
         setHasOptionsMenu(true);
     }
 
-    MainActivity.StatTmpForNikkiEndpoint statTmpForNikkiEndpoint = new MainActivity.StatTmpForNikkiEndpoint();
-    public static class StatTmpForNikkiEndpoint extends RevaWebsocketEndpoint {
+    //MainActivity.StatTmpForNikkiEndpoint statTmpForNikkiEndpoint = new MainActivity.StatTmpForNikkiEndpoint();
+    /*public static class StatTmpForNikkiEndpoint extends RevaWebsocketEndpoint {
         @Override
         public String key() {
             return "Stats";
@@ -163,6 +163,6 @@ public class StatFragment extends android.support.v4.app.Fragment
             });
             return null;
         }
-    };
+    };*/
 }
 
