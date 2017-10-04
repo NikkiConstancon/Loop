@@ -125,7 +125,7 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (type == ListItem.TYPE_NEW) {
             NewListItem item = (NewListItem) listItems.get(position);
             ((NewViewHolder) holder).bind(item);
-            return; 
+            return;
         }
         throw new IllegalStateException("Attempted to bind a type you haven't coded for: " + type);
     }

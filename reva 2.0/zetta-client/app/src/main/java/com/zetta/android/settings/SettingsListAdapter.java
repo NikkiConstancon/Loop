@@ -98,6 +98,10 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
                 return new ButtonViewHolder(view);
+            case SettingsItem.TYPE_PENDING:
+                layoutIdForListItem = R.layout.settings_item_pending;
+                view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+                return new PendingViewHolder(view);
             default:
                 throw new IllegalStateException("Attempted to create view holder for a type you haven't coded for: " + viewType);
         }
@@ -141,6 +145,9 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case SettingsItem.TYPE_BUTTON:
                 ((ButtonViewHolder) holder).bind((ButtonItem) settings.get(position));
                 break;
+            case SettingsItem.TYPE_PENDING:
+                ((PendingViewHolder) holder).bind((PendingItem) settings.get(position));
+                break;
             default:
                 throw new IllegalStateException("Attempted to bind a type you haven't coded for: " + holder.getItemViewType());
         }
@@ -157,6 +164,17 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return settings.size();
     }
 
+
+    class PendingViewHolder extends RecyclerView.ViewHolder {
+        private final TextView title;
+
+        public PendingViewHolder(View itemView) {
+            super (itemView);
+            title = (TextView) itemView.findViewById(R.id.txt_pending);
+        }
+
+        void bind(PendingItem item) {title.setText("" + item.getTitle());}
+    }
 
     /**
      * Cache of the children views for a list item.
