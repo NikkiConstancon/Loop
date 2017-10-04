@@ -397,6 +397,9 @@ public class MainActivity extends AppCompatActivity {
                         subbedTo.add(names);
                     }
                 }
+                @Override public void doneCallback(){
+                    Log.d("----doneCallback---", "--done--");
+                }
             }
     );
 
