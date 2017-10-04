@@ -60,8 +60,25 @@ webSockMessenger.attach(serviceName, {
                     refreshInfo(otherTransmitters[devId])
                 }
             },
-            DROP_PATIENT_AND_SUBSCRIBER: function () {
-
+            DROP_PUB_SUB_BINDING_AS_SUB: function (transmitter, msg, key, channel) {
+                userManager.dropPubSubBinding(transmitter.getUserUid(), msg, function (removed) {
+                    if (removed) {
+                        refreshInfo(transmitter)
+                        channel(msg)
+                    } else {
+                        channel("")
+                    }
+                })
+            },
+            DROP_PUB_SUB_BINDING_AS_PAT: function (transmitter, msg, key, channel) {
+                userManager.dropPubSubBinding(msg, transmitter.getUserUid(), function (removed) {
+                    if (removed) {
+                        refreshInfo(transmitter)
+                        channel(msg)
+                    } else {
+                        channel("")
+                    }
+                })
             }
         }
     }
@@ -90,7 +107,7 @@ function refreshInfo(transmitter) {
                     transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(sub.PubSubBindingConfirmationMap[user]) } })
                 }
                 transmitter.transmit({ PATIENT_LIST: sub.PatientList || [] })
-                transmitter.transmit({ SUBSCRIBER_LIST: sub.SubscriberList || [] })
+                //transmitter.transmit({ SUBSCRIBER_LIST: sub.SubscriberList || [] })
                 transmitter.transmit({ DONE: true })
             } catch (e) {
                 logger.error(e)

@@ -80,7 +80,7 @@ public class settingsPage extends AppCompatActivity {
             @Override
             public void deleteOnClick(View v, int position) {
                 Log.d("here", "deleteOnClick at position"+position);
-
+                pubSubBinderEndpoint.dropPubSubBindingAsSubscriber(((ExistingItem)settingsListAdapter.getSettings().get(position)).getTitle());
             }
 
             @Override

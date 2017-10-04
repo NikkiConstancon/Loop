@@ -132,11 +132,35 @@ var UserManager = module.exports = {
             try { throw e } catch (e) { logger.error(e) }
         })
     },
-    dropPubSubBinding: function (patient, sub) {
-        patientManager.getPatient({ Username: patient }).then(function (pat) {
+    dropPubSubBinding: function (reqName, targetName, then) {
+        patientManager.getPatient({ Username: reqName }).then(function (req) {
+            patientManager.getPatient({ Username: targetName }).then(function (tar) {
+                req.removeFromSubscriberList(targetName)
+                tar.removeFromPatientList(reqName)
 
+                //tar.removeFromSubscriberList(reqName)
+                //req.removeFromPatientList(targetName)
+
+                then(true)
+            }).catch(function () {
+                subscriberManager.getsubscriber({ Email: targetName }).then(function (tar) {
+                    req.removeFromSubscriberList(targetName)
+                    tar.removeFromPatientList(reqName)
+                    then(true)
+                })
+            }).catch(function () {
+                then(false)
+            })
         }).catch(function () {
-
+            return subscriberManager.getsubscriber({ Email: reqName }).then(function (req) {
+                patientManager.getPatient({ Username: targetName }).then(function (tar) {
+                    req.removeFromPatientList(targetName)
+                    tar.removeFromSubscriberList(reqName)
+                    then(true)
+                })
+            })
+        }).catch(function () {
+            then(false)
         })
     }
 }

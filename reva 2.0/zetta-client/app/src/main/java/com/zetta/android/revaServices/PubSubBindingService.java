@@ -16,7 +16,7 @@ import java.util.TreeMap;
  * Created by ME on 2017/10/03.
  */
 
-    public class PubSubBindingService extends RevaWebsocketEndpoint {
+public class PubSubBindingService extends RevaWebsocketEndpoint {
     public RevaWebSocketService.USER_TYPE getUserType() {
         return webService.getUserType();
     }
@@ -43,6 +43,12 @@ import java.util.TreeMap;
 
     public void pubSubBindingRequest(String target) {
         attachCloudAwaitObject(null, pubSubReqCAO).send(activity, "REQ_BIND", target);
+    }
+    public void dropPubSubBindingAsSubscriber(String target){
+        attachCloudAwaitObject(null, pubSubReqCAO).send(activity, "DROP_PUB_SUB_BINDING_AS_SUB", target);
+    }
+    public void dropPubSubBindingAsPatient(String target){
+        attachCloudAwaitObject(null, pubSubReqCAO).send(activity, "DROP_PUB_SUB_BINDING_AS_PAT", target);
     }
 
     static public class pubSubReqInfo {
@@ -165,7 +171,11 @@ import java.util.TreeMap;
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    pubSubWorker.sendRequestCallback((String) obj);
+                    if(obj instanceof String) {
+                        pubSubWorker.sendRequestCallback((String) obj);
+                    }else{
+                        pubSubWorker.sendRequestCallback("");
+                    }
                 }
             });
             return null;
