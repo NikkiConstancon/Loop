@@ -42,7 +42,6 @@ import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.settingsPage;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;

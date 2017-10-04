@@ -1,8 +1,13 @@
 package com.zetta.android.browse;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -32,6 +37,10 @@ public class notifications extends android.support.v4.app.Fragment
     public static final String Tag = "notificationsFragment";
     private Button btnTest;
     private NotificationsAdapter adapter;
+    private RecyclerView rv;
+    private View view;
+    private Context context;
+
 
     /**
      * Overridden view creator for the notifications section
@@ -43,34 +52,25 @@ public class notifications extends android.support.v4.app.Fragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.notifications, container, false);
+        view = inflater.inflate(R.layout.notifications, container, false);
 
-        Context context = getActivity();
+        context = getActivity();
 
-        RecyclerView rv = (RecyclerView) view.findViewById(R.id.rvNotif);
+        Button butn = (Button) view.findViewById(R.id.btn_test_notif);
 
-        Button butn = (Button) getView().findViewById(R.id.btn_test_notif);
 
         butn.setOnClickListener(new View.OnClickListener() {
 
-            /**
-             * The onClick method is triggered when this button (mDoSomethingCoolButton) is clicked.
-             *
-             * @param v The view that is clicked. In this case, it's mDoSomethingCoolButton.
-             */
             @Override
             public void onClick(View v) {
                 addNotification("Heart Rate", "Heart rate is dropping too fast", "Heart", RED);
             }
         });
 
+        rv = (RecyclerView) view.findViewById(R.id.rvNotif);
+
         LinearLayoutManager linearLayout = new LinearLayoutManager(context);
         rv.setLayoutManager(linearLayout);
-
-        //populateNotifications();
-
-        adapter = new NotificationsAdapter(context, list);
-        rv.setAdapter(adapter);
 
         return view;
     }
@@ -116,9 +116,45 @@ public class notifications extends android.support.v4.app.Fragment
         if(list == null)
         {
             list = new ArrayList<NotificationsObject>();
+            list.add(newNotif);
+
+            adapter = new NotificationsAdapter(context, list);
+            rv.setAdapter(adapter);
+        }
+        else
+        {
+            list.add(newNotif);
+
+            adapter.notifyItemInserted(list.size()-1);
         }
 
-        list.add(newNotif);
+        Intent dismissIntent = new Intent(context, notifications.class);
+        dismissIntent.setAction(Intent.ACTION_DEFAULT);
+        dismissIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.ic_heart)
+                        .setContentTitle("ReVA Alert")
+                        .setContentText("Deviations from the norm")
+                        .setDefaults(Notification.DEFAULT_ALL) // must requires VIBRATE permission
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)//must give priority to High, Max which will considered as heads-up notification
+                        .setAutoCancel(true);
+
+
+
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
+                dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        builder.setContentIntent(contentIntent);
+
+//set intents and pending intents to call service on click of "dismiss" action button of notification
+// Gets an instance of the NotificationManager service
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//to post your notification to the notification bar with a id. If a notification with same id already exists, it will get replaced with updated information.
+        notificationManager.notify(0, builder.build());
     }
 
     /**

@@ -19,16 +19,48 @@ setTimeout(function() {
     //Test Patient
     // PatientManager.addPatient()
     //console.log(PatientDataManager.getInstance("greg"));
-    /* PatientDataManager.getGraphPoints({
-        Username: 'greg'  ,
-        DeviceId: "thermometer" ,
-        StartTime:  parseFloat(1507101299972),
-        EndTime:  parseFloat(1507101300500),
-     })*/
+    patientManager.getDeviceMap({ Username: 'greg' }).then(function (pat) { 
+        PatientDataManager.getGraphPoints({
+            Username: 'greg'  ,
+            StartTime:  parseFloat(1407101299972),
+            EndTime:  parseFloat(1607101300500),
+        }).then(function(result){
+            
+            
+            
+            //console.log(result);
+            
+            var endResult = []
+            for(var i= 0; i < Object.keys(pat).length - 1; i ++){
+                    if(pat[Object.keys(pat)[i]] == true){
+                        var subResult = [];
+                        // add device type
+                        subResult.push({deviceID: Object.keys(pat)[i]});
+                        //go through result...
+                        for(var j = 0; j <  Object.keys(result).length - 1; j++){
+                            //console.log("Device: " + result[Object.keys(result)[j]].device)
+                            //console.log("Compare: " + Object.keys(pat)[i])
+                            if(result[Object.keys(result)[j]].device == Object.keys(pat)[i]){
+                                //console.log("here: ");
+                                //console.log(result[Object.keys(result)[j]].device)
+                                subResult.push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
+                            }
+                        }
+                        endResult.push(subResult);
+                        
+                        
+                    }
+            }
+            console.log(endResult);
+            
+            
+        })
+    })
     
-     patientManager.getDeviceMap(
-         {'Username': 'greg'}
-     )
+     /*PatientManager.addToDeviceMap(
+         {'Username': 'greg'},
+         "Kicks", true
+     )*/
     //(patientManager.getPatient({Username:"greg"})).then(function(hu){hu.addToPatientList("NEW1")});
     // (subscriberManager.getsubscriber({Email:"what@sub.com"})).then(function(hu){hu.addToPatientList("rinus")})
     // Patient.addToPatientList("no.@e");
