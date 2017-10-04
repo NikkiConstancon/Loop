@@ -1,3 +1,4 @@
+//I am so frustrated with the db setup! Wish we just did what I initially suggested with a single account table with, that can be aggregated with different roles :'(
 'use strict';
 /**
  * @file
@@ -54,10 +55,19 @@ var UserManager = module.exports = {
         if (reqType === 'patient') {//this shoud not be manage externally, but what can you do???
             patientManager.getPatient({ Username: requester }).then(function (requester) {
                 patientManager.getPatient({ Username: target }).then(function (target) {
-                    requester.addPubSubRequestAsRequester(target.Username, false)
+                    //Cannot wait for this to end. Way to much bad decisions for me to tolerate.
+                    if (requester.PubSubBindingConfirmationMap && requester.PubSubBindingConfirmationMap[target.Usrname]) {
+                        failCb({ clientSafe: "You are already connected to this user" })
+                        return
+                    }
+                    requester.addPubSubRequestAsRequester(target.Username, true)
                     target.addPubSubRequestAsTarget(requester.Username, true, passCb, failCb)
                 }).catch(function (e) {
                     subscriberManager.getsubscriber({ Email: target }).then(function (target) {
+                        if (requester.PubSubBindingConfirmationMap && requester.PubSubBindingConfirmationMap[target.Email]) {
+                            failCb({ clientSafe: "You are already connected to this user" })
+                            return
+                        }
                         requester.addPubSubRequestAsRequester(target.Email, true)
                         target.addPubSubRequestAsTarget(requester.Username, false, passCb, failCb)
                     }).catch(function (e) {
@@ -75,10 +85,15 @@ var UserManager = module.exports = {
         } else {
             subscriberManager.getsubscriber({ Email: requester }).then(function (requester) {
                 patientManager.getPatient({ Username: target }).then(function (target) {
+                    if (requester.PubSubBindingConfirmationMap && requester.PubSubBindingConfirmationMap[target.Username]) {
+                        failCb({ clientSafe: "You are already connected to this user" })
+                        return
+                    }
                     requester.addPubSubRequestAsRequester(target.Username, false)
                     target.addPubSubRequestAsTarget(requester.Email, true, passCb, failCb)
-                }).catch(function () {
-                    failCb({ clientSafe: "You cannot subscribe to this user" })
+                }).catch(function (e) {
+                    failCb({ clientSafe: "You can not subscribe to this user" })
+                    if(e) try { throw e } catch (e) { logger.error(e) }
                 })
             }).catch(function (e) {
                 try {
@@ -98,8 +113,8 @@ var UserManager = module.exports = {
                     logger.error(tmpErrorMsg)
                     then(false)
                 }
-                req.pubSubRequestOnDecision(acceptor, decision)
-                acc.pubSubRequestOnDecision(requester, decision)
+                req.pubSubRequestOnDecision(acceptor, decision, true)
+                acc.pubSubRequestOnDecision(requester, decision, true)
                 then(true)
             }).catch(function () {
                 subscriberManager.getsubscriber({ Email: requester }).then(function (req) {
@@ -107,8 +122,8 @@ var UserManager = module.exports = {
                         logger.error(tmpErrorMsg)
                         then(false)
                     }
-                    req.pubSubRequestOnDecision(acceptor, decision)
-                    acc.pubSubRequestOnDecision(requester, decision)
+                    req.pubSubRequestOnDecision(acceptor, decision, false)
+                    acc.pubSubRequestOnDecision(requester, decision, false)
                     then(true)
                 })
             }).catch(function (e) {
@@ -121,8 +136,8 @@ var UserManager = module.exports = {
                         logger.error(tmpErrorMsg)
                         then(false)
                     }
-                    req.pubSubRequestOnDecision(acceptor, decision)
-                    acc.pubSubRequestOnDecision(requester, decision)
+                    req.pubSubRequestOnDecision(acceptor, decision, false)
+                    acc.pubSubRequestOnDecision(requester, decision, false)
                     then(true)
                 })
             }).catch(function (e) {
@@ -138,8 +153,8 @@ var UserManager = module.exports = {
                 req.removeFromSubscriberList(targetName)
                 tar.removeFromPatientList(reqName)
 
-                //tar.removeFromSubscriberList(reqName)
-                //req.removeFromPatientList(targetName)
+                tar.removeFromSubscriberList(reqName)
+                req.removeFromPatientList(targetName)
 
                 then(true)
             }).catch(function () {

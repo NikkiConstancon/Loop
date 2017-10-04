@@ -1,4 +1,6 @@
-﻿const webSockMessenger = require('../lib/webSockMessenger')
+﻿//I am so frustrated with the db setup! Wish we just did what I initially suggested with a single account table with, that can be aggregated with different roles :(
+
+const webSockMessenger = require('../lib/webSockMessenger')
 const userManager = require('../userManager')
 const patientManager = require("../patientManager");
 var subscriberManager = require('../subscriberManager');
@@ -24,6 +26,12 @@ webSockMessenger.attach(serviceName, {
                 userManager.pubSubBindRequest(
                     function (info) {
                         channel("")
+                        refreshInfo(transmitter)
+                        otherTransmitters = webSockMessenger.getTransmitterArr(serviceName, msg)
+                        for (var i in otherTransmitters) {
+                            refreshInfo(otherTransmitters[i])
+                        }
+
                         webSockMessenger.transmitTo(serviceName, msg,
                             {
                                 NEW_BINDING_CONFIRMATION_REQ: {
@@ -43,21 +51,22 @@ webSockMessenger.attach(serviceName, {
                 userManager.pubSubBindRequestOnDecision(transmitter.getUserUid(), msg, true, function (passed) {
                     channel(passed ? msg : "")
                 })
-                refreshInfo(transmitter)
                 channel(msg)//for now
-                otherTransmitters = webSockMessenger.getTransmitters(msg)
-                for (var devId in getTransmitters(msg)) {
-                    refreshInfo(otherTransmitters[devId])
+                refreshInfo(transmitter)
+                otherTransmitters = webSockMessenger.getTransmitterArr(serviceName, msg)
+                for (var i in otherTransmitters) {
+                    refreshInfo(otherTransmitters[i])
                 }
             },
             DECLINE: function (transmitter, msg, key, channel) {
                 userManager.pubSubBindRequestOnDecision(transmitter.getUserUid(), msg, false, function (passed) {
                     channel(passed ? msg : "")
                 })
+                channel(msg)//for now
                 refreshInfo(transmitter)
-                otherTransmitters = webSockMessenger.getTransmitters(msg)
-                for (var devId in getTransmitters(msg)) {
-                    refreshInfo(otherTransmitters[devId])
+                otherTransmitters = webSockMessenger.getTransmitterArr(serviceName, msg)
+                for (var i in otherTransmitters) {
+                    refreshInfo(otherTransmitters[i])
                 }
             },
             DROP_PUB_SUB_BINDING_AS_SUB: function (transmitter, msg, key, channel) {
@@ -65,6 +74,12 @@ webSockMessenger.attach(serviceName, {
                     if (removed) {
                         refreshInfo(transmitter)
                         channel(msg)
+
+                        refreshInfo(transmitter)
+                        otherTransmitters = webSockMessenger.getTransmitterArr(serviceName, msg)
+                        for (var i in otherTransmitters) {
+                            refreshInfo(otherTransmitters[i])
+                        }
                     } else {
                         channel("")
                     }
@@ -75,6 +90,12 @@ webSockMessenger.attach(serviceName, {
                     if (removed) {
                         refreshInfo(transmitter)
                         channel(msg)
+
+                        refreshInfo(transmitter)
+                        otherTransmitters = webSockMessenger.getTransmitterArr(serviceName, msg)
+                        for (var i in otherTransmitters) {
+                            refreshInfo(otherTransmitters[i])
+                        }
                     } else {
                         channel("")
                     }
@@ -87,33 +108,43 @@ webSockMessenger.attach(serviceName, {
 
 
 function refreshInfo(transmitter) {
-    if (transmitter.getUserType() === 'patient') {
-        patientManager.getPatient({ Username: transmitter.getUserUid() }).then(function (pat) {
-            try {
-                for (var user in pat.PubSubBindingConfirmationMap) {
-                    transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(pat.PubSubBindingConfirmationMap[user]) } })
-                }
-                transmitter.transmit({ PATIENT_LIST: pat.PatientList || [] })
-                transmitter.transmit({ SUBSCRIBER_LIST: pat.SubscriberList || [] })
-                transmitter.transmit({ DONE: true })
-            } catch (e) {
-                logger.error(e)
+    setTimeout(function () {
+        try {
+            if (transmitter.getUserType && transmitter.getUserType() === 'patient') {
+                patientManager.getPatient({ Username: transmitter.getUserUid() }).then(function (pat) {
+                    try {
+                        var tmp = {}
+                        for (var user in pat.PubSubBindingConfirmationMap) {
+                            tmp[user] = JSON.parse(pat.PubSubBindingConfirmationMap[user])
+                        }
+                        transmitter.transmit({ BINDING_CONFIRMATION_REQ: tmp })
+                        transmitter.transmit({ PATIENT_LIST: pat.PatientList || [] })
+                        transmitter.transmit({ SUBSCRIBER_LIST: pat.SubscriberList || [] })
+                        transmitter.transmit({ DONE: true })
+                    } catch (e) {
+                        logger.error(e)
+                    }
+                });
+            } else {
+                subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (sub) {
+                    try {
+                        var tmp = {}
+                        for (var user in sub.PubSubBindingConfirmationMap) {
+                            tmp[user] = JSON.parse(sub.PubSubBindingConfirmationMap[user])
+                        }
+                        transmitter.transmit({ BINDING_CONFIRMATION_REQ: tmp })
+                        transmitter.transmit({ PATIENT_LIST: sub.PatientList || [] })
+                        //transmitter.transmit({ SUBSCRIBER_LIST: sub.SubscriberList || [] })
+                        transmitter.transmit({ DONE: true })
+                    } catch (e) {
+                        logger.error(e)
+                    }
+                });
             }
-        });
-    } else {
-        subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (sub) {
-            try {
-                for (var user in sub.PubSubBindingConfirmationMap) {
-                    transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(sub.PubSubBindingConfirmationMap[user]) } })
-                }
-                transmitter.transmit({ PATIENT_LIST: sub.PatientList || [] })
-                //transmitter.transmit({ SUBSCRIBER_LIST: sub.SubscriberList || [] })
-                transmitter.transmit({ DONE: true })
-            } catch (e) {
-                logger.error(e)
-            }
-        });
-    }
+        } catch (e) {
+            logger.error("I AM SO OVER THIS", e)
+        }
+    }, 333);
 }
 
 

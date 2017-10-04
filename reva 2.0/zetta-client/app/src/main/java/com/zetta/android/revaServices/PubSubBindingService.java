@@ -57,7 +57,7 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
         }
     };
 
-    static public class pubSubReqInfo {
+    static public class PubSubReqInfo {
         public enum TYPE {REQUESTER, TARGET}
 
         ;
@@ -73,7 +73,7 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
         public final TYPE type;
         public final STATE state;
 
-        public pubSubReqInfo(
+        public PubSubReqInfo(
                 String userUid_,
                 final String typeStr,
                 final String stateStr
@@ -103,13 +103,13 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
 
     List<String> patientList = new ArrayList<>();
     List<String> subscriberList = new ArrayList<>();
-    Map<String, pubSubReqInfo> pubSubInfoMap = new TreeMap<>();
+    Map<String, PubSubReqInfo> pubSubInfoMap = new TreeMap<>();
 
     public ArrayList<String> getPubSubList() {
         return new ArrayList<>(pubSubInfoMap.keySet());
     }
 
-    pubSubReqInfo getPubSubInfo(int i) {
+    PubSubReqInfo getPubSubInfo(int i) {
         ArrayList names = getPubSubList();
         return pubSubInfoMap.get(names.get(i));
     }
@@ -128,15 +128,15 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
                             Map<String, Map<String, String>> gotMap = (Map<String, Map<String, String>>) entry.getValue();
                             for (Map.Entry<String, Map<String, String>> entryInfo : gotMap.entrySet()) {
                                 Map<String, String> info = entryInfo.getValue();
-                                pubSubInfoMap.put(entryInfo.getKey(), new pubSubReqInfo(entryInfo.getKey(), info.get("type"), info.get("state")));
+                                pubSubInfoMap.put(entryInfo.getKey(), new PubSubReqInfo(entryInfo.getKey(), info.get("type"), info.get("state")));
                             }
                             pubSubInfoWorker.onConnect(pubSubInfoMap);
                         }
                         break;
                         case "NEW_BINDING_CONFIRMATION_REQ": {
                             Map<String, String> entryInfo = (Map<String, String>) entry.getValue();
-                            pubSubReqInfo info =
-                                    new pubSubReqInfo(
+                            PubSubReqInfo info =
+                                    new PubSubReqInfo(
                                             entryInfo.get("userUid"),
                                             entryInfo.get("type"),
                                             entryInfo.get("state")
@@ -157,6 +157,14 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
                         break;
                         case "DONE":{
                             pubSubInfoWorker.doneCallback();
+                            pubSubInfoWorker.doneCallback(
+                                    patientList,
+                                    subscriberList,
+                                    new ArrayList<>(pubSubInfoMap.values())
+                            );
+                            patientList.clear();
+                            subscriberList.clear();
+                            pubSubInfoMap.clear();
                         }
                         break;
                     }
@@ -191,7 +199,7 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
 
 
 
-    public void pubSubRequestReply(String userUid, pubSubReqInfo.REPLY reply) {
+    public void pubSubRequestReply(String userUid, PubSubReqInfo.REPLY reply) {
         attachCloudAwaitObject(null, pubSubReqReplyCAO).send(activity, reply.toString(), userUid);
     }
 
@@ -213,12 +221,13 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
     final PubSubWorker pubSubWorker;
 
     public static abstract class PubSubInfoWorker {
-        abstract public void onConnect(Map<String, pubSubReqInfo> infoMap);
+        abstract public void onConnect(Map<String, PubSubReqInfo> infoMap);
 
-        abstract public void newReq(pubSubReqInfo info);
+        abstract public void newReq(PubSubReqInfo info);
 
         abstract public void onPatientList(List<String> patientList);
         public void onSubscriberList(List<String> subscriberList){}
+        public void doneCallback(List<String> patientList, List<String> subscriberList,List<PubSubReqInfo> reqInfoList){}
         public void doneCallback(){}
     }
 

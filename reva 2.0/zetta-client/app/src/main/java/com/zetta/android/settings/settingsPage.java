@@ -14,17 +14,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.zetta.android.R;
-import com.zetta.android.browse.MainActivity;
-import com.zetta.android.browse.StatListAdapter;
 import com.zetta.android.revaServices.PubSubBindingService;
-import com.zetta.android.revaServices.UserManager;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class settingsPage extends AppCompatActivity {
     RecyclerView settingsList;
@@ -33,7 +32,7 @@ public class settingsPage extends AppCompatActivity {
     private List<SettingsItem> patList = new ArrayList<>();
     private List<SettingsItem> reqList = new ArrayList<>();
     private List<SettingsItem> pendList = new ArrayList<>();
-
+    private List<SettingsItem> subList = new ArrayList<>();
 
 
     //TODO: check for when a list is empty, so you can still display the header and a message
@@ -47,7 +46,6 @@ public class settingsPage extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-
         settingsList = (RecyclerView) findViewById(R.id.settings_recycler);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -58,29 +56,32 @@ public class settingsPage extends AppCompatActivity {
             @Override
             public void buttonYesOnClick(View v, int position) {
                 pubSubBinderEndpoint.pubSubRequestReply(
-                        ((RequestItem)settingsListAdapter.getSettings().get(position)).getTitle(),PubSubBindingService.pubSubReqInfo.REPLY.ACCEPT
+                        ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.ACCEPT
                 );
-
+                /*
                 SettingsItem item = settingsListAdapter.getSettings().get(position);
                 reqList.remove(item);
 
                 updateAdapter();
+                */
             }
+
             @Override
             public void buttonNoOnClick(View v, int position) {
                 pubSubBinderEndpoint.pubSubRequestReply(
-                        ((RequestItem)settingsListAdapter.getSettings().get(position)).getTitle(),PubSubBindingService.pubSubReqInfo.REPLY.DECLINE
+                        ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
                 );
-
+                /*
                 SettingsItem item = settingsListAdapter.getSettings().get(position);
                 reqList.remove(item);
-
                 updateAdapter();
+                */
             }
+
             @Override
             public void deleteOnClick(View v, int position) {
-                Log.d("here", "deleteOnClick at position"+position);
-                pubSubBinderEndpoint.dropPubSubBindingAsSubscriber(((ExistingItem)settingsListAdapter.getSettings().get(position)).getTitle());
+                Log.d("here", "deleteOnClick at position" + position);
+                pubSubBinderEndpoint.dropPubSubBindingAsSubscriber(((ExistingItem) settingsListAdapter.getSettings().get(position)).getTitle());
             }
 
             @Override
@@ -94,9 +95,17 @@ public class settingsPage extends AppCompatActivity {
     }
 
     private void updateAdapter() {
+        boolean isPatient = pubSubBinderEndpoint.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
         List<SettingsItem> tmp = new ArrayList<>();
+        /*
+        if(isPatient) {
+            tmp.add(new TitleItem("Sharing My Info With"));
+            tmp.addAll(subList);
+        }
+        */
+        tmp.add(new TitleItem(isPatient ? "Sharing My Info With" : "Subscribed Patients"));
         tmp.addAll(patList);
-        tmp.add(new ButtonItem("ADD PATIENT"));
+        tmp.add(new ButtonItem(isPatient ? "Share With New Contact" : "Add Patient"));
         tmp.addAll(reqList);
         tmp.add(new TitleItem("Pending Requests"));
         tmp.addAll(pendList);
@@ -115,7 +124,7 @@ public class settingsPage extends AppCompatActivity {
         input.setHint("jondoe@email.com");
         input.setHintTextColor(getResources().getColor(R.color.md_blue_grey_500));
         FrameLayout container = new FrameLayout(this);
-        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.leftMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogLeft);
         params.rightMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogRight);
         params.topMargin = getResources().getDimensionPixelSize(R.dimen.inputDialogTop);
@@ -171,59 +180,92 @@ public class settingsPage extends AppCompatActivity {
     }
 
     PubSubBindingService pubSubBinderEndpoint = new PubSubBindingService(this,
-            new PubSubBindingService.PubSubWorker(){
-                @Override public void sendRequestCallback(final String msg){
+            new PubSubBindingService.PubSubWorker() {
+                @Override
+                public void sendRequestCallback(final String msg) {
                     //You no longer need to do the ugly runOnUiThread
                     Log.d("MEAS", msg);
                     if (msg.equals("")) {
-                        alert("Succesfully sent request", "OK");
+                        //alert("Succesfully sent request", "OK");
                     } else {
                         alert(msg, "Try Again");
                     }
                     Log.d("------TEST---------", msg);
                 }
-                @Override public void sendReplyActionCallback(String userUid){
+
+                @Override
+                public void sendReplyActionCallback(String userUid) {
                     Log.d("--sendReplyActionCall--", userUid);
                 }
             },
-            new PubSubBindingService.PubSubInfoWorker(){
-                @Override public void onConnect(Map<String, PubSubBindingService.pubSubReqInfo> infoMap){
-                    List<SettingsItem> tmp = new ArrayList<>();
-                    reqList.clear();
-                    pendList.clear();
-                    reqList.add(new TitleItem("Subscriber Requests"));
-                    for(Map.Entry<String, PubSubBindingService.pubSubReqInfo> entry : infoMap.entrySet()){
-                        PubSubBindingService.pubSubReqInfo info =  entry.getValue();
-                        Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
+            new PubSubBindingService.PubSubInfoWorker() {
+                @Override
+                public void onConnect(Map<String, PubSubBindingService.PubSubReqInfo> infoMap) {
+                }
 
-                        if(info.type.toString().equals("REQUESTER")){
+                @Override
+                public void newReq(PubSubBindingService.PubSubReqInfo info) {
+                    Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
+                    reqList.add(new RequestItem(info.userUid));
+                }
+
+                @Override
+                public void onPatientList(List<String> patientList) {
+                }
+
+                @Override
+                public void onSubscriberList(List<String> subscriberList) {
+                    Log.d("--onSubscriberList---", subscriberList.toString());
+                }
+
+                @Override
+                public void doneCallback(
+                        List<String> patientList,
+                        List<String> subscriberList,
+                        List<PubSubBindingService.PubSubReqInfo> reqInfoList
+                ) {
+                    Set<String> added = new TreeSet<>();
+                    List<SettingsItem> tmp = new ArrayList<>();
+
+                    patList.clear();
+                    subList.clear();
+                    pendList.clear();
+                    reqList.clear();
+                    for (String userUid : patientList) {
+                        added.add(userUid);
+                        patList.add(new ExistingItem(userUid));
+                    }
+                    for (String userUid : subscriberList) {
+                        if (!added.contains(userUid)) subList.add(new ExistingItem(userUid));
+                    }
+                    for (PubSubBindingService.PubSubReqInfo info : reqInfoList) {
+                        if (info.type == PubSubBindingService.PubSubReqInfo.TYPE.REQUESTER) {
                             pendList.add(new PendingItem(info.userUid));
                         } else {
                             reqList.add(new RequestItem(info.userUid));
                         }
-
-                    }
-                    updateAdapter();
-                }
-
-                @Override public void newReq(PubSubBindingService.pubSubReqInfo info){
-                    Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
-                }
-
-                @Override public void onPatientList(List<String> patientList){
-                    Log.d("--setsub-list---", patientList.toString());
-
-                    patList.clear();
-                    patList.add(new TitleItem("Current Patients"));
-                    for (int i =0; i < patientList.size(); i++) {
-                        patList.add(new ExistingItem(patientList.get(i)));
                     }
 
-                    updateAdapter();
-                }
 
-                @Override public void onSubscriberList(List<String> subscriberList) {
-                    Log.d("--onSubscriberList---", subscriberList.toString());
+                    boolean isPatient = pubSubBinderEndpoint.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
+
+                    if (reqList.size() > 0) {
+                        tmp.add(new TitleItem("New Connection Requests"));
+                        tmp.addAll(reqList);
+                    }
+                    boolean flagGotConnections = patList.size() > 0 || subList.size() > 0;
+                    tmp.add(new TitleItem(
+                            flagGotConnections
+                                    ? (isPatient ? "Sharing My Info With" : "Subscribed Patients")
+                                    : ("You are not connected ... add someone")
+                    ));
+                    tmp.addAll(patList);
+                    tmp.addAll(subList);
+                    tmp.add(new ButtonItem(isPatient ? "Share With New Contact" : "Add Patient"));
+                    tmp.add(new TitleItem(pendList.size() > 0 ? "Requests waiting to be accepted" : "You have no pending requests"));
+                    tmp.addAll(pendList);
+
+                    settingsListAdapter.updateList(tmp);
                 }
             }
     );
