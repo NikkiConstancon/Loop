@@ -619,6 +619,7 @@ public class RevaWebSocketService extends Service {
                         + (long) ((1 - expRatio) * (threshhold / delta));
                 try {
                     if (connectThrashingGuardLastDelay > 1) {
+                        Log.d("-----SLEEP----1", ((Long)connectThrashingGuardLastDelay).toString());
                         Thread.sleep(connectThrashingGuardLastDelay);
                     }
                 } catch (InterruptedException e) {
@@ -693,7 +694,7 @@ public class RevaWebSocketService extends Service {
     private static RevaWebSocket revaWebSocket = null;
     private boolean runSouct = true;
     private Semaphore connectSemaphore = new Semaphore(1);
-    private static long connectThrashingGuardLastOpen = new Date().getTime();
+    private static long connectThrashingGuardLastOpen = Integer.MAX_VALUE;
     private static long connectThrashingGuardLastDelay = 0;
     // ----------------------------------- END socket Management ------------------------------
 }
