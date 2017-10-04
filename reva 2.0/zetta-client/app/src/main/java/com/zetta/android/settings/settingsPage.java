@@ -80,7 +80,6 @@ public class settingsPage extends AppCompatActivity {
             @Override
             public void deleteOnClick(View v, int position) {
                 Log.d("here", "deleteOnClick at position"+position);
-
             }
 
             @Override
@@ -208,10 +207,8 @@ public class settingsPage extends AppCompatActivity {
 
                 @Override public void newReq(PubSubBindingService.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
-
-
-
                 }
+
                 @Override public void onPatientList(List<String> patientList){
                     Log.d("--setsub-list---", patientList.toString());
 
@@ -223,6 +220,7 @@ public class settingsPage extends AppCompatActivity {
 
                     updateAdapter();
                 }
+
                 @Override public void onSubscriberList(List<String> subscriberList) {
                     Log.d("--onSubscriberList---", subscriberList.toString());
                 }
