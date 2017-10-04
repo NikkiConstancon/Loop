@@ -13,6 +13,7 @@ var logger = require('./revaLog');
 
 const patientManager = require("./patientManager");
 var subscriberManager = require('./subscriberManager');
+const userManagerUtil = require('./userManagerUtil')
 
 
 var UserManager = module.exports = {
@@ -53,12 +54,12 @@ var UserManager = module.exports = {
         if (reqType === 'patient') {//this shoud not be manage externally, but what can you do???
             patientManager.getPatient({ Username: requester }).then(function (requester) {
                 patientManager.getPatient({ Username: target }).then(function (target) {
-                    requester.addPubSubRequestAsRequester(target.Username)
-                    target.addPubSubRequestAsTarget(requester.Username, passCb, failCb)
+                    requester.addPubSubRequestAsRequester(target.Username, false)
+                    target.addPubSubRequestAsTarget(requester.Username, true, passCb, failCb)
                 }).catch(function (e) {
                     subscriberManager.getsubscriber({ Email: target }).then(function (target) {
-                        requester.addPubSubRequestAsRequester(target.Email)
-                        target.addPubSubRequestAsTarget(requester.Username, passCb, failCb)
+                        requester.addPubSubRequestAsRequester(target.Email, true)
+                        target.addPubSubRequestAsTarget(requester.Username, false, passCb, failCb)
                     }).catch(function (e) {
                         failCb({ clientSafe: "No such account" })
                     })
@@ -74,8 +75,8 @@ var UserManager = module.exports = {
         } else {
             subscriberManager.getsubscriber({ Email: requester }).then(function (requester) {
                 patientManager.getPatient({ Username: target }).then(function (target) {
-                    requester.addPubSubRequestAsRequester(target.Username)
-                    target.addPubSubRequestAsTarget(requester.Email, passCb, failCb)
+                    requester.addPubSubRequestAsRequester(target.Username, false)
+                    target.addPubSubRequestAsTarget(requester.Email, true, passCb, failCb)
                 }).catch(function () {
                     failCb({ clientSafe: "You cannot subscribe to this user" })
                 })
@@ -90,21 +91,34 @@ var UserManager = module.exports = {
         }
     },
     pubSubBindRequestOnDecision: function (acceptor, requester, decision) {
+        const tmpErrorMsg = "GREG! the person sending the request should not be able to accept"
         patientManager.getPatient({ Username: acceptor }).then(function (acc) {
             patientManager.getPatient({ Username: requester }).then(function (req) {
-                req.pubSubRequestOnDecision(acceptor, decision)
-                acc.pubSubRequestOnDecision(requester, decision)
-            }).catch(function () {
-                subscriberManager.getsubscriber({ Email: requester }).then(function (req) {
+                if (JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type != userManagerUtil.enum.pubSubReq.type.request) {
                     req.pubSubRequestOnDecision(acceptor, decision)
                     acc.pubSubRequestOnDecision(requester, decision)
+                } else {
+                    logger.error(tmpErrorMsg)
+                }
+            }).catch(function () {
+                subscriberManager.getsubscriber({ Email: requester }).then(function (req) {
+                    if (JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type != userManagerUtil.enum.pubSubReq.type.request) {
+                        req.pubSubRequestOnDecision(acceptor, decision)
+                        acc.pubSubRequestOnDecision(requester, decision)
+                    } else {
+                        logger.error(tmpErrorMsg)
+                    }
                 })
             })
         }).catch(function () {
             subscriberManager.getsubscriber({ Email: acceptor }).then(function (acc) {
                 patientManager.getPatient({ Username: requester }).then(function (req) {
-                    req.pubSubRequestOnDecision(acceptor, decision)
-                    acc.pubSubRequestOnDecision(requester, decision)
+                    if (JSON.parse(acc.PubSubBindingConfirmationMap[requester]).type != userManagerUtil.enum.pubSubReq.type.request) {
+                        req.pubSubRequestOnDecision(acceptor, decision)
+                        acc.pubSubRequestOnDecision(requester, decision)
+                    } else {
+                        logger.error(tmpErrorMsg)
+                    }
                 })
             })
         })

@@ -24,7 +24,12 @@ webSockMessenger.attach(serviceName, {
                 userManager.pubSubBindRequest(
                     function (info) {
                         channel("")
-                        webSockMessenger.transmitTo(serviceName, msg, { NEW_BINDING_CONFIRMATION_REQ: { type: info.type, state: info.state, userUid: msg } })
+                        webSockMessenger.transmitTo(serviceName, msg,
+                            {
+                                NEW_BINDING_CONFIRMATION_REQ: {
+                                    type: info.type, state: info.state, userUid: transmitter.getUserUid()
+                                }
+                            })
                     },
                     function (errMsg) {
                         channel(errMsg.message || errMsg.clientSafe || "Oops! Something went wrong :(")
