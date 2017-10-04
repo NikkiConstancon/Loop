@@ -20,6 +20,11 @@ import com.zetta.android.GraphEntry;
 import com.zetta.android.MoreGraph;
 import com.zetta.android.R;
 import com.zetta.android.StatItem;
+import com.zetta.android.revawebsocketservice.CloudAwaitObject;
+import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -48,6 +53,7 @@ public class StatFragment extends android.support.v4.app.Fragment
         View view = inflater.inflate(R.layout.stat_hist_fragment, container, false);
         super.onCreate(savedInstanceState);
         final FloatingActionButton myFab = (FloatingActionButton) view.findViewById(R.id.myFAB);
+        statTmpForNikkiEndpoint.bind(view.getContext());
 
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -57,6 +63,26 @@ public class StatFragment extends android.support.v4.app.Fragment
             }
         });
 
+        //Nikki
+
+        long start = new java.util.Date().getTime() - 1000000000;
+        long end = new java.util.Date().getTime();
+//MainActivity-- for stats
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("Username", "greg");
+            obj.put("DeviceId", "thermometer");
+            obj.put("StartTime", start);
+            obj.put("EndTime", end);
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        //
+        statTmpForNikkiEndpoint.attachCloudAwaitObject(
+                null,
+                statTmpForNikki
+        ).send(view.getContext(), "RAW", obj);
 
 
         //getFab(StatFragment.this.getContext(), (ViewGroup)view.getParent());
@@ -118,5 +144,26 @@ public class StatFragment extends android.support.v4.app.Fragment
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
     }
+
+    MainActivity.StatTmpForNikkiEndpoint statTmpForNikkiEndpoint = new MainActivity.StatTmpForNikkiEndpoint();
+    public static class StatTmpForNikkiEndpoint extends RevaWebsocketEndpoint {
+        @Override
+        public String key() {
+            return "Stats";
+        }
+    }
+    public CloudAwaitObject statTmpForNikki = new CloudAwaitObject("GRAPH_POINTS") {
+        @Override
+        public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
+            Log.d("object", obj.toString());
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //deserialize it
+                }
+            });
+            return null;
+        }
+    };
 }
 

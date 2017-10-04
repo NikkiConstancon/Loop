@@ -88,21 +88,13 @@ TimeStamp*/
                 var count = 0;
                 var result = []
 console.log("Getting Graph Points");
-//console.log(_info.keys);
                 var start = _info.StartTime;
                 var end = _info.EndTime;
-                
-                //if(start.length <= 19){
-                 //   start += ".000000+0000";
-                //}
-               // if(end.length <= 19){
-               //     end += ".000000+0000";
-              // }
                 console.log(start);
                 console.log(end);
                 var query = {
                     PatientUsername: _info.Username,
-                    DeviceID: _info.DeviceId,
+                    //DeviceID: _info.DeviceId,
                     TimeStamp : { '$gt':start, '$lte':end}
                 }
                 dbMan.models.instance.patientData.stream(query, {raw: true, allow_filtering: true}, function(data){
@@ -117,7 +109,7 @@ console.log("Getting Graph Points");
                         if(row.Value < minimum)
                             minimum = row.Value;
 
-                        result.push({ x: row.TimeStamp , y : row.Value})
+                        result.push({ x: row.TimeStamp , y : row.Value, device: row.DeviceID})
                     }
 
                     result.push({Min: minimum, Max: maximum, Avg: (avg/count) })
@@ -129,50 +121,19 @@ console.log("Getting Graph Points");
                     });
 
                     //need to find averages according to the interval
-                    console.log("Result: ");
-                    console.log(result);
-
-
-                 /*   var endInterval = new Date(_info.StartTime) //marks the end of the current interval
-                    //var currentTime = new Date(_info.StartTime) //marks the 
-                    var tempEndDate = new Date(_info.EndTime)
-                    var tempResult = [];
-
-                    tempResult.push({x: endInterval, y: 0})
-
-                    //add the interval to the time
-                    addMinutes(endInterval,_info.Interval)
-
-
-                    //Keep it up until we boom
-                    while(endInterval < tempEndDate){
-
-                    }*/
-
-
+                    //console.log("Result: ");
+                    //console.log(result);
                     resolve(result);
 
                 }, function(err){
                     reject(err);
                     //emitted when all rows have been retrieved and read
                 });
-
-
-
-
             }).catch((err) => {
                 reject(err)
             })
         })
 
 
-    }
+    },
 }
-/*models.instance.Person.stream({Name: 'John'}, {raw: true}, function(reader){
-    var row;
-    while (row = reader.readRow()) {
-        //process row
-    }
-}, function(err){
-    //emitted when all rows have been retrieved and read
-});*/
