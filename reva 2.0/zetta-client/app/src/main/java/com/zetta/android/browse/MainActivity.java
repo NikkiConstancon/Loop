@@ -25,6 +25,7 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zetta.android.MoreGraph;
@@ -41,6 +42,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private Interval validateUserUidInterval = null;
     public Context cont = this;
 
-    private List<String> subbedTo = new ArrayList<String>();
+    private Set<String> subbedTo = new TreeSet<>();
 
 
     /**
@@ -142,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
             adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
         }
 
-
+        SectionDrawerItem header = new SectionDrawerItem().withName("Patients");
         PrimaryDrawerItem tmpItemForNikki = new PrimaryDrawerItem().withIdentifier(1).withName("For Nikki");
         tmpItemForNikki.withTag(1234);
 
@@ -153,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem tmpItemForDecline = new PrimaryDrawerItem().withIdentifier(tmpItemForDeclineId)
                 .withName("tmpItemForDecline");
 
-        PrimaryDrawerItem greg = new PrimaryDrawerItem().withIdentifier(1).withName("greg").withTag(60);
-        PrimaryDrawerItem subTo = new PrimaryDrawerItem().withIdentifier(2).withName("Subscribed to").withTag("Subscribed to");
+
+
 
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -167,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
                         return false;
                     }
-                })
+                }).withSelectionListEnabledForSingleProfile(false)
                 .build();
 
 
@@ -217,10 +220,6 @@ public class MainActivity extends AppCompatActivity {
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
                             switch(value){
-                                case 60: {
-                                    dList.setUser("greg");
-                                    setupViewPager(mViewPager);
-                                }break;
                                 case 5: {
                                     Intent intent = new Intent(MainActivity.this, settingsPage.class);
                                     startActivity(intent);
@@ -254,10 +253,8 @@ public class MainActivity extends AppCompatActivity {
                 }).build();
 
         result.addItems(
-                greg,
                 adder,
-                new DividerDrawerItem(),
-                subTo
+                header
         );
 
         for(String name : subbedTo)
@@ -267,11 +264,12 @@ public class MainActivity extends AppCompatActivity {
 
         result.addItems(
                 new DividerDrawerItem(),
+                settings,
                 signOutItem,
+                new DividerDrawerItem(),
                 tmpItemForNikki,
                 tmpItemForAccept,
-                tmpItemForDecline,
-                settings
+                tmpItemForDecline
         );
 
 
