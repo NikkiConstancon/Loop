@@ -1,6 +1,7 @@
 package com.zetta.android.revaServices;
 
 import android.app.Activity;
+import android.support.annotation.IntegerRes;
 import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.browse.MainActivity;
 import com.zetta.android.browse.Registration_Cont;
+import com.zetta.android.browse.Registration_Patient;
 import com.zetta.android.browse.login_activity;
 import com.zetta.android.lib.Interval;
 import com.zetta.android.lib.NotifyCloudAwait;
@@ -117,159 +119,7 @@ public class UserManager extends RevaService {
     }
 
 
-    public static class PubSubBinderEndpoint extends RevaWebsocketEndpoint {
-        public RevaWebSocketService.USER_TYPE getUserType(){
-            return webService.getUserType();
-        }
-        public static abstract class WorkOnUser{
-            abstract public void work(String userUid);
-        }
-        @Override
-        public String key() {
-            return "UserManager";
-        }
-        public PubSubBinderEndpoint(
-                Activity activity_,
-                PubSubWorker pubSubWorker_,
-                PubSubInfoWorker pubSubInfoWorker_
-        ){
-            activity = activity_;
-            pubSubWorker = pubSubWorker_;
-            pubSubInfoWorker = pubSubInfoWorker_;
-        }
 
-
-        public void pubSubBindingRequest(String target){
-            attachCloudAwaitObject(null, pubSubReqCAO).send(activity, "REQ_BIND", target);
-        }
-
-        static public class pubSubReqInfo{
-            public enum TYPE {REQUESTER, TARGET};
-            public enum STATE {PENDING, DELIVERED, ACCEPTED};
-            public enum REPLY {ACCEPT, DECLINE};
-            public final String userUid;
-            public final TYPE type;
-            public final STATE state;
-
-            public pubSubReqInfo(
-                    String userUid_,
-                    final String typeStr ,
-                    final String stateStr
-            ){
-                userUid = userUid_;
-
-                if(typeStr.compareTo("request") == 0){
-                    type = TYPE.REQUESTER;
-                }else{
-                    type = TYPE.TARGET;
-                }
-                switch (stateStr){
-                    case "pending":{
-                        state = STATE.PENDING;
-                    }break;
-                    case "delivered":{
-                        state = STATE.DELIVERED;
-                    }break;
-                    default:{
-                        state = STATE.ACCEPTED;
-                    }
-                }
-            }
-        }
-
-        List<String> patientList = new ArrayList<>();
-        Map<String, pubSubReqInfo> pubSubInfoMap = new TreeMap<>();
-
-        public ArrayList<String> getPubSubList(){
-            return new ArrayList<>(pubSubInfoMap.keySet());
-        }
-
-        pubSubReqInfo getPubSubInfo(int i){
-            ArrayList names = getPubSubList();
-            return pubSubInfoMap.get(names.get(i));
-        }
-
-        final Activity activity;
-        @Override
-        public void onMessage(final LinkedTreeMap obj){
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Map<String, Object> gotMapKeys = obj;
-                    for(Map.Entry<String, Object> entry : gotMapKeys.entrySet()){
-                        switch (entry.getKey()){
-                            case "BINDING_CONFIRMATION_REQ":{
-                                Map<String, Map<String, String>> gotMap = (Map<String, Map<String, String>>)entry.getValue();
-                                for(Map.Entry<String, Map<String, String>> entryInfo : gotMap.entrySet()){
-                                    Map<String, String> info = entryInfo.getValue();
-                                    pubSubInfoMap.put(entryInfo.getKey(), new pubSubReqInfo(entryInfo.getKey(), info.get("type"), info.get("state")));
-                                }
-                                pubSubInfoWorker.onConnect(pubSubInfoMap);
-                            }break;
-                            case "NEW_BINDING_CONFIRMATION_REQ":{
-                                Map<String, String> entryInfo = (Map<String, String>)entry.getValue();
-                                pubSubReqInfo info =
-                                        new pubSubReqInfo(
-                                                entryInfo.get("userUid"),
-                                                entryInfo.get("type"),
-                                                entryInfo.get("state")
-                                        );
-
-                                pubSubInfoMap.put(entryInfo.get("userUid"),info);
-                                pubSubInfoWorker.newReq(info);
-                            }break;
-                            case "PATIENT_LIST":{
-                                patientList = (ArrayList<String>)entry.getValue();
-                                pubSubInfoWorker.onPatientList(patientList);
-                            }break;
-                        }
-                    }
-                }
-            });
-        }
-        @Override
-        public void onServiceConnect(RevaWebSocketService service) {
-            webService = service;
-        }
-        RevaWebSocketService webService = null;
-        CloudAwaitObject pubSubReqCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
-            @Override
-            public Object get(final Object obj, Object localMsg, CloudAwaitObject cao) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        pubSubWorker.sendRequestCallback((String)obj);
-                    }
-                });
-                return null;
-            }
-        };
-
-
-        public void pubSubRequestReply(String userUid, pubSubReqInfo.REPLY reply){
-            attachCloudAwaitObject(null, pubSubReqReplyCAO).send(activity, reply.toString(), userUid);
-        }
-        final CloudAwaitObject pubSubReqReplyCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
-            @Override
-            public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
-                pubSubWorker.sendReplyActionCallback((boolean)obj);
-                return null;
-            }
-        };
-
-
-        public static abstract class PubSubWorker{
-            abstract public void sendRequestCallback(String msg);
-            abstract public void sendReplyActionCallback(boolean sucsess);
-        }
-        final PubSubWorker pubSubWorker;
-        public static abstract class PubSubInfoWorker{
-            abstract public void onConnect(Map<String, pubSubReqInfo> infoMap);
-            abstract public void newReq(pubSubReqInfo info);
-            abstract public void onPatientList(List<String> patientList);
-        }
-        final PubSubInfoWorker pubSubInfoWorker;
-    }
 
 
 
@@ -318,7 +168,7 @@ public class UserManager extends RevaService {
                     if ((boolean) got.get("PASS")) {
                         if (patient) {
                             /////////////////////////////////////////change intent to Registration_cont
-                            Intent toReg = new Intent(activity, Registration_Cont.class);
+                            Intent toReg = new Intent(activity, Registration_Patient.class);
                             toReg.putExtra("regEmail", regEmail);
                             toReg.putExtra("regPass", regPass);
                             activity.startActivityForResult(toReg, 0);
@@ -494,10 +344,10 @@ public class UserManager extends RevaService {
         NotifyCloudAwait notifyWait = null;
 
         public void tryLogin(String userUid, String password){
-            getService().setLogin(userUid, password);
-            buildLoginAwaitObject();
+            buildLoginAwaitObject(userUid, password);
         }
-        public void buildLoginAwaitObject() {
+        public void buildLoginAwaitObject(final String userUid, final String password) {
+            getService().setLogin(userUid, password);
             if (notifyWait == null) {
                 notifyWait = new NotifyCloudAwait(activity, false,
                         750, " ... validating your input ... ", 5000) {
@@ -512,7 +362,7 @@ public class UserManager extends RevaService {
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             notifyWait = null;
-                                            buildLoginAwaitObject();
+                                            buildLoginAwaitObject(userUid, password);
                                             dialog.dismiss();
                                         }
                                     });
@@ -539,40 +389,69 @@ public class UserManager extends RevaService {
 
         Activity activity;
 
-        public final void onMessage(LinkedTreeMap obj) {
-            //TODO move this to
-            final String USER_MANAGER_KEY_CONNECTED = "CONNECTED";
-            if (obj.containsKey(USER_MANAGER_KEY_CONNECTED)) {
-                notifyWait.dismiss(true);
-                notifyWait = null;
-                Map<String, Object> info = (Map<String, Object>) obj.get(USER_MANAGER_KEY_CONNECTED);
-                String userUid = (String) info.get("USER_UID");
-                if (userUid.compareTo(RevaWebSocketService.SPECIAL_USER_ANONYMOUS) != 0) {
-                    Intent intent = new Intent(activity, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra("Username", userUid.toString());
-                    activity.startActivity(intent);
-                } else {
-                    final Map<String, String> errorMap = (Map<String, String>) info.get("ERROR");
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (errorMap != null) {
-                                String error = errorMap.get("text");
-                                if (errorMap.get("field").compareTo("password") == 0) {
-                                    passwordEditText.setError(error);
-                                } else {
-                                    userUidEditText.setError(error);
+        public final void onMessage(final LinkedTreeMap obj) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    final String USER_MANAGER_KEY_CONNECTED = "CONNECTED";
+                    if (notifyWait != null && obj.containsKey(USER_MANAGER_KEY_CONNECTED)) {
+                        notifyWait.dismiss(true);
+                        notifyWait = null;
+                        if (tryLoginInterval == null) {
+                            tryLoginInterval = new Interval(1, Integer.MAX_VALUE) {
+                                @Override
+                                public void work() {
+                                    activity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (tryLoginInterval != null && getService().isLoggedIn()) {
+                                                tryLoginInterval.clearInterval();
+                                                tryLoginInterval = null;
+                                            }
+                                        }
+                                    });
                                 }
-                            } else {
-                                userUidEditText.setError("You must specify a username");
-                            }
+                                @Override
+                                public void end() {
+                                    activity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Intent intent = new Intent(activity, MainActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            intent.putExtra("Username", getService().getAuthId());
+                                            activity.startActivity(intent);
+                                        }
+                                    });
+                                }
+                            };
                         }
-                    });
+                        Map<String, Object> info = (Map<String, Object>) obj.get(USER_MANAGER_KEY_CONNECTED);
+                        String userUid = (String) info.get("USER_UID");
+                        if (userUid.compareTo(RevaWebSocketService.SPECIAL_USER_ANONYMOUS) != 0) {
+                        } else {
+                            final Map<String, String> errorMap = (Map<String, String>) info.get("ERROR");
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (errorMap != null) {
+                                        String error = errorMap.get("text");
+                                        if (errorMap.get("field").compareTo("password") == 0) {
+                                            passwordEditText.setError(error);
+                                        } else {
+                                            userUidEditText.setError(error);
+                                        }
+                                    } else {
+                                        userUidEditText.setError("You must specify a username");
+                                    }
+                                }
+                            });
+                        }
+                    }
                 }
-            }
+            });
         }
 
         EditText userUidEditText, passwordEditText;
+        Interval tryLoginInterval = null;
     }
 }

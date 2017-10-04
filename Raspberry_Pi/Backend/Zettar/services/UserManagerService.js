@@ -9,11 +9,13 @@ const serviceName = 'UserManager'
 
 webSockMessenger.attach(serviceName, {
     connect: function (transmitter) {
-        refreshInfo(transmitter)
     },
     close: function (transmitter) {
     },
     receiver: function (transmitter, obj) {
+    },
+    onEnable: function (transmitter) {
+        refreshInfo(transmitter)
     },
     requirePersistentLink: true,
     defaultEnabled: true
@@ -78,32 +80,6 @@ webSockMessenger.attach(serviceName, {
                         channeler({ NON_PATIENT_ERROR: 'something went wrong', NON_PATIENT_PASS: false })
                     })
             }
-        },
-        BIND_PATIENT_AND_SUBSCRIBER: {
-            REQ_BIND: function (transmitter, msg, key, channel) {
-                userManager.pubSubBindRequest(
-                    function (info) {
-                        channel("")
-                        webSockMessenger.transmitTo(serviceName, msg, { NEW_BINDING_CONFIRMATION_REQ: { type: info.type, state: info.state, userUid: msg } })
-                    },
-                    function (errMsg) {
-                        channel(errMsg.message || errMsg.clientSafe || "Oops! Something went wrong :(" )
-                    },
-                    transmitter.getUserUid(),
-                    msg,
-                    transmitter.getUserType()
-                )
-            },
-            ACCEPT: function (transmitter, msg, key, channel) {
-                userManager.pubSubBindRequestOnDecision(transmitter.getUserUid(), msg, true)
-                refreshInfo(transmitter)
-                channel(true)//for now
-            },
-            DECLINE: function (transmitter, msg, key, channel) {
-                userManager.pubSubBindRequestOnDecision(transmitter.getUserUid(), msg, false)
-                refreshInfo(transmitter)
-                channel(true)//for now
-            }
         }
     }
 })
@@ -114,14 +90,14 @@ function refreshInfo(transmitter) {
             for (var user in pat.PubSubBindingConfirmationMap) {
                 transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(pat.PubSubBindingConfirmationMap[user]) } })
             }
-            transmitter.transmit({ PATIENT_LIST: pat.PatientList })
+            transmitter.transmit({ PATIENT_LIST: pat.PatientList || []})
         });
     } else {
         subscriberManager.getsubscriber({ Email: transmitter.getUserUid() }).then(function (sub) {
             for (var user in sub.PubSubBindingConfirmationMap) {
                 transmitter.transmit({ BINDING_CONFIRMATION_REQ: { [user]: JSON.parse(sub.PubSubBindingConfirmationMap[user]) } })
             }
-            transmitter.transmit({ PATIENT_LIST: sub.PatientList })
+            transmitter.transmit({ PATIENT_LIST: sub.PatientList || [] })
         });
     }
 }

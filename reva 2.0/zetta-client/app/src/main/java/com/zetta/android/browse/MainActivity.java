@@ -30,15 +30,15 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zetta.android.MoreGraph;
 import com.zetta.android.R;
 import com.zetta.android.lib.Interval;
+import com.zetta.android.revaServices.PubSubBindingService;
 import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.settingsPage;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Interval validateUserUidInterval = null;
     public Context cont = this;
+
+    private List<String> subbedTo = new ArrayList<String>();
 
 
     /**
@@ -100,8 +102,15 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    void bootstrap(String zettaUser_) {
-        zettaUser = zettaUser_;//getIntent().getStringExtra("Username");
+    static class PatientTag{
+        PatientTag(String name_) {
+            name = name_;
+        }
+        public final String name;
+    }
+
+    void bootstrap(final String userUid) {
+        zettaUser = userUid;//getIntent().getStringExtra("Username");
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarMain);
@@ -145,12 +154,13 @@ public class MainActivity extends AppCompatActivity {
                 .withName("tmpItemForDecline");
 
         PrimaryDrawerItem greg = new PrimaryDrawerItem().withIdentifier(1).withName("greg").withTag(60);
+        PrimaryDrawerItem subTo = new PrimaryDrawerItem().withIdentifier(2).withName("Subscribed to").withTag("Subscribed to");
 
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName("Nikki").withEmail("nikki@gmail.com").withIcon(getResources().getDrawable(R.drawable.ic_person_black_24dp))
+                        new ProfileDrawerItem().withName(userUid)/*.withEmail("nikki@gmail.com")*/.withIcon(getResources().getDrawable(R.drawable.ic_person_black_24dp))
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
@@ -165,18 +175,6 @@ public class MainActivity extends AppCompatActivity {
         Drawer result = new DrawerBuilder().withAccountHeader(headerResult)
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .addDrawerItems(
-                        greg,
-                        adder,
-
-                        new DividerDrawerItem(),
-                        signOutItem,
-                        tmpItemForNikki,
-                        tmpItemForAccept,
-                        tmpItemForDecline,
-                        settings
-                )
-
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -184,12 +182,12 @@ public class MainActivity extends AppCompatActivity {
                         switch ((int)drawerItem.getIdentifier()){
                             case tmpItemForAcceptId:{
                                 pubSubBinderEndpoint.pubSubRequestReply(
-                                        "rinus", UserManager.PubSubBinderEndpoint.pubSubReqInfo.REPLY.ACCEPT
+                                        "rinus",PubSubBindingService.pubSubReqInfo.REPLY.ACCEPT
                                 );
                             }
                             case tmpItemForDeclineId:{
                                 pubSubBinderEndpoint.pubSubRequestReply(
-                                        "rinus", UserManager.PubSubBinderEndpoint.pubSubReqInfo.REPLY.DECLINE
+                                        "rinus",PubSubBindingService.pubSubReqInfo.REPLY.DECLINE
                                 );
                             }
                         }
@@ -208,6 +206,14 @@ public class MainActivity extends AppCompatActivity {
 
                         // do something with the clicked item :D
                         Object tag = drawerItem.getTag();
+
+                        String name = drawerItem.toString();
+                        Log.d("--Name of name", name);
+                        if(tag instanceof PatientTag){
+                            dList.setUser(((PatientTag)tag).name);
+                            setupViewPager(mViewPager);
+                        }
+                        
                         if(tag != null && tag instanceof Integer){
                             Integer value = (Integer)tag;
                             switch(value){
@@ -245,8 +251,28 @@ public class MainActivity extends AppCompatActivity {
 
                         return true;
                     }
-                })
-                .build();
+                }).build();
+
+        result.addItems(
+                greg,
+                adder,
+                new DividerDrawerItem(),
+                subTo
+        );
+
+        for(String name : subbedTo)
+        {
+            result.addItem(new PrimaryDrawerItem().withName(name).withTag(new PatientTag(name)));
+        }
+
+        result.addItems(
+                new DividerDrawerItem(),
+                signOutItem,
+                tmpItemForNikki,
+                tmpItemForAccept,
+                tmpItemForDecline,
+                settings
+        );
 
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -337,8 +363,8 @@ public class MainActivity extends AppCompatActivity {
     UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(this);
 
 
-    UserManager.PubSubBinderEndpoint pubSubBinderEndpoint = new UserManager.PubSubBinderEndpoint(this,
-            new UserManager.PubSubBinderEndpoint.PubSubWorker(){
+   PubSubBindingService pubSubBinderEndpoint = new PubSubBindingService(this,
+            new PubSubBindingService.PubSubWorker(){
                 @Override public void sendRequestCallback(final String msg){
                     //You no longer need to do the ugly runOnUiThread
                     Log.d("MEAS", msg);
@@ -353,18 +379,23 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             },
-            new UserManager.PubSubBinderEndpoint.PubSubInfoWorker(){
-                @Override public void onConnect(Map<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> infoMap){
-                    for(Map.Entry<String, UserManager.PubSubBinderEndpoint.pubSubReqInfo> entry : infoMap.entrySet()){
-                        UserManager.PubSubBinderEndpoint.pubSubReqInfo info =  entry.getValue();
+            new PubSubBindingService.PubSubInfoWorker(){
+                @Override public void onConnect(Map<String,PubSubBindingService.pubSubReqInfo> infoMap){
+                    for(Map.Entry<String,PubSubBindingService.pubSubReqInfo> entry : infoMap.entrySet()){
+                       PubSubBindingService.pubSubReqInfo info =  entry.getValue();
                         Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                     }
                 }
-                @Override public void newReq(UserManager.PubSubBinderEndpoint.pubSubReqInfo info){
+                @Override public void newReq(PubSubBindingService.pubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                 }
                 @Override public void onPatientList(List<String> patientList){
                     Log.d("----sub-list---", patientList.toString());
+
+                    for(String names : patientList)
+                    {
+                        subbedTo.add(names);
+                    }
                 }
             }
     );

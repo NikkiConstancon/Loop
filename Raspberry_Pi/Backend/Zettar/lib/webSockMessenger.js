@@ -445,6 +445,10 @@ webSockMessenger.attach('RCC', {
                     } else {
                         transmitter.context.subServiceMap[key].serviceBound = Boolean(obj.PAUSE_RESUME.ENABLEMENT).valueOf()
                     }
+                    if (transmitter.context.subServiceMap[key].serviceBound){
+                        var serviceTransmitter = transmitter.context.subServiceMap[key]
+                        subServiceOptionsMap[key].onEnable && subServiceOptionsMap[key].onEnable(serviceTransmitter);
+                    }
                 } catch (e) {
                     logger.error('WebSocketMessenger$RCC#obj.SERVICE_BINDING: on key: ' + key + '\n', e)
                 }

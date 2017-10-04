@@ -378,6 +378,15 @@ var patientManager = module.exports = {
             })
         })
     },
+    triggerUpdateForSubscriberListInfoHook: function (pat, newSub) {
+        if (SubscriberListInofHookMap[pat.Username]) {
+            var list = pat.getSubscriberList()
+            if (list.indexOf(newSub) == -1) {
+                list.push(newSub)
+            }
+            SubscriberListInofHookMap[pat.Username](list)
+        }
+    },
     bindSubscriberListInfoHook: function (userInfo, cb) {
         var userUid = userInfo.Username || userInfo.Email
         if (SubscriberListInofHookMap[userUid]) {

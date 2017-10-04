@@ -37,6 +37,11 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private List<SettingsItem> settings;
 
+    public List<SettingsItem> getSettings() {
+        return settings;
+    }
+
+
     /**
      * Constructor for SettingsListAdapter that accepts a number of items to display and the specification
      * for the ListItemClickListener.
@@ -93,11 +98,15 @@ public class SettingsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public void updateList (List<SettingsItem> items) {
-        if (items != null && items.size() > 0) {
+
+        if (settings != null) {
             settings.clear();
             settings.addAll(items);
-            notifyDataSetChanged();
         }
+        else {
+            settings = items;
+        }
+        notifyDataSetChanged();
     }
 
     /**
