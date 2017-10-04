@@ -79,6 +79,7 @@ public class settingsPage extends AppCompatActivity {
             @Override
             public void deleteOnClick(View v, int position) {
                 Log.d("here", "deleteOnClick at position"+position);
+
             }
 
             @Override
@@ -138,7 +139,7 @@ public class settingsPage extends AppCompatActivity {
     }
 
     public void alert(String message, final String buttonMsg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MaterialBaseTheme_Light_AlertDialog);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ThemeOverlay_AppCompat_Dialog_Alert);
         builder.setTitle(message);
 
         // Set up the buttons

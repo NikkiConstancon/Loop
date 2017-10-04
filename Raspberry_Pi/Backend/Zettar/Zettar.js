@@ -46,7 +46,7 @@ var hook = new Hook(initializedZetta)
         topicName: 'vitals',
         cb: function (info, response) {
             realtimeDataService.publish(info, response);
-            //patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.type, TimeStamp: response.timestamp, Value: parseFloat(response.data) });
+            patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.name, TimeStamp: parseFloat(response.timestamp), Value: parseFloat(response.data) });
         },
         errcb: function (e) {
             console.log(e)

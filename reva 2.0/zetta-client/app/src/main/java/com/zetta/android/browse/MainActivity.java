@@ -42,7 +42,6 @@ import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.settingsPage;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -361,7 +360,13 @@ public class MainActivity extends AppCompatActivity {
                 @Override public void doneCallback(){
                     Log.d("----doneCallback---", "--done--");
                     if(userManagerEndpoint.getUserType() != RevaWebSocketService.USER_TYPE.PATIENT){
-                        dList.setUser(subbedTo.iterator().next());
+                        if (subbedTo.isEmpty()) {
+                            dList.setUser("new");
+                        }
+                        else {
+                            dList.setUser(subbedTo.iterator().next());
+                        }
+
                     }
 
                     userManagerEndpoint.resumeGuardActivityByVerifiedUser(workOnUser);

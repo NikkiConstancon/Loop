@@ -57,29 +57,35 @@ class DeviceList {
         public List<ListItem> createListItems(@NonNull List<ZIKServer> servers, String name) {
             List<ListItem> items = new ArrayList<>();
             boolean hasServer = false; //hotfix
-            for (ZIKServer server : servers) {
-                if (server.getName().equals(name)) { //hotfix
-                    ZettaStyle serverStyle = zettaStyleParser.parseStyle(server);
-                    items.add(createServerListItem(serverStyle, server));
+            if (name.equals("new")) {
 
-                    List<ZIKDevice> zikDevices = server.getDevices();
+                items.add(new NewListItem("You have no patients yet, go to settings to send a patient a request.")); //TODO: add item to devicelistadapter so you can show tips
+            } else {
+                for (ZIKServer server : servers) {
+                    if (server.getName().equals(name)) { //hotfix
+                        ZettaStyle serverStyle = zettaStyleParser.parseStyle(server);
+                        items.add(createServerListItem(serverStyle, server));
 
-                    if (zikDevices.isEmpty()) {
-                        items.add(createEmptyServerListItem(serverStyle));
-                    } else {
-                        for (ZIKDevice device : zikDevices) {
-                            items.add(createDeviceListItem(server, device));
+                        List<ZIKDevice> zikDevices = server.getDevices();
+
+                        if (zikDevices.isEmpty()) {
+                            items.add(createEmptyServerListItem(serverStyle));
+                        } else {
+                            for (ZIKDevice device : zikDevices) {
+                                items.add(createDeviceListItem(server, device));
+                            }
                         }
+                        hasServer = true;
                     }
-                    hasServer = true;
+                }
+
+
+                if (!hasServer && !servers.isEmpty()) {
+                    ZettaStyle serverStyle = zettaStyleParser.parseStyle(servers.get(0));
+                    items.add(createEmptyServerListItem(serverStyle));
                 }
             }
 
-
-           /* if (!hasServer && !servers.isEmpty()) {// hotfix
-                ZettaStyle serverStyle = zettaStyleParser.parseStyle(servers.get(0));
-                items.add(createEmptyServerListItem(serverStyle));
-            }*/
 
             return items;
         }
