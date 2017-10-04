@@ -193,11 +193,17 @@ public class Registration extends AppCompatActivity {
                     emailText.setError(null);
                 }
             });
-            //registerEndpoint.sendRequest(patient, regEmail, regPass, (EditText) findViewById(R.id.input_emailReg), builder1);
-            Intent toRegPat = new Intent(context, Registration_Cont.class);
-            toRegPat.putExtra("regEmail", regEmail);
-            toRegPat.putExtra("regPass", regPass);
-            startActivityForResult(toRegPat, 0);
+
+            if(patient) {
+                Intent toRegPat = new Intent(context, Registration_Cont.class);
+                toRegPat.putExtra("regEmail", regEmail);
+                toRegPat.putExtra("regPass", regPass);
+                startActivityForResult(toRegPat, 0);
+            }
+            else
+            {
+                registerEndpoint.sendRequest(patient, regEmail, regPass, (EditText) findViewById(R.id.input_emailReg), builder1);
+            }
         }
     }
 

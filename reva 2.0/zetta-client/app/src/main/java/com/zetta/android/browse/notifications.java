@@ -9,9 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zetta.android.R;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,7 @@ public class notifications extends android.support.v4.app.Fragment
 {
     public static final String Tag = "notificationsFragment";
     private Button btnTest;
+    private NotificationsAdapter adapter;
 
     /**
      * Overridden view creator for the notifications section
@@ -45,12 +49,27 @@ public class notifications extends android.support.v4.app.Fragment
 
         RecyclerView rv = (RecyclerView) view.findViewById(R.id.rvNotif);
 
+        Button butn = (Button) getView().findViewById(R.id.btn_test_notif);
+
+        butn.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * The onClick method is triggered when this button (mDoSomethingCoolButton) is clicked.
+             *
+             * @param v The view that is clicked. In this case, it's mDoSomethingCoolButton.
+             */
+            @Override
+            public void onClick(View v) {
+                addNotification("Heart Rate", "Heart rate is dropping too fast", "Heart", RED);
+            }
+        });
+
         LinearLayoutManager linearLayout = new LinearLayoutManager(context);
         rv.setLayoutManager(linearLayout);
 
-        populateNotifications();
+        //populateNotifications();
 
-        NotificationsAdapter adapter = new NotificationsAdapter(context, list);
+        adapter = new NotificationsAdapter(context, list);
         rv.setAdapter(adapter);
 
         return view;
@@ -66,6 +85,40 @@ public class notifications extends android.support.v4.app.Fragment
         list.add(new NotificationsObject("Glucose", "ReVA has detected slight deviations from the norm. Please check on the patient.", R.drawable.ic_settings_black_24dp, GREEN));
         list.add(new NotificationsObject("Glucose", "ReVA has detected strong deviations from the norm. Please contact a medical professional immediately.", R.drawable.ic_dashboard_black_24dp, RED));
         list.add(new NotificationsObject("Glucose", "ReVA has detected moderate deviations from the norm. Consider contacting a medical professional.", R.drawable.ic_help_black_24dp, YELLOW));
+    }
+
+    public void addNotification(String title, String content, String resource, int severity)
+    {
+        int res = R.drawable.ic_dashboard_black_24dp;
+
+        if(resource.equalsIgnoreCase("Heart"))
+        {
+            res = R.drawable.ic_heart;
+        }
+        else if(resource.equalsIgnoreCase("Temperature"))
+        {
+            res = R.drawable.ic_add_black_24dp;
+        }
+        else if(resource.equalsIgnoreCase("Glucose"))
+        {
+            res = R.drawable.ic_check_box_black_24dp;
+        }
+        else if(resource.equalsIgnoreCase("Bone density"))
+        {
+            res = R.drawable.ic_settings_black_24dp;
+        }
+        else if(resource.equalsIgnoreCase("Blood Pressure"))
+        {
+            res = R.drawable.ic_help_black_24dp;
+        }
+
+        NotificationsObject newNotif = new NotificationsObject(title, content, res, severity);
+        if(list == null)
+        {
+            list = new ArrayList<NotificationsObject>();
+        }
+
+        list.add(newNotif);
     }
 
     /**

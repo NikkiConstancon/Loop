@@ -68,8 +68,10 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     NotificationsAdapter(Context context, List<NotificationsObject> notifs)
     {
-        myCont = context;
-        this.notifs = notifs;
+        if(notifs != null) {
+            myCont = context;
+            this.notifs = notifs;
+        }
     }
 
     @Override
