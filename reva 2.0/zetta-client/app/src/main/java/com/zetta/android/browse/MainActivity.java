@@ -1,5 +1,6 @@
 package com.zetta.android.browse;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -48,7 +49,7 @@ import java.util.TreeSet;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-
+    private ProgressDialog dialog;
     private SectionsPageAdapter mSectionsPageAdapter;
 
     private ViewPager mViewPager;
@@ -74,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Loading your patients and stats..");
+        dialog.show();
         Log.d(TAG, "onCreate: Starting.");
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
@@ -123,7 +127,18 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPageAdapter);
-        dList.setUser(getUser());
+
+        PrimaryDrawerItem adder;
+        PrimaryDrawerItem patient = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
+        if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
+            patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
+            adder = new PrimaryDrawerItem().withName(userUid).withTag(new PatientTag(userUid));
+            dList.setUser(getUser());
+
+        }else{
+            adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
+        }
+
         setupViewPager(mViewPager);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -135,15 +150,9 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1).withName("Settings");
         settings.withTag(5);
 
-        PrimaryDrawerItem adder;
 
-        PrimaryDrawerItem patient = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
-        if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
-            patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
-             adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddSub).withTag(R.string.drawerNameAddSub);
-        }else{
-            adder = new PrimaryDrawerItem().withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
-        }
+
+
 
         SectionDrawerItem header = new SectionDrawerItem().withName("Patients");
         PrimaryDrawerItem tmpItemForNikki = new PrimaryDrawerItem().withIdentifier(1).withName("For Nikki");
@@ -397,6 +406,15 @@ public class MainActivity extends AppCompatActivity {
                 }
                 @Override public void doneCallback(){
                     Log.d("----doneCallback---", "--done--");
+                    if(userManagerEndpoint.getUserType() != RevaWebSocketService.USER_TYPE.PATIENT){
+                        dList.setUser(subbedTo.iterator().next());
+                    }
+
+                    userManagerEndpoint.resumeGuardActivityByVerifiedUser(workOnUser);
+
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
                 }
             }
     );
