@@ -74,6 +74,8 @@ public class settingsPage extends AppCompatActivity {
     }
 
 
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -120,7 +122,7 @@ public class settingsPage extends AppCompatActivity {
                     Log.d("--setsub-list---", patientList.toString());
 
                     patList.clear();
-                    patList.add(new TitleItem("Current Subscribers"));
+                    patList.add(new TitleItem("Current Patients"));
                     for (int i =0; i < patientList.size(); i++) {
                         patList.add(new ExistingItem(patientList.get(i)));
                     }
