@@ -99,7 +99,11 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (viewType == ListItem.TYPE_EMPTY) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_empty, parent, false);
             return new EmptyViewHolder(v);
+        } else if (viewType == ListItem.TYPE_NEW)  {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_empty, parent, false);
+            return new NewViewHolder(v);
         }
+
         throw new IllegalStateException("Attempted to create view holder for a type you haven't coded for: " + viewType);
     }
 
@@ -118,6 +122,10 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ListItem.EmptyListItem emptyListItem = (ListItem.EmptyListItem) listItems.get(position);
             ((EmptyViewHolder) holder).bind(emptyListItem);
             return;
+        } else if (type == ListItem.TYPE_NEW) {
+            NewListItem item = (NewListItem) listItems.get(position);
+            ((NewViewHolder) holder).bind(item);
+            return; 
         }
         throw new IllegalStateException("Attempted to bind a type you haven't coded for: " + type);
     }
@@ -127,6 +135,18 @@ class DeviceListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void onDeviceClick(@NonNull ZettaDeviceId deviceId);
 
         void onDeviceLongClick(@NonNull ZettaDeviceId deviceId);
+
+    }
+
+    static class NewViewHolder extends RecyclerView.ViewHolder {
+        @NonNull private final TextView helpMsg;
+
+        public NewViewHolder(@NonNull View itemView) {
+            super(itemView);
+            helpMsg = (TextView) itemView.findViewById(R.id.list_item_empty_message);
+        }
+
+        public void bind(NewListItem item) { helpMsg.setText("" + item.getTitle());}
 
     }
 
