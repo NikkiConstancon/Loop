@@ -50,6 +50,7 @@ public class notifications extends android.support.v4.app.Fragment
     private View view;
     private Context context;
     private int counter = 0;
+    private int notifs = 0;
 
 
     /**
@@ -169,14 +170,13 @@ public class notifications extends android.support.v4.app.Fragment
 
         Intent dismissIntent = new Intent(context, MainActivity.class);
         dismissIntent.setAction(Intent.ACTION_DEFAULT);
-        dismissIntent.putExtra("NotificationMessager", "STUFF");//
         dismissIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_heart)
-                        .setContentTitle("reva Alert")
+                        .setSmallIcon(res)
+                        .setContentTitle("ReVA Alert")
                         .setContentText("Deviations from the norm")
                         .setDefaults(Notification.DEFAULT_ALL) // must requires VIBRATE permission
                         .setPriority(NotificationCompat.PRIORITY_HIGH)//must give priority to High, Max which will considered as heads-up notification
@@ -192,7 +192,8 @@ public class notifications extends android.support.v4.app.Fragment
 // Gets an instance of the NotificationManager service
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 //to post your notification to the notification bar with a id. If a notification with same id already exists, it will get replaced with updated information.
-        notificationManager.notify(0, builder.build());
+        notificationManager.notify(notifs, builder.build());
+        notifs++;
     }
 
     /**
