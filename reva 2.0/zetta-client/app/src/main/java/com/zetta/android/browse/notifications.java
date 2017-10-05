@@ -71,7 +71,7 @@ public class notifications extends android.support.v4.app.Fragment
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(context);
         rv.setLayoutManager(linearLayout);
-        Toast.makeText(context, "Hello we here", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, "Hello we here", Toast.LENGTH_SHORT).show();
 
         return view;
     }

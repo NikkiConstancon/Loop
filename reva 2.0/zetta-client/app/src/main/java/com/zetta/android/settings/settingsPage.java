@@ -1,5 +1,6 @@
 package com.zetta.android.settings;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -33,6 +34,7 @@ public class settingsPage extends AppCompatActivity {
     private List<SettingsItem> patList = new ArrayList<>();
     private List<SettingsItem> reqList = new ArrayList<>();
     private List<SettingsItem> pendList = new ArrayList<>();
+    private ProgressDialog dialog;
 
 
 
@@ -46,6 +48,7 @@ public class settingsPage extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        dialog = new ProgressDialog(this);
 
 
         settingsList = (RecyclerView) findViewById(R.id.settings_recycler);
@@ -68,13 +71,13 @@ public class settingsPage extends AppCompatActivity {
             }
             @Override
             public void buttonNoOnClick(View v, int position) {
+                SettingsItem item = settingsListAdapter.getSettings().get(position);
+                Log.d("del", "" + reqList.remove(item));
+                dialog.setMessage("Rejecting the request...");
+                dialog.show();
                 pubSubBinderEndpoint.pubSubRequestReply(
                         ((RequestItem)settingsListAdapter.getSettings().get(position)).getTitle(),PubSubBindingService.pubSubReqInfo.REPLY.DECLINE
                 );
-
-                SettingsItem item = settingsListAdapter.getSettings().get(position);
-                reqList.remove(item);
-
                 updateAdapter();
             }
             @Override
@@ -183,6 +186,15 @@ public class settingsPage extends AppCompatActivity {
                 }
                 @Override public void sendReplyActionCallback(String userUid){
                     Log.d("--sendReplyActionCall--", userUid);
+                    dialog.dismiss();
+//                    if (userUid.equals("")) {
+//                        //Failed
+//                        alert("Failed.", "OK");
+//                    } else {
+//                        //Success
+//                        alert("Success!", "OK");
+//                    }
+                    updateAdapter();
                 }
             },
             new PubSubBindingService.PubSubInfoWorker(){
