@@ -5,39 +5,62 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp">
-
-    <Button
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_margin="5dp"
-        android:background="@drawable/subs"/>
-
-    <TextView
-        android:id="@+id/request_title"
-
-        android:layout_width="0dp"
+        android:layout_gravity="center_vertical"
+        android:backgroundTint="@color/primary"
+        android:background="@drawable/ic_profile"/>
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorPrimaryText"
-        android:text="Person wanting sub"
-        android:textSize="14sp"
-        android:padding="8dp"
-        tools:ignore="HardcodedText,RtlHardcoded"
-        tools:text="Person wanting sub"
-        android:layout_weight="1.0"
-        tools:targetApi="m" />
-    <Button
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:id="@+id/btn_yes_sub"
-        android:layout_margin="5dp"
-        android:background="@drawable/checked"
-        tools:targetApi="lollipop" />
-    <Button
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:id="@+id/btn_no_sub"
-        android:layout_margin="5dp"
-        android:background="@drawable/cancel"
-        tools:targetApi="lollipop" />
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <TextView
+                android:id="@+id/request_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimaryText"
+                android:text="Person wanting sub"
+                android:textSize="14sp"
+                android:padding="8dp"
+                tools:ignore="HardcodedText,RtlHardcoded"
+                tools:text="Person wanting sub"
+                android:layout_weight="1.0"
+                tools:targetApi="m" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="ACCEPT"
+                android:textColor="@color/white"
+                android:id="@+id/btn_yes_sub"
+                android:backgroundTint="@color/md_light_green_A700"
+                tools:targetApi="lollipop"
+                />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="DENY"
+                android:id="@+id/btn_no_sub"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/accent"
+
+                tools:targetApi="lollipop" />
+        </LinearLayout>
+    </LinearLayout>
+
+
 
 </LinearLayout>
