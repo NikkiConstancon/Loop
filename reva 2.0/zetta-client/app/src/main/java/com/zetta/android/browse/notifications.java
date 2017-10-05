@@ -84,7 +84,7 @@ public class notifications extends android.support.v4.app.Fragment
 
         list = new ArrayList<NotificationsObject>();
 
-
+        //MyPref is the place holder for the username (change it with username of current user)
         SharedPreferences saved_values = context.getSharedPreferences("MyPref", MODE_PRIVATE);
 
         String json;
@@ -206,6 +206,7 @@ public class notifications extends android.support.v4.app.Fragment
         Gson gson = new Gson();
         String json;
 
+        //MyPref is the place holder for the username (change it with username of current user)
         SharedPreferences saved_values = context.getSharedPreferences("MyPref", MODE_PRIVATE);
         SharedPreferences.Editor editor=saved_values.edit();
         counter = 0;
