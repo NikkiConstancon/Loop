@@ -1,5 +1,6 @@
 package com.zetta.android.settings;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -32,7 +33,9 @@ public class settingsPage extends AppCompatActivity {
     private List<SettingsItem> patList = new ArrayList<>();
     private List<SettingsItem> reqList = new ArrayList<>();
     private List<SettingsItem> pendList = new ArrayList<>();
+    private ProgressDialog dialog;
     private List<SettingsItem> subList = new ArrayList<>();
+
 
 
     //TODO: check for when a list is empty, so you can still display the header and a message
@@ -45,6 +48,7 @@ public class settingsPage extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        dialog = new ProgressDialog(this);
 
         settingsList = (RecyclerView) findViewById(R.id.settings_recycler);
 
@@ -76,6 +80,15 @@ public class settingsPage extends AppCompatActivity {
                     pubSubBinderEndpoint.pubSubRequestReply(
                             ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
                     );
+
+                    SettingsItem item = settingsListAdapter.getSettings().get(position);
+                    Log.d("del", "" + reqList.remove(item));
+                    dialog.setMessage("Rejecting the request...");
+                    dialog.show();
+                    pubSubBinderEndpoint.pubSubRequestReply(
+                            ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
+                    );
+
                 }catch (Exception e) {
                     Log.e(this.getClass().getName(), e.toString());
                 }
@@ -199,7 +212,7 @@ public class settingsPage extends AppCompatActivity {
                     //You no longer need to do the ugly runOnUiThread
                     Log.d("MEAS", msg);
                     if (msg.equals("")) {
-                        //alert("Succesfully sent request", "OK");
+                        alert("Succesfully sent request", "OK");
                     } else {
                         alert(msg, "Try Again");
                     }
@@ -209,6 +222,15 @@ public class settingsPage extends AppCompatActivity {
                 @Override
                 public void sendReplyActionCallback(String userUid) {
                     Log.d("--sendReplyActionCall--", userUid);
+                    dialog.dismiss();
+//                    if (userUid.equals("")) {
+//                        //Failed
+//                        alert("Failed.", "OK");
+//                    } else {
+//                        //Success
+//                        alert("Success!", "OK");
+//                    }
+                    updateAdapter();
                 }
             },
             new PubSubBindingService.PubSubInfoWorker() {
