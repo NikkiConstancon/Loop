@@ -56,7 +56,7 @@ public class login_activity extends AppCompatActivity {
             loginEndpoint.unbind(this);
             this.finishAffinity();
         } else {
-            Toast.makeText(this, "Press back again to exit ReVA", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Press back again to exit reva", Toast.LENGTH_SHORT).show();
             exit = true;
             new Handler().postDelayed(new Runnable() {
                 @Override
