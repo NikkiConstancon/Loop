@@ -56,7 +56,11 @@ var UserManager = module.exports = {
             patientManager.getPatient({ Username: requester }).then(function (requester) {
                 patientManager.getPatient({ Username: target }).then(function (target) {
                     //Cannot wait for this to end. Way to much bad decisions for me to tolerate.
-                    if (requester.PubSubBindingConfirmationMap && requester.PubSubBindingConfirmationMap[target.Usrname]) {
+                    if (requester.PubSubBindingConfirmationMap &&
+                        requester.PubSubBindingConfirmationMap[target.Username] ||
+                        requester.SubscriberList &&
+                        requester.SubscriberList.indexOf(target.Username) != -1
+                    ){
                         failCb({ clientSafe: "You are already connected to this user" })
                         return
                     }
@@ -64,7 +68,10 @@ var UserManager = module.exports = {
                     target.addPubSubRequestAsTarget(requester.Username, true, passCb, failCb)
                 }).catch(function (e) {
                     subscriberManager.getsubscriber({ Email: target }).then(function (target) {
-                        if (requester.PubSubBindingConfirmationMap && requester.PubSubBindingConfirmationMap[target.Email]) {
+                        if (requester.PubSubBindingConfirmationMap && requester.PubSubBindingConfirmationMap[target.Email] ||
+                            requester.SubscriberList &&
+                            requester.SubscriberList.indexOf(target.Email) != -1
+                        ) {
                             failCb({ clientSafe: "You are already connected to this user" })
                             return
                         }
@@ -85,7 +92,10 @@ var UserManager = module.exports = {
         } else {
             subscriberManager.getsubscriber({ Email: requester }).then(function (requester) {
                 patientManager.getPatient({ Username: target }).then(function (target) {
-                    if (requester.PubSubBindingConfirmationMap && requester.PubSubBindingConfirmationMap[target.Username]) {
+                    if (requester.PubSubBindingConfirmationMap && requester.PubSubBindingConfirmationMap[target.Username] ||
+                        requester.PatientList &&
+                        requester.PatientList.indexOf(target.Username) != -1
+                    ) {
                         failCb({ clientSafe: "You are already connected to this user" })
                         return
                     }

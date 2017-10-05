@@ -1,6 +1,8 @@
 var util = require('util')
 var uuidv1 = require('uuid/v1')
 
+
+const pubSubBindingService = require('../services/PubSubBindingService')
 var Model = require('../lib/modelClass')
 const userManagerUtil = require('../userManagerUtil')
 
@@ -118,7 +120,9 @@ module.exports = {
                         } else { next() }
                     });
             } else {
+                pubSubBindingService.update(instance.Email, instance.PubSubBindingConfirmationMap, instance.PatientList, instance.SubscriberList)
                 next()
             }
+            
 		}
 	}

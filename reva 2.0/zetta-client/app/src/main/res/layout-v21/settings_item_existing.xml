@@ -6,13 +6,15 @@
     android:layout_height="wrap_content"
     android:padding="16dp">
 
-    <Button
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_margin="5dp"
-        android:background="@drawable/subs"/>
+        android:background="@drawable/ic_profile"
+        android:backgroundTint="@color/primary"/>
 
     <TextView
+        android:layout_gravity="center_vertical"
         android:id="@+id/txt_existing"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -26,11 +28,14 @@
         tools:targetApi="m" />
 
     <Button
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="DELETE"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/accent"
         android:id="@+id/btn_delete_existing"
-        android:layout_margin="5dp"
-        android:background="@drawable/cancel"/>
+        />
 
 
 </LinearLayout>
