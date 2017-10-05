@@ -42,6 +42,22 @@ import java.util.TreeSet;
 
 public class MainActivity extends AppCompatActivity {
 
+    @Override
+    public void onNewIntent(Intent intent){
+        Bundle extras = intent.getExtras();
+        if(extras != null){
+            if(extras.containsKey("NotificationMessager"))
+            {
+                String msg = extras.getString("NotificationMessager");
+                int foo = 0;
+            }
+        }
+
+
+    }
+
+
+
     private static final String TAG = "MainActivity";
     private ProgressDialog dialog;
     private SectionsPageAdapter mSectionsPageAdapter;

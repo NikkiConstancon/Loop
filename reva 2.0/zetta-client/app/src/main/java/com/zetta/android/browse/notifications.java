@@ -131,6 +131,7 @@ public class notifications extends android.support.v4.app.Fragment
 
         Intent dismissIntent = new Intent(context, MainActivity.class);
         dismissIntent.setAction(Intent.ACTION_DEFAULT);
+        dismissIntent.putExtra("NotificationMessager", "STUFF");//
         dismissIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
