@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.zetta.android.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.graphics.Color.BLACK;
@@ -63,10 +64,10 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         }
     }
 
-    List<NotificationsObject> notifs;
+    ArrayList<NotificationsObject> notifs;
     Context myCont;
 
-    NotificationsAdapter(Context context, List<NotificationsObject> notifs)
+    NotificationsAdapter(Context context, ArrayList<NotificationsObject> notifs)
     {
         if(notifs != null) {
             myCont = context;

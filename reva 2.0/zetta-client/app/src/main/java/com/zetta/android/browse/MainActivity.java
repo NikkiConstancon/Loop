@@ -314,8 +314,11 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param viewPager the pager of the views to be tabbed
      */
+
+
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
+
 
         adapter.addFragment(dList, "Vitals");
         adapter.addFragment(new StatFragment(), "Stats");
@@ -398,4 +401,9 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     };
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
 }
