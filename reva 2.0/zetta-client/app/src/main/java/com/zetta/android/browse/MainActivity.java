@@ -33,6 +33,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zetta.android.R;
 import com.zetta.android.lib.Interval;
+import com.zetta.android.lib.RevaNotificationManager;
 import com.zetta.android.revaServices.PubSubBindingService;
 import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.CloudAwaitObject;
@@ -50,17 +51,9 @@ import java.util.TreeSet;
 public class MainActivity extends AppCompatActivity {
 
     @Override
-    public void onNewIntent(Intent intent){
-        Bundle extras = intent.getExtras();
-        if(extras != null){
-            if(extras.containsKey("NotificationMessager"))
-            {
-                String msg = extras.getString("NotificationMessager");
-                int foo = 0;
-            }
-        }
-
-
+    public void onNewIntent(Intent gotIntent){
+        Log.d("-----onNewIntent-------", "test)");
+        //RevaNotificationManager.getInstance().doOnNewIntent(this, intent);
     }
 
 
