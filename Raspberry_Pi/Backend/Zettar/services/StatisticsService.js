@@ -66,7 +66,7 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                                     
                                 }
                         }
-                        console.log(endResult);
+//                        console.log(endResult);
                         channel(endResult);
                     }).catch(function (e) {
                         logger.error('GraphRetievalError', e)
