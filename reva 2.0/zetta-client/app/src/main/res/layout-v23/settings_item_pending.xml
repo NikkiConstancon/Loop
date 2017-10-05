@@ -6,13 +6,16 @@
     android:layout_height="wrap_content"
     android:padding="16dp">
 
-    <Button
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
         android:layout_margin="5dp"
-        android:background="@drawable/subs"/>
+        android:backgroundTint="@color/primary"
+        android:background="@drawable/ic_profile"/>
 
     <TextView
+        android:layout_gravity="center_vertical"
         android:id="@+id/txt_pending"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -10,9 +10,11 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_margin="5dp"
+        android:backgroundTint="@color/primary"
         android:background="@drawable/ic_profile"/>
 
     <TextView
+        android:layout_gravity="center_vertical"
         android:id="@+id/txt_existing"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -26,6 +28,7 @@
         tools:targetApi="m" />
 
     <Button
+        android:layout_gravity="center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:text="DELETE"

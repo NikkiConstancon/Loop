@@ -44,7 +44,9 @@ public class settingsPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("My connections");
         setSupportActionBar(toolbar);
+
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -278,11 +280,11 @@ public class settingsPage extends AppCompatActivity {
                     tmp.add(new TitleItem(
                             flagGotConnections
                                     ? (isPatient ? "Sharing my info with" : "Your Patients")
-                                    : (isPatient ? "You are not sharing your information to anyone" : "You have no patients")
+                                    : (isPatient ? "You are not sharing your information with anyone" : "You have no patients")
                     ));
                     tmp.addAll(patList);
                     tmp.addAll(subList);
-                    tmp.add(new ButtonItem(isPatient ? "Share With New Contact" : "Add Patient"));
+                    tmp.add(new ButtonItem(isPatient ? "Add Someone" : "Add Patient"));
                     tmp.add(new TitleItem(pendList.size() > 0 ? "Pending requests" : "You have no pending requests"));
                     tmp.addAll(pendList);
 
