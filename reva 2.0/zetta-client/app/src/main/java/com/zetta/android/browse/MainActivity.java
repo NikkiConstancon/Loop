@@ -2,15 +2,22 @@ package com.zetta.android.browse;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -97,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
         userManagerEndpoint.bind(this);
         pubSubBinderEndpoint.bind(this);
-        statTmpForNikkiEndpoint.bind(this);
 
         userManagerEndpoint.hardGuardActivityByVerifiedUser(workOnUser);
     }
@@ -107,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         userManagerEndpoint.unbind(this);
         pubSubBinderEndpoint.unbind(this);
-        statTmpForNikkiEndpoint.unbind(this);
     }
 
     @Override
@@ -195,42 +200,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         //create the drawer and remember the `Drawer` result object
-        Drawer result = new DrawerBuilder().withAccountHeader(headerResult)
+        final Drawer result = new DrawerBuilder().withAccountHeader(headerResult)
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-
-                        switch ((int)drawerItem.getIdentifier()){
-                            case tmpItemForAcceptId:{
-                                pubSubBinderEndpoint.pubSubRequestReply(
-                                        "rinus", PubSubBindingService.PubSubReqInfo.REPLY.ACCEPT
-                                );
-                            }
-                            case tmpItemForDeclineId:{
-                                pubSubBinderEndpoint.pubSubRequestReply(
-                                        "rinus", PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
-                                );
-                            }
-                        }
-                        //Nikki
-
-                        long start = new java.util.Date().getTime() - 1000;
-                        long end = new java.util.Date().getTime();
-
-                        JSONObject obj = new JSONObject();
-                        try {
-                            obj.put("Username", "greg");
-                            obj.put("DeviceId", "thermometer");
-                            obj.put("StartTime", start);
-                            obj.put("EndTime", end);
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        //
-
                         // do something with the clicked item :D
                         Object tag = drawerItem.getTag();
 
@@ -250,13 +225,29 @@ public class MainActivity extends AppCompatActivity {
                                     startActivity(intent);
                                 }break;
                                 case R.string.drawerNameSignOut:{
-                                    userManagerEndpoint.triggerLoginIntent();
+
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(cont, R.style.ThemeOverlay_AppCompat_Dialog_Alert);
+                                    builder.setTitle(Html.fromHtml("<font color='#38ACEC'>Are you sure you want to sign out?</font>"));
+
+                                    // Set up the buttons
+                                    builder.setPositiveButton(Html.fromHtml("<font color='#38ACEC'>Yes</font>"), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            userManagerEndpoint.triggerLoginIntent();
+                                        }
+                                    });
+                                    builder.setNegativeButton(Html.fromHtml("<font color='#38ACEC'>No</font>"), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                        }
+                                    });
+
+                                    builder.show();
+
                                 }break;
                                 case R.string.drawerNameSettings: {
                                     Toast.makeText(cont, drawerItem.getTag().toString(), Toast.LENGTH_SHORT).show();
-                                }break;
-                                case 123:{
-                                    pubSubBinderEndpoint.pubSubBindingRequest("what@sub.com");
                                 }break;
                             }
                         }
@@ -273,6 +264,8 @@ public class MainActivity extends AppCompatActivity {
                 header
         );
 
+
+
         for(String name : subbedTo)
         {
             result.addItem(new PrimaryDrawerItem().withName(name).withTag(new PatientTag(name)).withIcon(R.drawable.ic_profile));
@@ -282,10 +275,7 @@ public class MainActivity extends AppCompatActivity {
                 new DividerDrawerItem(),
                 settings,
                 signOutItem,
-                new DividerDrawerItem(),
-                tmpItemForNikki,
-                tmpItemForAccept,
-                tmpItemForDecline
+                new DividerDrawerItem()
         );
 
 
@@ -383,24 +373,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
     );
-
-
-
-
-    StatTmpForNikkiEndpoint statTmpForNikkiEndpoint = new StatTmpForNikkiEndpoint();
-    public static class StatTmpForNikkiEndpoint extends RevaWebsocketEndpoint {
-        @Override
-        public String key() {
-            return "Stats";
-        }
-    }
-    public CloudAwaitObject statTmpForNikki = new CloudAwaitObject("GRAPH_POINTS") {
-        @Override
-        public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
-            Log.d("object", obj.toString());
-            return null;
-        }
-    };
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
