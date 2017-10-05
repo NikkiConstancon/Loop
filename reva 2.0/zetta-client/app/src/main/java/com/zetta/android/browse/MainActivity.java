@@ -2,22 +2,15 @@ package com.zetta.android.browse;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.InputType;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -31,7 +24,6 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.zetta.android.MoreGraph;
 import com.zetta.android.R;
 import com.zetta.android.lib.Interval;
 import com.zetta.android.revaServices.PubSubBindingService;
@@ -42,8 +34,7 @@ import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.settingsPage;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.util.ArrayList;
-import java.util.Calendar;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -154,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem signOutItem = new SecondaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut);
         signOutItem.withTag(R.string.drawerNameSignOut);
 
-        SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1).withName("Settings");
+        SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1).withName("My Connections");
         settings.withTag(5);
 
 
@@ -198,12 +189,12 @@ public class MainActivity extends AppCompatActivity {
                         switch ((int)drawerItem.getIdentifier()){
                             case tmpItemForAcceptId:{
                                 pubSubBinderEndpoint.pubSubRequestReply(
-                                        "rinus",PubSubBindingService.pubSubReqInfo.REPLY.ACCEPT
+                                        "rinus", PubSubBindingService.PubSubReqInfo.REPLY.ACCEPT
                                 );
                             }
                             case tmpItemForDeclineId:{
                                 pubSubBinderEndpoint.pubSubRequestReply(
-                                        "rinus",PubSubBindingService.pubSubReqInfo.REPLY.DECLINE
+                                        "rinus", PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
                                 );
                             }
                         }
@@ -336,13 +327,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             },
             new PubSubBindingService.PubSubInfoWorker(){
-                @Override public void onConnect(Map<String,PubSubBindingService.pubSubReqInfo> infoMap){
-                    for(Map.Entry<String,PubSubBindingService.pubSubReqInfo> entry : infoMap.entrySet()){
-                       PubSubBindingService.pubSubReqInfo info =  entry.getValue();
+                @Override public void onConnect(Map<String,PubSubBindingService.PubSubReqInfo> infoMap){
+                    for(Map.Entry<String,PubSubBindingService.PubSubReqInfo> entry : infoMap.entrySet()){
+                       PubSubBindingService.PubSubReqInfo info =  entry.getValue();
                         Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                     }
                 }
-                @Override public void newReq(PubSubBindingService.pubSubReqInfo info){
+                @Override public void newReq(PubSubBindingService.PubSubReqInfo info){
                     Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                 }
                 @Override public void onPatientList(List<String> patientList){
