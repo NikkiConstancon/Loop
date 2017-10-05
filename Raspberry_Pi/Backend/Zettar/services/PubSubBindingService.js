@@ -26,12 +26,6 @@ webSockMessenger.attach(serviceName, {
                 userManager.pubSubBindRequest(
                     function (info) {
                         channel("")
-                        refreshInfo(transmitter)
-                        otherTransmitters = webSockMessenger.getTransmitterArr(serviceName, msg)
-                        for (var i in otherTransmitters) {
-                            refreshInfo(otherTransmitters[i])
-                        }
-
                         webSockMessenger.transmitTo(serviceName, msg,
                             {
                                 NEW_BINDING_CONFIRMATION_REQ: {
@@ -51,35 +45,16 @@ webSockMessenger.attach(serviceName, {
                 userManager.pubSubBindRequestOnDecision(transmitter.getUserUid(), msg, true, function (passed) {
                     channel(passed ? msg : "")
                 })
-                channel(msg)//for now
-                refreshInfo(transmitter)
-                otherTransmitters = webSockMessenger.getTransmitterArr(serviceName, msg)
-                for (var i in otherTransmitters) {
-                    refreshInfo(otherTransmitters[i])
-                }
             },
             DECLINE: function (transmitter, msg, key, channel) {
                 userManager.pubSubBindRequestOnDecision(transmitter.getUserUid(), msg, false, function (passed) {
                     channel(passed ? msg : "")
                 })
-                channel(msg)//for now
-                refreshInfo(transmitter)
-                otherTransmitters = webSockMessenger.getTransmitterArr(serviceName, msg)
-                for (var i in otherTransmitters) {
-                    refreshInfo(otherTransmitters[i])
-                }
             },
             DROP_PUB_SUB_BINDING_AS_SUB: function (transmitter, msg, key, channel) {
                 userManager.dropPubSubBinding(transmitter.getUserUid(), msg, function (removed) {
                     if (removed) {
-                        refreshInfo(transmitter)
                         channel(msg)
-
-                        refreshInfo(transmitter)
-                        otherTransmitters = webSockMessenger.getTransmitterArr(serviceName, msg)
-                        for (var i in otherTransmitters) {
-                            refreshInfo(otherTransmitters[i])
-                        }
                     } else {
                         channel("")
                     }
@@ -88,14 +63,7 @@ webSockMessenger.attach(serviceName, {
             DROP_PUB_SUB_BINDING_AS_PAT: function (transmitter, msg, key, channel) {
                 userManager.dropPubSubBinding(msg, transmitter.getUserUid(), function (removed) {
                     if (removed) {
-                        refreshInfo(transmitter)
                         channel(msg)
-
-                        refreshInfo(transmitter)
-                        otherTransmitters = webSockMessenger.getTransmitterArr(serviceName, msg)
-                        for (var i in otherTransmitters) {
-                            refreshInfo(otherTransmitters[i])
-                        }
                     } else {
                         channel("")
                     }
@@ -147,4 +115,14 @@ function refreshInfo(transmitter) {
     }, 333);
 }
 
+
+
+module.exports = {
+    update: function (userUid, PubSubBindingConfirmationMap, PatientList, SubscriberList) {
+        transmitters = webSockMessenger.getTransmitterArr(serviceName, userUid)
+        for (var i in transmitters) {
+            refreshInfo(transmitters[i])
+        }
+    }
+}
 

@@ -1,5 +1,6 @@
 package com.zetta.android.settings;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -32,7 +33,9 @@ public class settingsPage extends AppCompatActivity {
     private List<SettingsItem> patList = new ArrayList<>();
     private List<SettingsItem> reqList = new ArrayList<>();
     private List<SettingsItem> pendList = new ArrayList<>();
+    private ProgressDialog dialog;
     private List<SettingsItem> subList = new ArrayList<>();
+
 
 
     //TODO: check for when a list is empty, so you can still display the header and a message
@@ -41,10 +44,13 @@ public class settingsPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("My connections");
         setSupportActionBar(toolbar);
+
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        dialog = new ProgressDialog(this);
 
         settingsList = (RecyclerView) findViewById(R.id.settings_recycler);
 
@@ -55,33 +61,37 @@ public class settingsPage extends AppCompatActivity {
         settingsListAdapter = new SettingsListAdapter(settings, new SettingsListAdapter.MyAdapterListener() {
             @Override
             public void buttonYesOnClick(View v, int position) {
-                pubSubBinderEndpoint.pubSubRequestReply(
-                        ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.ACCEPT
-                );
-                /*
-                SettingsItem item = settingsListAdapter.getSettings().get(position);
-                reqList.remove(item);
-
-                updateAdapter();
-                */
+                try {
+                    pubSubBinderEndpoint.pubSubRequestReply(
+                            ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.ACCEPT
+                    );
+                }catch (Exception e){
+                    Log.e(this.getClass().getName(), e.toString());
+                }
             }
 
             @Override
             public void buttonNoOnClick(View v, int position) {
-                pubSubBinderEndpoint.pubSubRequestReply(
-                        ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
-                );
-                /*
-                SettingsItem item = settingsListAdapter.getSettings().get(position);
-                reqList.remove(item);
-                updateAdapter();
-                */
+                try {
+                    pubSubBinderEndpoint.pubSubRequestReply(
+                            ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
+                    );
+                }catch (Exception e) {
+                    Log.e(this.getClass().getName(), e.toString());
+                }
+
             }
 
             @Override
             public void deleteOnClick(View v, int position) {
-                Log.d("here", "deleteOnClick at position" + position);
-                pubSubBinderEndpoint.dropPubSubBindingAsSubscriber(((ExistingItem) settingsListAdapter.getSettings().get(position)).getTitle());
+
+                try {
+                    Log.d("here", "deleteOnClick at position" + position);
+                    alert("Are you sure you would like to remove patient " + ((ExistingItem) settingsListAdapter.getSettings().get(position)).getTitle() + "?", "Delete");
+                }catch (Exception e) {
+                    Log.e(this.getClass().getName(), e.toString());
+                }
+
             }
 
             @Override
@@ -103,9 +113,9 @@ public class settingsPage extends AppCompatActivity {
             tmp.addAll(subList);
         }
         */
-        tmp.add(new TitleItem(isPatient ? "Sharing My Info With" : "Subscribed Patients"));
+        tmp.add(new TitleItem(isPatient ? "Sharing my info with" : "Your Patients"));
         tmp.addAll(patList);
-        tmp.add(new ButtonItem(isPatient ? "Share With New Contact" : "Add Patient"));
+        tmp.add(new ButtonItem(isPatient ? "Add Someone" : "Add Patient"));
         tmp.addAll(reqList);
         tmp.add(new TitleItem("Pending Requests"));
         tmp.addAll(pendList);
@@ -149,7 +159,7 @@ public class settingsPage extends AppCompatActivity {
         builder.show();
     }
 
-    public void alert(String message, final String buttonMsg) {
+    public void alert(final String message, final String buttonMsg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ThemeOverlay_AppCompat_Dialog_Alert);
         builder.setTitle(message);
 
@@ -159,6 +169,10 @@ public class settingsPage extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 if (buttonMsg.equals("Try Again")) {
                     addAlert();
+                } else if (buttonMsg.equals("Delete")) {
+                    String [] split = message.split("\\s+");
+                    String patient = split[split.length-1].substring(0, split[split.length-1].length()-1); //last item in prompt is the patient name
+                    pubSubBinderEndpoint.dropPubSubBindingAsSubscriber(patient);
                 }
             }
         });
@@ -186,7 +200,7 @@ public class settingsPage extends AppCompatActivity {
                     //You no longer need to do the ugly runOnUiThread
                     Log.d("MEAS", msg);
                     if (msg.equals("")) {
-                        //alert("Succesfully sent request", "OK");
+                        alert("Succesfully sent request", "OK");
                     } else {
                         alert(msg, "Try Again");
                     }
@@ -196,6 +210,15 @@ public class settingsPage extends AppCompatActivity {
                 @Override
                 public void sendReplyActionCallback(String userUid) {
                     Log.d("--sendReplyActionCall--", userUid);
+                    dialog.dismiss();
+//                    if (userUid.equals("")) {
+//                        //Failed
+//                        alert("Failed.", "OK");
+//                    } else {
+//                        //Success
+//                        alert("Success!", "OK");
+//                    }
+                    //updateAdapter();
                 }
             },
             new PubSubBindingService.PubSubInfoWorker() {
@@ -250,22 +273,24 @@ public class settingsPage extends AppCompatActivity {
                     boolean isPatient = pubSubBinderEndpoint.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
 
                     if (reqList.size() > 0) {
-                        tmp.add(new TitleItem("New Connection Requests"));
+                        tmp.add(new TitleItem("New Requests"));
                         tmp.addAll(reqList);
                     }
                     boolean flagGotConnections = patList.size() > 0 || subList.size() > 0;
                     tmp.add(new TitleItem(
                             flagGotConnections
-                                    ? (isPatient ? "Sharing My Info With" : "Subscribed Patients")
-                                    : ("You are not connected ... add someone")
+                                    ? (isPatient ? "Sharing my info with" : "Your Patients")
+                                    : (isPatient ? "You are not sharing your information with anyone" : "You have no patients")
                     ));
                     tmp.addAll(patList);
                     tmp.addAll(subList);
-                    tmp.add(new ButtonItem(isPatient ? "Share With New Contact" : "Add Patient"));
-                    tmp.add(new TitleItem(pendList.size() > 0 ? "Requests waiting to be accepted" : "You have no pending requests"));
+                    tmp.add(new ButtonItem(isPatient ? "Add Someone" : "Add Patient"));
+                    tmp.add(new TitleItem(pendList.size() > 0 ? "Pending requests" : "You have no pending requests"));
                     tmp.addAll(pendList);
 
                     settingsListAdapter.updateList(tmp);
+                    settingsListAdapter.notifyDataSetChanged();
+                    settingsList.smoothScrollBy(1,0);
                 }
             }
     );

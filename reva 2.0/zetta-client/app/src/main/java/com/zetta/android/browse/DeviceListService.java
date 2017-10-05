@@ -120,7 +120,6 @@ class DeviceListService {
     @NonNull
     private List<ListItem> getQuickActions(@NonNull ZettaDeviceId deviceId) {
         return sdkService.getQuickActions(deviceId);
-
     }
 
     interface Callback {
