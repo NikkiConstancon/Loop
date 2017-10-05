@@ -135,7 +135,7 @@ public class StatFragment extends android.support.v4.app.Fragment
     @Override
     public void onDestroy() {
         super.onDestroy();
-        endpoint.unbind(getView().getContext());
+        //endpoint.unbind(getView().getContext());
     }
 
     //    public FloatingActionButton getFab(Context context, ViewGroup parent) {
