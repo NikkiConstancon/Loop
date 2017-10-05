@@ -1,15 +1,20 @@
 package com.zetta.android.browse;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +22,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.zetta.android.R;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.GREEN;
 import static android.graphics.Color.RED;
 import static android.graphics.Color.YELLOW;
@@ -40,6 +49,7 @@ public class notifications extends android.support.v4.app.Fragment
     private RecyclerView rv;
     private View view;
     private Context context;
+    private int counter = 0;
 
 
     /**
@@ -71,10 +81,36 @@ public class notifications extends android.support.v4.app.Fragment
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(context);
         rv.setLayoutManager(linearLayout);
+
+        list = new ArrayList<NotificationsObject>();
+
+
+        SharedPreferences saved_values = context.getSharedPreferences("MyPref", MODE_PRIVATE);
+
+        String json;
+        counter = saved_values.getInt("counter", -1);
+        Gson g = new Gson();
+
+
+        if(counter != -1) {
+            for (int i = 0; i < counter; i++) {
+                json = saved_values.getString(Integer.toString(i), "");
+                NotificationsObject newNot = g.fromJson(json, NotificationsObject.class);
+                list.add(newNot);
+            }
+        }
+
+        adapter = new NotificationsAdapter(context, list);
+
+        rv.setAdapter(adapter);
+
+        adapter.notifyDataSetChanged();
+
+
         return view;
     }
 
-    public List<NotificationsObject> list;
+    public ArrayList<NotificationsObject> list;
 
     public void populateNotifications()
     {
@@ -160,6 +196,35 @@ public class notifications extends android.support.v4.app.Fragment
      * The default constructor
      */
     public notifications(){}
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Gson gson = new Gson();
+        String json;
+
+        SharedPreferences saved_values = context.getSharedPreferences("MyPref", MODE_PRIVATE);
+        SharedPreferences.Editor editor=saved_values.edit();
+        counter = 0;
+
+        if(list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                json = gson.toJson(list.get(i));
+                editor.putString(Integer.toString(counter), json);
+                counter++;
+            }
+        }
+        else
+        {
+            counter = -1;
+        }
+
+        editor.putInt("counter", counter);
+
+        editor.commit();
+    }
 
     /**
      * Overridden on activity create method to create appropriate notification view
