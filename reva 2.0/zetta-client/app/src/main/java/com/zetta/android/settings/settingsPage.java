@@ -198,7 +198,7 @@ public class settingsPage extends AppCompatActivity {
                     //You no longer need to do the ugly runOnUiThread
                     Log.d("MEAS", msg);
                     if (msg.equals("")) {
-                        alert("Succesfully sent request", "OK");
+
                     } else {
                         alert(msg, "Try Again");
                     }
