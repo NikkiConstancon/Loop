@@ -263,7 +263,7 @@ public class RevaWebSocketService extends Service {
 
                     NotificationCompat.Builder builder =
                             new NotificationCompat.Builder(RevaWebSocketService.this)
-                                    .setSmallIcon(R.drawable.ic_heart)
+                                    .setSmallIcon(R.mipmap.reva_white)
                                     .setContentTitle("ReVA New Request")
                                     .setContentText(info.userUid + " has sent you and invite")
                                     .setDefaults(Notification.DEFAULT_ALL) // must requires VIBRATE permission
