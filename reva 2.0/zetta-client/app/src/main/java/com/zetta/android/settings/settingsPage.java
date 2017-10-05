@@ -82,15 +82,6 @@ public class settingsPage extends AppCompatActivity {
                     pubSubBinderEndpoint.pubSubRequestReply(
                             ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
                     );
-
-                    SettingsItem item = settingsListAdapter.getSettings().get(position);
-                    Log.d("del", "" + reqList.remove(item));
-                    dialog.setMessage("Rejecting the request...");
-                    dialog.show();
-                    pubSubBinderEndpoint.pubSubRequestReply(
-                            ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
-                    );
-
                 }catch (Exception e) {
                     Log.e(this.getClass().getName(), e.toString());
                 }

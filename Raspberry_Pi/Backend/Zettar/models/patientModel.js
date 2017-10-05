@@ -5,6 +5,7 @@
  **/
 
 
+const pubSubBindingService = require('../services/PubSubBindingService')
 var util = require('util')
 var uuidv1 = require('uuid/v1')
 
@@ -195,6 +196,7 @@ module.exports = {
                         } else { next() }
                     });
             } else {
+                pubSubBindingService.update(instance.Username, instance.PubSubBindingConfirmationMap, instance.PatientList, instance.SubscriberList)
                 next()
             }
 
