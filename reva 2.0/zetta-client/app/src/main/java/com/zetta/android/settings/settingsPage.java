@@ -113,7 +113,7 @@ public class settingsPage extends AppCompatActivity {
         */
         tmp.add(new TitleItem(isPatient ? "Sharing my info with" : "Your Patients"));
         tmp.addAll(patList);
-        tmp.add(new ButtonItem(isPatient ? "Share With New Contact" : "Add Patient"));
+        tmp.add(new ButtonItem(isPatient ? "Add Someone" : "Add Patient"));
         tmp.addAll(reqList);
         tmp.add(new TitleItem("Pending Requests"));
         tmp.addAll(pendList);
@@ -278,7 +278,7 @@ public class settingsPage extends AppCompatActivity {
                     tmp.add(new TitleItem(
                             flagGotConnections
                                     ? (isPatient ? "Sharing my info with" : "Your Patients")
-                                    : (isPatient ? "You have no friends" : "You have no patients")
+                                    : (isPatient ? "You are not sharing your information to anyone" : "You have no patients")
                     ));
                     tmp.addAll(patList);
                     tmp.addAll(subList);
