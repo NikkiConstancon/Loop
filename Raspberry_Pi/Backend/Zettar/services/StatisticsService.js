@@ -58,7 +58,8 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                                             subResult.push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
                                         }
                                     }
-                                    endResult.push({Object.keys(pat)[i]: subResult});
+                                    var tmp = Object.keys(pat)[i];
+                                    endResult.push({tmp: subResult});
                                                
                                     
                                 }
