@@ -230,7 +230,7 @@ public class settingsPage extends AppCompatActivity {
 //                        //Success
 //                        alert("Success!", "OK");
 //                    }
-                    updateAdapter();
+                    //updateAdapter();
                 }
             },
             new PubSubBindingService.PubSubInfoWorker() {
