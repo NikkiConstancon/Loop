@@ -74,6 +74,8 @@ public class notifications extends android.support.v4.app.Fragment
             @Override
             public void onClick(View v) {
                 addNotification("Heart Rate", "Heart rate is dropping too fast", "Heart", RED);
+                addNotification("Temperature", "Temperature is too high. Please check on the patient", "Temperature", GREEN);
+                addNotification("Glucose", "Body glucose levels are not normal. Please consider contacting a medical professional", "Glucose", YELLOW);
             }
         });
 
@@ -132,15 +134,15 @@ public class notifications extends android.support.v4.app.Fragment
         }
         else if(resource.equalsIgnoreCase("Temperature"))
         {
-            res = R.drawable.ic_add_black_24dp;
+            res = R.drawable.thermometer;
         }
         else if(resource.equalsIgnoreCase("Glucose"))
         {
-            res = R.drawable.ic_check_box_black_24dp;
+            res = R.drawable.glucose;
         }
-        else if(resource.equalsIgnoreCase("Bone density"))
+        else if(resource.equalsIgnoreCase("Insulin"))
         {
-            res = R.drawable.ic_settings_black_24dp;
+            res = R.drawable.insulin;
         }
         else if(resource.equalsIgnoreCase("Blood Pressure"))
         {
