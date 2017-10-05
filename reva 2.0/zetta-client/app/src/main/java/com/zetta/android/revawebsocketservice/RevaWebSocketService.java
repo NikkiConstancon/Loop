@@ -1,6 +1,8 @@
 package com.zetta.android.revawebsocketservice;
 
+import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +26,9 @@ import com.zetta.android.R;
 import com.zetta.android.browse.MainActivity;
 import com.zetta.android.browse.login_activity;
 import com.zetta.android.lib.Interval;
+import com.zetta.android.revaServices.PubSubBindingService;
 import com.zetta.android.revaServices.UserManager;
+import com.zetta.android.settings.settingsPage;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
@@ -235,6 +239,57 @@ public class RevaWebSocketService extends Service {
     ;
     USER_TYPE userType;
 
+    PubSubBindingService pubSubBindingService = new PubSubBindingService(this,
+            new PubSubBindingService.PubSubWorker() {
+                @Override
+                public void sendRequestCallback(final String msg) {
+                }
+
+                @Override
+                public void sendReplyActionCallback(String userUid) {
+                }
+            },
+            new PubSubBindingService.PubSubInfoWorker() {
+                @Override
+                public void onConnect(Map<String, PubSubBindingService.PubSubReqInfo> infoMap) {
+                }
+
+                @Override
+                public void newReq(PubSubBindingService.PubSubReqInfo info) {
+                    Intent dismissIntent = new Intent(RevaWebSocketService.this, settingsPage.class);
+                    dismissIntent.setAction(Intent.ACTION_DEFAULT);
+                    dismissIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                    NotificationCompat.Builder builder =
+                            new NotificationCompat.Builder(RevaWebSocketService.this)
+                                    .setSmallIcon(R.drawable.ic_heart)
+                                    .setContentTitle("ReVA New Request")
+                                    .setContentText(info.userUid + " has sent you and invite")
+                                    .setDefaults(Notification.DEFAULT_ALL) // must requires VIBRATE permission
+                                    .setPriority(NotificationCompat.PRIORITY_HIGH)//must give priority to High, Max which will considered as heads-up notification
+                                    .setAutoCancel(true);
+
+                    PendingIntent contentIntent = PendingIntent.getActivity(RevaWebSocketService.this, 0,
+                            dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+                    builder.setContentIntent(contentIntent);
+                    NotificationManager notificationManager = (NotificationManager) RevaWebSocketService.this.getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.notify(0, builder.build());
+
+                }
+
+                @Override
+                public void onPatientList(List<String> patientList) {
+                }
+
+                @Override
+                public void onSubscriberList(List<String> subscriberList) {
+                    Log.d("--onSubscriberList---", subscriberList.toString());
+                }
+            }
+    );
     class RCCEndpoint extends RevaWebsocketEndpoint {
         private final String TAG = this.getClass().getName();
 
@@ -359,6 +414,7 @@ public class RevaWebSocketService extends Service {
 
         initScout();
         rccPublisher = rccEndpoint.bind(RevaWebSocketService.this);
+        pubSubBindingService.bind(this);
     }
 
     @Override

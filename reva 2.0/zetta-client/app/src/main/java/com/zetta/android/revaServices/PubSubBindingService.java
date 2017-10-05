@@ -1,11 +1,19 @@
 package com.zetta.android.revaServices;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.zetta.android.R;
 import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
+import com.zetta.android.settings.settingsPage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,24 +39,24 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
     }
 
     public PubSubBindingService(
-            Activity activity_,
+            Context context_,
             PubSubWorker pubSubWorker_,
             PubSubInfoWorker pubSubInfoWorker_
     ) {
-        activity = activity_;
+        context = context_;
         pubSubWorker = pubSubWorker_;
         pubSubInfoWorker = pubSubInfoWorker_;
     }
 
 
     public void pubSubBindingRequest(String target) {
-        attachCloudAwaitObject(null, pubSubReqCAO).send(activity, "REQ_BIND", target);
+        attachCloudAwaitObject(null, pubSubReqCAO).send(context, "REQ_BIND", target);
     }
     public void dropPubSubBindingAsSubscriber(String target){
-        attachCloudAwaitObject(null, pubSubReqDropBindingCAO).send(activity, "DROP_PUB_SUB_BINDING_AS_SUB", target);
+        attachCloudAwaitObject(null, pubSubReqDropBindingCAO).send(context, "DROP_PUB_SUB_BINDING_AS_SUB", target);
     }
     public void dropPubSubBindingAsPatient(String target){
-        attachCloudAwaitObject(null, pubSubReqDropBindingCAO).send(activity, "DROP_PUB_SUB_BINDING_AS_PAT", target);
+        attachCloudAwaitObject(null, pubSubReqDropBindingCAO).send(context, "DROP_PUB_SUB_BINDING_AS_PAT", target);
     }
     final CloudAwaitObject pubSubReqDropBindingCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
         @Override
@@ -114,63 +122,72 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
         return pubSubInfoMap.get(names.get(i));
     }
 
-    final Activity activity;
+    final Context context;
+
+    void doOnMessage(final LinkedTreeMap obj) {
+        Map<String, Object> gotMapKeys = obj;
+        for (Map.Entry<String, Object> entry : gotMapKeys.entrySet()) {
+            switch (entry.getKey()) {
+                case "BINDING_CONFIRMATION_REQ": {
+                    Map<String, Map<String, String>> gotMap = (Map<String, Map<String, String>>) entry.getValue();
+                    for (Map.Entry<String, Map<String, String>> entryInfo : gotMap.entrySet()) {
+                        Map<String, String> info = entryInfo.getValue();
+                        pubSubInfoMap.put(entryInfo.getKey(), new PubSubReqInfo(entryInfo.getKey(), info.get("type"), info.get("state")));
+                    }
+                    pubSubInfoWorker.onConnect(pubSubInfoMap);
+                }
+                break;
+                case "NEW_BINDING_CONFIRMATION_REQ": {
+                    Map<String, String> entryInfo = (Map<String, String>) entry.getValue();
+                    PubSubReqInfo info =
+                            new PubSubReqInfo(
+                                    entryInfo.get("userUid"),
+                                    entryInfo.get("type"),
+                                    entryInfo.get("state")
+                            );
+
+                    pubSubInfoMap.put(entryInfo.get("userUid"), info);
+                    pubSubInfoWorker.newReq(info);
+
+                }
+                break;
+                case "PATIENT_LIST": {
+                    patientList = (ArrayList<String>) entry.getValue();
+                    pubSubInfoWorker.onPatientList(patientList);
+                }
+                case "SUBSCRIBER_LIST": {
+                    subscriberList = (ArrayList<String>) entry.getValue();
+                    pubSubInfoWorker.onSubscriberList(subscriberList);
+                }
+                break;
+                case "DONE": {
+                    pubSubInfoWorker.doneCallback();
+                    pubSubInfoWorker.doneCallback(
+                            patientList,
+                            subscriberList,
+                            new ArrayList<>(pubSubInfoMap.values())
+                    );
+                    patientList.clear();
+                    subscriberList.clear();
+                    pubSubInfoMap.clear();
+                }
+                break;
+            }
+        }
+    }
 
     @Override
     public void onMessage(final LinkedTreeMap obj) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Map<String, Object> gotMapKeys = obj;
-                for (Map.Entry<String, Object> entry : gotMapKeys.entrySet()) {
-                    switch (entry.getKey()) {
-                        case "BINDING_CONFIRMATION_REQ": {
-                            Map<String, Map<String, String>> gotMap = (Map<String, Map<String, String>>) entry.getValue();
-                            for (Map.Entry<String, Map<String, String>> entryInfo : gotMap.entrySet()) {
-                                Map<String, String> info = entryInfo.getValue();
-                                pubSubInfoMap.put(entryInfo.getKey(), new PubSubReqInfo(entryInfo.getKey(), info.get("type"), info.get("state")));
-                            }
-                            pubSubInfoWorker.onConnect(pubSubInfoMap);
-                        }
-                        break;
-                        case "NEW_BINDING_CONFIRMATION_REQ": {
-                            Map<String, String> entryInfo = (Map<String, String>) entry.getValue();
-                            PubSubReqInfo info =
-                                    new PubSubReqInfo(
-                                            entryInfo.get("userUid"),
-                                            entryInfo.get("type"),
-                                            entryInfo.get("state")
-                                    );
-
-                            pubSubInfoMap.put(entryInfo.get("userUid"), info);
-                            pubSubInfoWorker.newReq(info);
-                        }
-                        break;
-                        case "PATIENT_LIST": {
-                            patientList = (ArrayList<String>) entry.getValue();
-                            pubSubInfoWorker.onPatientList(patientList);
-                        }
-                        case "SUBSCRIBER_LIST":{
-                            subscriberList = (ArrayList<String>) entry.getValue();
-                            pubSubInfoWorker.onSubscriberList(subscriberList);
-                        }
-                        break;
-                        case "DONE":{
-                            pubSubInfoWorker.doneCallback();
-                            pubSubInfoWorker.doneCallback(
-                                    patientList,
-                                    subscriberList,
-                                    new ArrayList<>(pubSubInfoMap.values())
-                            );
-                            patientList.clear();
-                            subscriberList.clear();
-                            pubSubInfoMap.clear();
-                        }
-                        break;
-                    }
+        if(context instanceof Activity) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    doOnMessage(obj);
                 }
-            }
-        });
+            });
+        }else{
+            doOnMessage(obj);
+        }
     }
 
     @Override
@@ -182,16 +199,24 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
     CloudAwaitObject pubSubReqCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
         @Override
         public Object get(final Object obj, Object localMsg, CloudAwaitObject cao) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(obj instanceof String) {
-                        pubSubWorker.sendRequestCallback((String) obj);
-                    }else{
-                        pubSubWorker.sendRequestCallback("");
+            if(context instanceof Activity) {
+                ((Activity)context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (obj instanceof String) {
+                            pubSubWorker.sendRequestCallback((String) obj);
+                        } else {
+                            pubSubWorker.sendRequestCallback("");
+                        }
                     }
+                });
+            }else{
+                if (obj instanceof String) {
+                    pubSubWorker.sendRequestCallback((String) obj);
+                } else {
+                    pubSubWorker.sendRequestCallback("");
                 }
-            });
+            }
             return null;
         }
     };
@@ -200,7 +225,7 @@ public class PubSubBindingService extends RevaWebsocketEndpoint {
 
 
     public void pubSubRequestReply(String userUid, PubSubReqInfo.REPLY reply) {
-        attachCloudAwaitObject(null, pubSubReqReplyCAO).send(activity, reply.toString(), userUid);
+        attachCloudAwaitObject(null, pubSubReqReplyCAO).send(context, reply.toString(), userUid);
     }
 
     final CloudAwaitObject pubSubReqReplyCAO = new CloudAwaitObject("BIND_PATIENT_AND_SUBSCRIBER") {
