@@ -2,15 +2,22 @@ package com.zetta.android.browse;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -250,7 +257,26 @@ public class MainActivity extends AppCompatActivity {
                                     startActivity(intent);
                                 }break;
                                 case R.string.drawerNameSignOut:{
-                                    userManagerEndpoint.triggerLoginIntent();
+
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(cont, R.style.ThemeOverlay_AppCompat_Dialog_Alert);
+                                    builder.setTitle(Html.fromHtml("<font color='#38ACEC'>Are you sure you want to sign out?</font>"));
+
+                                    // Set up the buttons
+                                    builder.setPositiveButton(Html.fromHtml("<font color='#38ACEC'>Yes</font>"), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            userManagerEndpoint.triggerLoginIntent();
+                                        }
+                                    });
+                                    builder.setNegativeButton(Html.fromHtml("<font color='#38ACEC'>No</font>"), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                        }
+                                    });
+
+                                    builder.show();
+
                                 }break;
                                 case R.string.drawerNameSettings: {
                                     Toast.makeText(cont, drawerItem.getTag().toString(), Toast.LENGTH_SHORT).show();
