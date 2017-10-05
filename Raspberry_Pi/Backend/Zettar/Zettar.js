@@ -62,8 +62,8 @@ var hook = new Hook(initializedZetta)
     .registerStreamListener({
         topicName: 'vitals',
         cb: function (info, response) {
-            console.log(this.result.state);
-            console.log(response.data);
+//            console.log(this.result.state);
+//            console.log(response.data);
             realtimeDataService.publish(info, response);
             patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.name, TimeStamp: parseFloat(response.timestamp), Value: parseFloat(response.data) });
         },

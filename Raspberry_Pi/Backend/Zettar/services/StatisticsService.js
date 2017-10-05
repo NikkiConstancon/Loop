@@ -41,13 +41,13 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                         StartTime:  tmp.StartTime,
                         EndTime:tmp.EndTime,
                     }).then(function(result){
-                        
-                        var endResult = []
+//                        console.log(result);
+  //                     console.log(Object.keys(pat).length);
+                         var endResult = []
                         for(var i= 0; i < Object.keys(pat).length - 1; i ++){
                                 if(pat[Object.keys(pat)[i]] == true){
                                     var subResult = [];
                                     // add device type
-                                    subResult.push({deviceID: Object.keys(pat)[i]});
                                     //go through result...
                                     for(var j = 0; j <  Object.keys(result).length - 1; j++){
                                         //console.log("Device: " + result[Object.keys(result)[j]].device)
@@ -58,12 +58,16 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                                             subResult.push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
                                         }
                                     }
-                                    endResult.push(subResult);
-                                    
+                                    var tmp = {};
+
+                                    tmp[ Object.keys(pat)[i]] = subResult;
+                                    endResult.push(tmp);
+                                               
                                     
                                 }
                         }
                         console.log(endResult);
+                        channel(endResult);
                     }).catch(function (e) {
                         logger.error('GraphRetievalError', e)
                         channel(false)

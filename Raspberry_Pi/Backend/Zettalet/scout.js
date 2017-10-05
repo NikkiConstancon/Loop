@@ -16,10 +16,10 @@ util.inherits(StateMachineScout, Scout);
 StateMachineScout.prototype.init = function(next) {
   var self = this;
   setTimeout(function() {
-    //self.discover(Insulin)
-   // self.discover(Thermometer)
+    self.discover(Insulin)
+    self.discover(Thermometer)
     self.discover(Glucose)
-   // self.discover(Heartbeat)
+    self.discover(Heartbeat)
   }, 1000);
   next();
 }

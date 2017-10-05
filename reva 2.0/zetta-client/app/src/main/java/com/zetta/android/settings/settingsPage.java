@@ -1,8 +1,14 @@
 package com.zetta.android.settings;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +23,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import com.zetta.android.R;
+import com.zetta.android.browse.MainActivity;
+import com.zetta.android.lib.RevaNotificationManager;
 import com.zetta.android.revaServices.PubSubBindingService;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 
@@ -226,8 +234,6 @@ public class settingsPage extends AppCompatActivity {
 
                 @Override
                 public void newReq(PubSubBindingService.PubSubReqInfo info) {
-                    Log.d("----NEW-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
-                    reqList.add(new RequestItem(info.userUid));
                 }
 
                 @Override
