@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 import static com.zetta.android.R.layout.more_graph;
@@ -60,7 +61,6 @@ public class StatFragment extends android.support.v4.app.Fragment
             public void onClick(View v) {
                 Intent toAddStat = new Intent(getActivity(), AddSimpleStat.class);
                 startActivityForResult(toAddStat, 0);
-
             }
         });
 
@@ -160,12 +160,20 @@ public class StatFragment extends android.support.v4.app.Fragment
     }
     public CloudAwaitObject statTmpForNikki = new CloudAwaitObject("GRAPH_POINTS") {
         @Override
-        public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
+        public Object get(final Object obj, Object localMsg, CloudAwaitObject cao) {
             Log.d("object", obj.toString());
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //deserialize it
+                    try {
+                        Map<String, Map<String, Double>> stats = (Map<String, Map<String, Double>>) obj;
+                        for (Map.Entry<String, Map<String, Double>> stat : stats.entrySet()) {
+                            Log.d("ENTRY", stat.getKey() + stat.getKey());
+                        }
+                    } catch (ClassCastException e ) {
+                        Log.e("BIGD", e.toString());
+                    }
+
                 }
             });
             return null;
