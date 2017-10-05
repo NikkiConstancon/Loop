@@ -74,6 +74,8 @@ public class notifications extends android.support.v4.app.Fragment
             @Override
             public void onClick(View v) {
                 addNotification("Heart Rate", "Heart rate is dropping too fast", "Heart", RED);
+                addNotification("Temperature", "Temperature is too high. Please check on the patient", "Temperature", GREEN);
+                addNotification("Glucose", "Body glucose levels are not normal. Please consider contacting a medical professional", "Glucose", YELLOW);
             }
         });
 
@@ -115,11 +117,11 @@ public class notifications extends android.support.v4.app.Fragment
     public void populateNotifications()
     {
         list = new ArrayList<NotificationsObject>();
-        list.add(new NotificationsObject("Heart Rate", "ReVA has detected strong deviations from the norm. Please contact a medical professional immediately.", R.drawable.ic_heart, RED));
-        list.add(new NotificationsObject("Temperature", "ReVA has detected moderate deviations from the norm. Consider contacting a medical professional.", R.drawable.ic_notifications_black_24dp, YELLOW));
-        list.add(new NotificationsObject("Glucose", "ReVA has detected slight deviations from the norm. Please check on the patient.", R.drawable.ic_settings_black_24dp, GREEN));
-        list.add(new NotificationsObject("Glucose", "ReVA has detected strong deviations from the norm. Please contact a medical professional immediately.", R.drawable.ic_dashboard_black_24dp, RED));
-        list.add(new NotificationsObject("Glucose", "ReVA has detected moderate deviations from the norm. Consider contacting a medical professional.", R.drawable.ic_help_black_24dp, YELLOW));
+        list.add(new NotificationsObject("Heart Rate", "reva has detected strong deviations from the norm. Please contact a medical professional immediately.", R.drawable.ic_heart, RED));
+        list.add(new NotificationsObject("Temperature", "reva has detected moderate deviations from the norm. Consider contacting a medical professional.", R.drawable.ic_notifications_black_24dp, YELLOW));
+        list.add(new NotificationsObject("Glucose", "reva has detected slight deviations from the norm. Please check on the patient.", R.drawable.ic_settings_black_24dp, GREEN));
+        list.add(new NotificationsObject("Glucose", "reva has detected strong deviations from the norm. Please contact a medical professional immediately.", R.drawable.ic_dashboard_black_24dp, RED));
+        list.add(new NotificationsObject("Glucose", "reva has detected moderate deviations from the norm. Consider contacting a medical professional.", R.drawable.ic_help_black_24dp, YELLOW));
     }
 
     public void addNotification(String title, String content, String resource, int severity)
@@ -132,15 +134,15 @@ public class notifications extends android.support.v4.app.Fragment
         }
         else if(resource.equalsIgnoreCase("Temperature"))
         {
-            res = R.drawable.ic_add_black_24dp;
+            res = R.drawable.thermometer;
         }
         else if(resource.equalsIgnoreCase("Glucose"))
         {
-            res = R.drawable.ic_check_box_black_24dp;
+            res = R.drawable.glucose;
         }
-        else if(resource.equalsIgnoreCase("Bone density"))
+        else if(resource.equalsIgnoreCase("Insulin"))
         {
-            res = R.drawable.ic_settings_black_24dp;
+            res = R.drawable.insulin;
         }
         else if(resource.equalsIgnoreCase("Blood Pressure"))
         {
@@ -174,7 +176,7 @@ public class notifications extends android.support.v4.app.Fragment
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_heart)
-                        .setContentTitle("ReVA Alert")
+                        .setContentTitle("reva Alert")
                         .setContentText("Deviations from the norm")
                         .setDefaults(Notification.DEFAULT_ALL) // must requires VIBRATE permission
                         .setPriority(NotificationCompat.PRIORITY_HIGH)//must give priority to High, Max which will considered as heads-up notification
