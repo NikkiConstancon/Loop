@@ -131,7 +131,7 @@ public class notifications extends android.support.v4.app.Fragment
 
         if(resource.equalsIgnoreCase("Heart"))
         {
-            res = R.drawable.ic_heart;
+            res = R.drawable.heart;
         }
         else if(resource.equalsIgnoreCase("Temperature"))
         {
