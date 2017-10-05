@@ -48,7 +48,6 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                                 if(pat[Object.keys(pat)[i]] == true){
                                     var subResult = [];
                                     // add device type
-                                    subResult.push({deviceID: Object.keys(pat)[i]});
                                     //go through result...
                                     for(var j = 0; j <  Object.keys(result).length - 1; j++){
                                         //console.log("Device: " + result[Object.keys(result)[j]].device)
@@ -59,7 +58,7 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                                             subResult.push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
                                         }
                                     }
-                                    endResult.push(subResult);
+                                    endResult.push({Object.keys(pat)[i]: subResult});
                                                
                                     
                                 }
