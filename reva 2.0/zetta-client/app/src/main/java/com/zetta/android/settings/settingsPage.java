@@ -45,8 +45,6 @@ public class settingsPage extends AppCompatActivity {
     private List<SettingsItem> subList = new ArrayList<>();
 
 
-
-    //TODO: check for when a list is empty, so you can still display the header and a message
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

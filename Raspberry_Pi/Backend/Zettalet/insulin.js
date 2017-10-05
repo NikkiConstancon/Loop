@@ -4,6 +4,8 @@ var extend = require('node.extend');
 
 var icon = 'https://emojipedia-us.s3.amazonaws.com/thumbs/120/twitter/103/syringe_1f489.png';
 
+const MAX = 38.8;
+const MIN = 5;
 
 function degToRad(x) {
   return x * ( Math.PI / 180 );
@@ -34,17 +36,46 @@ Insulin.prototype.init = function(config) {
     .name('Body_insulin')
 
 
-    .monitor('vitals');
+    .monitor('vitals')
+    .when('safe', {allow: ['isLow','isHigh']})
+    .when('low', {allow: ['isSafe','isHigh']})
+    .when('high', {allow: ['isLow','isSafe']})
+    
+    .map('isLow', this.isLow)
+    .map('isHigh', this.isHigh)
+    .map('isSafe', this.isSafe)
 
   this._startMockData();
 };
 
+Insulin.prototype.isLow = function(cb) {
+    this.state = 'low';
+    cb();
+}
+
+Insulin.prototype.isHigh = function(cb) {
+    this.state = 'high';
+    cb();
+}
+
+Insulin.prototype.isSafe = function(cb) {
+    this.state = 'safe';
+    cb();
+}
 
 Insulin.prototype._startMockData = function(cb) {
   var self = this;
   this._timeOut = setInterval(function() {
     self.vitals = 37 + (Math.sin(degToRad(self._counter)) + 1.0) * 1;
     self._counter += self._increment;
+        if(self.vitals > MAX){
+        self.isHigh(function(){});
+    } else if(self.vitals < MIN){ 
+        self.isLow(function(){});
+    } else{
+        self.isSafe(function(){});
+    }
+    
   }, 1000);
 }
 

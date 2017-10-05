@@ -36,13 +36,14 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
             RAW: function (transmitter, msg, key, channel) {
                 var tmp = msg.nameValuePairs
                  patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
-                    PatientDataManager.getGraphPoints({
+                    dataManager.getGraphPoints({
                         Username: tmp.Username  ,
                         StartTime:  tmp.StartTime,
                         EndTime:tmp.EndTime,
                     }).then(function(result){
-                        
-                        var endResult = []
+//                        console.log(result);
+  //                     console.log(Object.keys(pat).length);
+                         var endResult = []
                         for(var i= 0; i < Object.keys(pat).length - 1; i ++){
                                 if(pat[Object.keys(pat)[i]] == true){
                                     var subResult = [];
@@ -59,13 +60,12 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                                         }
                                     }
                                     endResult.push(subResult);
-                                    
+                                               
                                     
                                 }
                         }
                         console.log(endResult);
-                        
-                        
+                        channel(endResult);
                     }).catch(function (e) {
                         logger.error('GraphRetievalError', e)
                         channel(false)

@@ -46,6 +46,7 @@ public class StatFragment extends android.support.v4.app.Fragment
     private RecyclerView statList;
     private StatListAdapter statListAdapter;
     private List<StatItem> cards = new ArrayList<>();
+    private static StatTmpForNikkiEndpoint endpoint = new StatTmpForNikkiEndpoint();
 
     @Nullable
     @Override
@@ -53,7 +54,7 @@ public class StatFragment extends android.support.v4.app.Fragment
         View view = inflater.inflate(R.layout.stat_hist_fragment, container, false);
         super.onCreate(savedInstanceState);
         final FloatingActionButton myFab = (FloatingActionButton) view.findViewById(R.id.myFAB);
-        //statTmpForNikkiEndpoint.bind(view.getContext());
+        endpoint.bind(view.getContext());
 
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -78,11 +79,11 @@ public class StatFragment extends android.support.v4.app.Fragment
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        //
-        /*statTmpForNikkiEndpoint.attachCloudAwaitObject(
+
+        endpoint.attachCloudAwaitObject(
                 null,
                 statTmpForNikki
-        ).send(view.getContext(), "RAW", obj);*/
+        ).send(view.getContext(), "RAW", obj);
 
         //getFab(StatFragment.this.getContext(), (ViewGroup)view.getParent());
         // MOCK DATA STARTS HERE
@@ -102,7 +103,7 @@ public class StatFragment extends android.support.v4.app.Fragment
         cards.add(new GraphStatItem("Heart-rate", "", "line-graph", timeStamp, timeStamp, "BPM", entries ));
         // MOCK DATA ENDS HERE
 
-        cards.add(new SimpleStatItem("This thing", "http://i.imgur.com/R9xBixo.png", "average", timeStamp, timeStamp, "D", 57.34 ));
+        cards.add(new SimpleStatItem("Heart-rate", "", "average", timeStamp, timeStamp, "C", 57.34 ));
         cards.add(new SimpleStatItem("That thing", "", "min", timeStamp, timeStamp, "C", 27.34 ));
         cards.add(new SimpleStatItem("That one", "http://i.imgur.com/R9xBixo.png", "max", timeStamp, timeStamp, "C", 67.34 ));
 
@@ -131,8 +132,13 @@ public class StatFragment extends android.support.v4.app.Fragment
         return view;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //endpoint.unbind(getView().getContext());
+    }
 
-//    public FloatingActionButton getFab(Context context, ViewGroup parent) {
+    //    public FloatingActionButton getFab(Context context, ViewGroup parent) {
 //        LayoutInflater inflater = LayoutInflater.from(context);
 //        return (FloatingActionButton) inflater.inflate(R.layout.myfab, parent, false);
 //    }
@@ -142,10 +148,11 @@ public class StatFragment extends android.support.v4.app.Fragment
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
+
     }
 
     //MainActivity.StatTmpForNikkiEndpoint statTmpForNikkiEndpoint = new MainActivity.StatTmpForNikkiEndpoint();
-    /*public static class StatTmpForNikkiEndpoint extends RevaWebsocketEndpoint {
+    public static class StatTmpForNikkiEndpoint extends RevaWebsocketEndpoint {
         @Override
         public String key() {
             return "Stats";
@@ -163,6 +170,6 @@ public class StatFragment extends android.support.v4.app.Fragment
             });
             return null;
         }
-    };*/
+    };
 }
 

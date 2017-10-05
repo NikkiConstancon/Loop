@@ -97,7 +97,7 @@ public class RevaNotificationManager {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_heart)
-                        .setContentTitle("ReVA Alert")
+                        .setContentTitle("reva Alert")
                         .setContentText("Deviations from the norm")
                         .setDefaults(Notification.DEFAULT_ALL) // must requires VIBRATE permission
                         .setPriority(NotificationCompat.PRIORITY_HIGH)//must give priority to High, Max which will considered as heads-up notification
