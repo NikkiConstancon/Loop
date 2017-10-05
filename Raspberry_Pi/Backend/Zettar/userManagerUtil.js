@@ -109,7 +109,7 @@ var UserManager = module.exports = {
         this.SubscriberList = updateValue;
         this.save(function(err){});
     },
-    pubSubRequestOnDecision: function (onUserUid, decision) {
+    pubSubRequestOnDecision: function (onUserUid, decision, flagForceAddToPatList) {
         const patientManager = require("./patientManager")
         //NOTE: just delete the key value pair for now to minimize serve client state change handshaking
         try {
@@ -122,6 +122,9 @@ var UserManager = module.exports = {
                 if (this.getType() == UserManager.enum.userType.patient && obj.isTargetPatient) {
                     this.addToSubscriberList(onUserUid)
                     patientManager.triggerUpdateForSubscriberListInfoHook(this, onUserUid)
+                    if (flagForceAddToPatList) {
+                        this.addToPatientList(onUserUid)
+                    }
                 } else {
                     this.addToPatientList(onUserUid)
                     obj.state = UserManager.enum.pubSubReq.state.accepted
@@ -132,7 +135,7 @@ var UserManager = module.exports = {
             map[onUserUid] = JSON.stringify(obj)
             delete map[onUserUid]//allways for now
             this.PubSubBindingConfirmationMap = map
-            this.save()
+            this.save(function (err) { })
             return true
         } catch (e) {
             logger.error(e)

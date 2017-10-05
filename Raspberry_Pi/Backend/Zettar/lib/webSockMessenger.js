@@ -72,8 +72,14 @@ const webSockMessenger = module.exports = {
             transmitter.transmit(msg, errcb)
         }
     },
-    getTransmitters: function (userUid) {
-        return userSocketContextMap[userUid]
+    getTransmitterArr: function (serviceKey, userUid) {
+        var list = []
+        for (var deviceUid in userSocketContextMap[userUid]) {
+            var context = userSocketContextMap[userUid][deviceUid]
+            var transmitter = context.subServiceMap[serviceKey]
+            list.push(transmitter)
+        }
+        return list
     }
 }
 var userSocketContextMap = {}
