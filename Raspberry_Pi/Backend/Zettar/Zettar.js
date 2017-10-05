@@ -31,6 +31,23 @@ const realtimeDataService = require('./services/RealtimeDataService')
 var initializedZetta = zetta('peers').name('Zettar')
 
 
+/*//Threshold functions:
+const THRESHOLDS = [
+    { DeviceName: "Body_temperature", min: ,max: },
+    { DeviceName: "Body_insulin", min: ,max: },
+    { DeviceName: "Heart-rate", min: ,max: },
+    { DeviceName: "Body_glucose", min: ,max: },
+    { DeviceName: , min: ,max: },
+    { DeviceName: , min: ,max: },
+]
+var prevThresholds = 
+function checkTreshold(){
+    
+    
+}
+*/
+//END
+
 
 //pass the initialized zetta var to a new hook
 var hook = new Hook(initializedZetta)
@@ -45,6 +62,8 @@ var hook = new Hook(initializedZetta)
     .registerStreamListener({
         topicName: 'vitals',
         cb: function (info, response) {
+            console.log(this.result.state);
+            console.log(response.data);
             realtimeDataService.publish(info, response);
             patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.name, TimeStamp: parseFloat(response.timestamp), Value: parseFloat(response.data) });
         },
