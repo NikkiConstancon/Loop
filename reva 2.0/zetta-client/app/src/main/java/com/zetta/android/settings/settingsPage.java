@@ -62,20 +62,19 @@ public class settingsPage extends AppCompatActivity {
                 pubSubBinderEndpoint.pubSubRequestReply(
                         ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.ACCEPT
                 );
-                /*
-                SettingsItem item = settingsListAdapter.getSettings().get(position);
-                reqList.remove(item);
 
-                updateAdapter();
-                */
+                //SettingsItem item = settingsListAdapter.getSettings().get(position);
+                //reqList.remove(item);
+
+                //updateAdapter();
             }
 
             @Override
             public void buttonNoOnClick(View v, int position) {
-                SettingsItem item = settingsListAdapter.getSettings().get(position);
-                Log.d("del", "" + reqList.remove(item));
-                dialog.setMessage("Rejecting the request...");
-                dialog.show();
+//                SettingsItem item = settingsListAdapter.getSettings().get(position);
+//                Log.d("del", "" + reqList.remove(item));
+//                dialog.setMessage("Rejecting the request...");
+//                dialog.show();
                 pubSubBinderEndpoint.pubSubRequestReply(
                         ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
                 );
@@ -89,6 +88,7 @@ public class settingsPage extends AppCompatActivity {
             @Override
             public void deleteOnClick(View v, int position) {
                 Log.d("here", "deleteOnClick at position" + position);
+                alert("Are you sure you would like to remove patient " + ((ExistingItem) settingsListAdapter.getSettings().get(position)).getTitle() + "?", "Delete");
                 pubSubBinderEndpoint.dropPubSubBindingAsSubscriber(((ExistingItem) settingsListAdapter.getSettings().get(position)).getTitle());
             }
 
@@ -111,7 +111,7 @@ public class settingsPage extends AppCompatActivity {
             tmp.addAll(subList);
         }
         */
-        tmp.add(new TitleItem(isPatient ? "Sharing My Info With" : "Subscribed Patients"));
+        tmp.add(new TitleItem(isPatient ? "Sharing my info with" : "Your Patients"));
         tmp.addAll(patList);
         tmp.add(new ButtonItem(isPatient ? "Share With New Contact" : "Add Patient"));
         tmp.addAll(reqList);
@@ -167,6 +167,8 @@ public class settingsPage extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 if (buttonMsg.equals("Try Again")) {
                     addAlert();
+                } else if (buttonMsg.equals("Delete")) {
+
                 }
             }
         });
@@ -273,7 +275,7 @@ public class settingsPage extends AppCompatActivity {
                     boolean flagGotConnections = patList.size() > 0 || subList.size() > 0;
                     tmp.add(new TitleItem(
                             flagGotConnections
-                                    ? (isPatient ? "Sharing My Info With" : "Subscribed Patients")
+                                    ? (isPatient ? "Sharing my info with" : "Your Patients")
                                     : ("You are not connected ... add someone")
                     ));
                     tmp.addAll(patList);
@@ -283,6 +285,8 @@ public class settingsPage extends AppCompatActivity {
                     tmp.addAll(pendList);
 
                     settingsListAdapter.updateList(tmp);
+                    settingsListAdapter.notifyDataSetChanged();
+                    settingsList.smoothScrollBy(1,0);
                 }
             }
     );
