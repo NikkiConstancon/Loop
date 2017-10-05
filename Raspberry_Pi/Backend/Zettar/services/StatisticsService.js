@@ -43,7 +43,7 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                     }).then(function(result){
 //                        console.log(result);
   //                     console.log(Object.keys(pat).length);
-                         var endResult = []
+                         var endResult = "{";
                         for(var i= 0; i < Object.keys(pat).length - 1; i ++){
                                 if(pat[Object.keys(pat)[i]] == true){
                                     var subResult = [];
@@ -58,15 +58,18 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                                             subResult.push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
                                         }
                                     }
-                                    var tmp = {};
+                                    //var tmp = {};
 
-                                    tmp[ Object.keys(pat)[i]] = subResult;
-                                    endResult.push(tmp);
-                                               
-                                    
+                                    //tmp[ Object.keys(pat)[i]] = subResult;
+                                   // endResult.push(tmp);
+                                   endResult += Object.keys(pat)[i] + ":" + subResult;
                                 }
                         }
-//                        console.log(endResult);
+
+
+
+                        endResult += "}"
+                       // console.log(endResult);
                         channel(endResult);
                     }).catch(function (e) {
                         logger.error('GraphRetievalError', e)

@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.header)
+                .withHeaderBackground(R.drawable.header1)
                 .addProfiles(
                         new ProfileDrawerItem().withName(userUid).withEmail(R.string.serverURL).withIcon(getResources().getDrawable(R.drawable.ic_person_black_24dp))
                 )
@@ -267,8 +267,7 @@ public class MainActivity extends AppCompatActivity {
         result.addItems(
                 new DividerDrawerItem(),
                 settings,
-                signOutItem,
-                new DividerDrawerItem()
+                signOutItem
         );
 
 
@@ -356,7 +355,6 @@ public class MainActivity extends AppCompatActivity {
                             dList.setUser(subbedTo.iterator().next());
                         }
                     }
-
 
                     userManagerEndpoint.resumeGuardActivityByVerifiedUser(workOnUser);
 
