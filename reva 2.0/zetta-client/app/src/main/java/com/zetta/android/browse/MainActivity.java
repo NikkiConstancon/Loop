@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem patient = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
         if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
             patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
-            adder = new PrimaryDrawerItem().withName(userUid).withTag(new PatientTag(userUid));
+            adder = new PrimaryDrawerItem().withName(userUid).withTag(new PatientTag(userUid)).withIcon(R.drawable.ic_profile);
             dList.setUser(getUser());
 
         }
@@ -158,10 +158,10 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        SecondaryDrawerItem signOutItem = new SecondaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut);
+        SecondaryDrawerItem signOutItem = new SecondaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut).withIcon(R.drawable.ic_sign_out);
         signOutItem.withTag(R.string.drawerNameSignOut);
 
-        SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1).withName("My Connections");
+        SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1).withName("My Connections").withIcon(R.drawable.ic_user_manage);
         settings.withTag(5);
 
 
@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
 
         for(String name : subbedTo)
         {
-            result.addItem(new PrimaryDrawerItem().withName(name).withTag(new PatientTag(name)));
+            result.addItem(new PrimaryDrawerItem().withName(name).withTag(new PatientTag(name)).withIcon(R.drawable.ic_profile));
         }
 
         result.addItems(

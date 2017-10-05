@@ -36,7 +36,7 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
             RAW: function (transmitter, msg, key, channel) {
                 var tmp = msg.nameValuePairs
                  patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
-                    PatientDataManager.getGraphPoints({
+                    dataManager.getGraphPoints({
                         Username: tmp.Username  ,
                         StartTime:  tmp.StartTime,
                         EndTime:tmp.EndTime,
