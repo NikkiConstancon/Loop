@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
 
         userManagerEndpoint.bind(this);
         pubSubBinderEndpoint.bind(this);
-        statTmpForNikkiEndpoint.bind(this);
 
         userManagerEndpoint.hardGuardActivityByVerifiedUser(workOnUser);
     }
@@ -107,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         userManagerEndpoint.unbind(this);
         pubSubBinderEndpoint.unbind(this);
-        statTmpForNikkiEndpoint.unbind(this);
     }
 
     @Override
@@ -195,42 +193,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         //create the drawer and remember the `Drawer` result object
-        Drawer result = new DrawerBuilder().withAccountHeader(headerResult)
+        final Drawer result = new DrawerBuilder().withAccountHeader(headerResult)
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-
-                        switch ((int)drawerItem.getIdentifier()){
-                            case tmpItemForAcceptId:{
-                                pubSubBinderEndpoint.pubSubRequestReply(
-                                        "rinus", PubSubBindingService.PubSubReqInfo.REPLY.ACCEPT
-                                );
-                            }
-                            case tmpItemForDeclineId:{
-                                pubSubBinderEndpoint.pubSubRequestReply(
-                                        "rinus", PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
-                                );
-                            }
-                        }
-                        //Nikki
-
-                        long start = new java.util.Date().getTime() - 1000;
-                        long end = new java.util.Date().getTime();
-
-                        JSONObject obj = new JSONObject();
-                        try {
-                            obj.put("Username", "greg");
-                            obj.put("DeviceId", "thermometer");
-                            obj.put("StartTime", start);
-                            obj.put("EndTime", end);
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        //
-
                         // do something with the clicked item :D
                         Object tag = drawerItem.getTag();
 
@@ -255,9 +223,6 @@ public class MainActivity extends AppCompatActivity {
                                 case R.string.drawerNameSettings: {
                                     Toast.makeText(cont, drawerItem.getTag().toString(), Toast.LENGTH_SHORT).show();
                                 }break;
-                                case 123:{
-                                    pubSubBinderEndpoint.pubSubBindingRequest("what@sub.com");
-                                }break;
                             }
                         }
 
@@ -273,6 +238,8 @@ public class MainActivity extends AppCompatActivity {
                 header
         );
 
+
+
         for(String name : subbedTo)
         {
             result.addItem(new PrimaryDrawerItem().withName(name).withTag(new PatientTag(name)).withIcon(R.drawable.ic_profile));
@@ -282,10 +249,7 @@ public class MainActivity extends AppCompatActivity {
                 new DividerDrawerItem(),
                 settings,
                 signOutItem,
-                new DividerDrawerItem(),
-                tmpItemForNikki,
-                tmpItemForAccept,
-                tmpItemForDecline
+                new DividerDrawerItem()
         );
 
 
@@ -383,24 +347,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
     );
-
-
-
-
-    StatTmpForNikkiEndpoint statTmpForNikkiEndpoint = new StatTmpForNikkiEndpoint();
-    public static class StatTmpForNikkiEndpoint extends RevaWebsocketEndpoint {
-        @Override
-        public String key() {
-            return "Stats";
-        }
-    }
-    public CloudAwaitObject statTmpForNikki = new CloudAwaitObject("GRAPH_POINTS") {
-        @Override
-        public Object get(Object obj, Object localMsg, CloudAwaitObject cao) {
-            Log.d("object", obj.toString());
-            return null;
-        }
-    };
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
