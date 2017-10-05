@@ -59,9 +59,16 @@ public class settingsPage extends AppCompatActivity {
         settingsListAdapter = new SettingsListAdapter(settings, new SettingsListAdapter.MyAdapterListener() {
             @Override
             public void buttonYesOnClick(View v, int position) {
-                pubSubBinderEndpoint.pubSubRequestReply(
-                        ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.ACCEPT
-                );
+                try {
+                    pubSubBinderEndpoint.pubSubRequestReply(
+                            ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.ACCEPT
+                    );
+                }catch (Exception e){
+                    Log.e(this.getClass().getName(), e.toString());
+                }
+
+//                SettingsItem item = settingsListAdapter.getSettings().get(position);
+//                reqList.remove(item);
 
                 //SettingsItem item = settingsListAdapter.getSettings().get(position);
                 //reqList.remove(item);
@@ -71,25 +78,37 @@ public class settingsPage extends AppCompatActivity {
 
             @Override
             public void buttonNoOnClick(View v, int position) {
-//                SettingsItem item = settingsListAdapter.getSettings().get(position);
-//                Log.d("del", "" + reqList.remove(item));
-//                dialog.setMessage("Rejecting the request...");
-//                dialog.show();
-                pubSubBinderEndpoint.pubSubRequestReply(
-                        ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
-                );
-                /*
-                SettingsItem item = settingsListAdapter.getSettings().get(position);
-                reqList.remove(item);
-                updateAdapter();
-                */
+                try {
+                    pubSubBinderEndpoint.pubSubRequestReply(
+                            ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
+                    );
+
+                    SettingsItem item = settingsListAdapter.getSettings().get(position);
+                    Log.d("del", "" + reqList.remove(item));
+                    dialog.setMessage("Rejecting the request...");
+                    dialog.show();
+                    pubSubBinderEndpoint.pubSubRequestReply(
+                            ((RequestItem) settingsListAdapter.getSettings().get(position)).getTitle(), PubSubBindingService.PubSubReqInfo.REPLY.DECLINE
+                    );
+
+                }catch (Exception e) {
+                    Log.e(this.getClass().getName(), e.toString());
+                }
+
             }
 
             @Override
             public void deleteOnClick(View v, int position) {
-                Log.d("here", "deleteOnClick at position" + position);
-                alert("Are you sure you would like to remove patient " + ((ExistingItem) settingsListAdapter.getSettings().get(position)).getTitle() + "?", "Delete");
-                pubSubBinderEndpoint.dropPubSubBindingAsSubscriber(((ExistingItem) settingsListAdapter.getSettings().get(position)).getTitle());
+
+                try {
+                    Log.d("here", "deleteOnClick at position" + position);
+                    alert("Are you sure you would like to remove patient " + ((ExistingItem) settingsListAdapter.getSettings().get(position)).getTitle() + "?", "Delete");
+                    pubSubBinderEndpoint.dropPubSubBindingAsSubscriber(((ExistingItem) settingsListAdapter.getSettings().get(position)).getTitle());
+
+                }catch (Exception e) {
+                    Log.e(this.getClass().getName(), e.toString());
+                }
+
             }
 
             @Override
@@ -214,7 +233,7 @@ public class settingsPage extends AppCompatActivity {
 //                        //Success
 //                        alert("Success!", "OK");
 //                    }
-                    updateAdapter();
+                    //updateAdapter();
                 }
             },
             new PubSubBindingService.PubSubInfoWorker() {
