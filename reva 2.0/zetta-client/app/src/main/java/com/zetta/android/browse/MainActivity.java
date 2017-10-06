@@ -381,8 +381,8 @@ public class MainActivity extends AppCompatActivity {
                         List<String> subscriberList,
                         List<PubSubBindingService.PubSubReqInfo> reqInfoList
                 ) {
-                    boolean isOpen = result.isDrawerOpen();
-                    result.closeDrawer();
+                    boolean isOpen = result != null && result.isDrawerOpen();
+                    if(result!=null){result.closeDrawer();}
                     if (dialog.isShowing()) {
                         dialog.dismiss();
                     }
@@ -407,7 +407,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     userManagerEndpoint.resumeGuardActivityByVerifiedUser(workOnUser);
 
-                    if(isOpen){
+                    if(result != null && isOpen){
                         result.openDrawer();
                     }
                 }
