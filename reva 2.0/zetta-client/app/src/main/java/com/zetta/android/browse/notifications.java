@@ -152,17 +152,20 @@ public class notifications extends android.support.v4.app.Fragment
 
         NotificationsObject newNotif = new NotificationsObject(title, content, res, severity);
 
-        if(list == null)
+        if(list == null || list.size() == 0)
         {
             list = new ArrayList<NotificationsObject>();
             list.add(newNotif);
 
             adapter = new NotificationsAdapter(context, list, sharedPrefId);
             rv.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
         }
         else
         {
             ArrayList<NotificationsObject> newList = new ArrayList<NotificationsObject>();
+            list.clear();
+            list.addAll(adapter.getCurrentList());
             newList.addAll(list);
             newList.add(newNotif);
             list = newList;
