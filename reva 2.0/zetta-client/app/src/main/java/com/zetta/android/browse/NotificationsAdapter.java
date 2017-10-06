@@ -1,6 +1,7 @@
 package com.zetta.android.browse;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
@@ -18,12 +19,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.zetta.android.R;
+import com.zetta.android.revaServices.NotificationsService;
 import com.zetta.android.settings.SettingsItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.GREEN;
 import static android.graphics.Color.RED;
@@ -67,13 +71,16 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     ArrayList<NotificationsObject> notifs;
     Context myCont;
+    String sharedPrefId;
 
-    NotificationsAdapter(Context context, ArrayList<NotificationsObject> notifs)
+    NotificationsAdapter(Context context, ArrayList<NotificationsObject> notifs, String myPref)
     {
         if(notifs != null) {
             myCont = context;
             this.notifs = notifs;
         }
+
+        this.sharedPrefId = myPref;
     }
 
     @Override
@@ -143,9 +150,38 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
                 notifyItemRangeChanged(pos, notifs.size());
 
+                Gson gson = new Gson();
+                String json;
+
+                //MyPref is the place holder for the username (change it with username of current user)
+                SharedPreferences saved_values = myCont.getSharedPreferences(sharedPrefId, MODE_PRIVATE);
+                SharedPreferences.Editor editor=saved_values.edit();
+                int counter = 0;
+
+                if(notifs != null) {
+                    for (int i = 0; i < notifs.size(); i++) {
+                        json = gson.toJson(notifs.get(i));
+                        editor.putString(Integer.toString(counter), json);
+                        counter++;
+                    }
+                }
+                else
+                {
+                    counter = -1;
+                }
+
+                editor.putInt("counter", counter);
+
+                editor.commit();
+
                 Toast.makeText(myCont,"Notification has been removed" ,Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public ArrayList<NotificationsObject> getCurrentList()
+    {
+        return notifs;
     }
 
     public void updateList (ArrayList<NotificationsObject> items) {

@@ -22,7 +22,6 @@ import com.zetta.android.R;
 import com.zetta.android.revaServices.NotificationsService;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -61,20 +60,6 @@ public class notifications extends android.support.v4.app.Fragment
 
         context = getActivity();
 
-        Button butn = (Button) view.findViewById(R.id.btn_test_notif);
-
-
-        butn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                addNotification("Heart Rate", "Heart rate is dropping too fast", "Heart", RED);
-                addNotification("Temperature", "Temperature is too high. Please check on the patient", "Temperature", GREEN);
-                addNotification("Glucose", "Body glucose levels are not normal. Please consider contacting a medical professional", "Glucose", YELLOW);
-                addNotification("Insulin", "Blood insulin levels far too low. Contact medical professional immediately", "Insulin", RED);
-            }
-        });
-
         rv = (RecyclerView) view.findViewById(R.id.rvNotif);
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(context);
@@ -98,7 +83,7 @@ public class notifications extends android.support.v4.app.Fragment
             }
         }
 
-        adapter = new NotificationsAdapter(context, list);
+        adapter = new NotificationsAdapter(context, list, sharedPrefId);
 
         rv.setAdapter(adapter);
 
@@ -167,30 +152,52 @@ public class notifications extends android.support.v4.app.Fragment
 
         NotificationsObject newNotif = new NotificationsObject(title, content, res, severity);
 
-        if(list == null)
+        if(list == null || list.size() == 0)
         {
             list = new ArrayList<NotificationsObject>();
             list.add(newNotif);
 
-            adapter = new NotificationsAdapter(context, list);
+            adapter = new NotificationsAdapter(context, list, sharedPrefId);
             rv.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
         }
         else
         {
             ArrayList<NotificationsObject> newList = new ArrayList<NotificationsObject>();
-            for(int i = 0; i < list.size(); i++)
-            {
-                newList.add(list.get(i));
-            }
-
+            list.clear();
+            list.addAll(adapter.getCurrentList());
+            newList.addAll(list);
             newList.add(newNotif);
-
-            adapter.updateList(newList);
-
             list = newList;
+            adapter.updateList(newList);
         }
 
-        adapter.notifyDataSetChanged();
+
+        Gson gson = new Gson();
+        String json;
+
+        //MyPref is the place holder for the username (change it with username of current user)
+        SharedPreferences saved_values = context.getSharedPreferences(sharedPrefId, MODE_PRIVATE);
+        SharedPreferences.Editor editor=saved_values.edit();
+        counter = 0;
+
+        if(list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                json = gson.toJson(list.get(i));
+                editor.putString(Integer.toString(counter), json);
+                counter++;
+            }
+        }
+        else
+        {
+            counter = -1;
+        }
+
+        editor.putInt("counter", counter);
+
+        editor.commit();
+
+        rv.smoothScrollBy(1,0);
 
         Intent dismissIntent = new Intent(context, MainActivity.class);
         dismissIntent.setAction(Intent.ACTION_DEFAULT);
@@ -325,7 +332,7 @@ public class notifications extends android.support.v4.app.Fragment
                 @Override  public void onNotification(NotificationsService.Notification note){
                     Log.d("---Notifications---Note", "here");
                     boolean isPatient = notificationsService.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
-                    notifications.this.addNotification(
+                    addNotification(
                             note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
                             note.message,
                             "?",
