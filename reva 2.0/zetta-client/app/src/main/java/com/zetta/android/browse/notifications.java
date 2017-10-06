@@ -1,6 +1,5 @@
 package com.zetta.android.browse;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,29 +7,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.zetta.android.R;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.GREEN;
@@ -77,6 +66,7 @@ public class notifications extends android.support.v4.app.Fragment
                 addNotification("Heart Rate", "Heart rate is dropping too fast", "Heart", RED);
                 addNotification("Temperature", "Temperature is too high. Please check on the patient", "Temperature", GREEN);
                 addNotification("Glucose", "Body glucose levels are not normal. Please consider contacting a medical professional", "Glucose", YELLOW);
+                addNotification("Insulin", "Blood insulin levels far too low. Contact medical professional immediately", "Insulin", RED);
             }
         });
 
@@ -135,7 +125,7 @@ public class notifications extends android.support.v4.app.Fragment
         }
         else if(resource.equalsIgnoreCase("Temperature"))
         {
-            res = R.drawable.thermometer;
+            res = R.drawable.thermometer1;
         }
         else if(resource.equalsIgnoreCase("Glucose"))
         {
@@ -143,7 +133,7 @@ public class notifications extends android.support.v4.app.Fragment
         }
         else if(resource.equalsIgnoreCase("Insulin"))
         {
-            res = R.drawable.insulin;
+            res = R.drawable.insulin1;
         }
         else if(resource.equalsIgnoreCase("Blood Pressure"))
         {

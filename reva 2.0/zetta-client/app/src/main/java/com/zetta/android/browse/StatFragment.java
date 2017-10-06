@@ -72,7 +72,7 @@ public class StatFragment extends android.support.v4.app.Fragment
         JSONObject obj = new JSONObject();
         try {
             obj.put("Username", "greg");
-            obj.put("DeviceId", "thermometer");
+            obj.put("DeviceId", "thermometer1");
             obj.put("StartTime", start);
             obj.put("EndTime", end);
         } catch (JSONException e) {

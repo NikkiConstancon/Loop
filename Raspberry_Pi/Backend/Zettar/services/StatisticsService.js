@@ -41,32 +41,22 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                         StartTime:  tmp.StartTime,
                         EndTime:tmp.EndTime,
                     }).then(function(result){
-//                        console.log(result);
-  //                     console.log(Object.keys(pat).length);
-                         var endResult = []
+                        
+                        var endResult = {};
                         for(var i= 0; i < Object.keys(pat).length - 1; i ++){
+                            
                                 if(pat[Object.keys(pat)[i]] == true){
-                                    var subResult = [];
-                                    // add device type
-                                    //go through result...
+                                    
+                                    endResult[Object.keys(pat)[i]] = [];
                                     for(var j = 0; j <  Object.keys(result).length - 1; j++){
-                                        //console.log("Device: " + result[Object.keys(result)[j]].device)
-                                        //console.log("Compare: " + Object.keys(pat)[i])
+                                        
                                         if(result[Object.keys(result)[j]].device == Object.keys(pat)[i]){
-                                            //console.log("here: ");
-                                            //console.log(result[Object.keys(result)[j]].device)
-                                            subResult.push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
+                                            
+                                            endResult[Object.keys(pat)[i]].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
                                         }
                                     }
-                                    var tmp = {};
-
-                                    tmp[ Object.keys(pat)[i]] = subResult;
-                                    endResult.push(tmp);
-                                               
-                                    
                                 }
                         }
-                        console.log(endResult);
                         channel(endResult);
                     }).catch(function (e) {
                         logger.error('GraphRetievalError', e)
