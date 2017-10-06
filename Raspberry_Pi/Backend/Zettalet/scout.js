@@ -17,13 +17,14 @@ var deviceLibrary = [];
 	deviceLibrary.push(require('./Devices/BPPulse.js'));
 */
 //Pulsioximeter
-/*
+
 	var Pulse = require('./Devices/Pulse.js');
 	deviceLibrary.push(require('./Devices/Pulse.js'));
 	var OxygenInBlood = require('./Devices/OxygenInBlood.js');
 	deviceLibrary.push(require('./Devices/OxygenInBlood.js'));
+/*
 //Electrocardiograph
-*/	var Electrocardiograph = require('./Devices/Electrocardiograph.js');
+	var Electrocardiograph = require('./Devices/Electrocardiograph.js');
 	deviceLibrary.push(require('./Devices/Electrocardiograph.js'));
 //	var ECGPulse = require('./Devices/ECGPulse.js');
 //	deviceLibrary.push(require('./Devices/ECGPulse.js'));
@@ -41,7 +42,7 @@ var deviceLibrary = [];
 	deviceLibrary.push(require('./Devices/SpirometerAirFlow.js'));
 /*
 //Scale
-*/
+
 	var scaleWeight = require('./Devices/ScaleWeight.js');
 	deviceLibrary.push(require('./Devices/ScaleWeight.js'));
 	console.log("required library");
@@ -73,17 +74,18 @@ var deviceLibrary = [];
 //Construct the scout class
 DeviceController = module.exports = function() {
   Scout.call(this);
+console.log("in rinus scout");
 }
 util.inherits(DeviceController, Scout);
 
 DeviceController.prototype.init = function(next) {
 
-
+		var self = this;
+console.log("in rinus scout");
 
 
 			console.log("before settimeout: ");
-	setTimeout(function(){
-		var self = this;
+setTimeout(function(){
 		var tempDevice;
 		for (var i = 0; i < deviceLibrary.length; i++) 
 		{
@@ -92,6 +94,7 @@ DeviceController.prototype.init = function(next) {
 			if (tempDevice != null)
 				arduinoController.addDevice(tempDevice);
 		}
+
 	  	arduinoController.onChange(function(){console.log("just got data");});
 
 
@@ -101,11 +104,11 @@ DeviceController.prototype.init = function(next) {
 	//tempDevice = self.discover(scaleWeight)
 	//bleController.addDevice(tempDevice);
   	//bleController.onChange(function(){console.log("just got bluetooth data");});
-},5000);
+},1000);
 
+console.log("in rinus scout");
+	//this.discover(heart);
 /*
-	this.discover(heart);
-
 
 
 

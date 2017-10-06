@@ -16,8 +16,8 @@ var dbHostPort = 9042;
 var keyspace = 'reva';
 
 const MAX_GLOBAL_TRY_FAILS = 1;
-const MAX_TRYS = 16;
-const TRYS_INTERVALS = 1000;
+const MAX_TRYS = 20;
+const TRYS_INTERVALS = 3000;
 var globalTryFails = 0;
 
 

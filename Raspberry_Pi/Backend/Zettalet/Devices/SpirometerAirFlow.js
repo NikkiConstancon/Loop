@@ -16,7 +16,7 @@ SpirometerAirFlow.prototype.init = function(config)
 {
     config
       .type('wired_device')
-      .name('spirometer_air_flow')
+      .name('spirometer_airflow')
       .monitor('vitals');
 }
 

@@ -1,7 +1,10 @@
 var util = require('util')
 var uuidv1 = require('uuid/v1')
 
+
+const pubSubBindingService = require('../services/PubSubBindingService')
 var Model = require('../lib/modelClass')
+const userManagerUtil = require('../userManagerUtil')
 
 var CryptoJS = require("crypto-js");
 const ENCRYPT_KEY = "xP{}Lk.x#3V2S?F2p'q{kqd[Qu{7/S-d*bzt"
@@ -14,14 +17,13 @@ function decrypt(value) {
 }
 
 
+
 var mailer = require('../lib/mailer')
 var keys = require('../lib/keys')
 var logger = require('../revaLog')
 
-class SubscriberModel extends Model {
-	constructor() {
-	    super()
-	    this.fields = {
+module.exports = {
+    fields: {
 	    	Email: {
 	                type: "text",
 	                rule: {
@@ -51,11 +53,19 @@ class SubscriberModel extends Model {
 	                    },
 	                    message: 'Relation is not included in the set of reasons.'
 	                }
-	            },
+            },
+            SubscriberList: {
+                type: "list",
+                typeDef: "<text>"
+            },
 	        PatientList     : {
 	                type: "list",
 	                typeDef: "<text>"
-	            },
+            },
+            PubSubBindingConfirmationMap: {
+                type: 'map',
+                typeDef: '<text, text>'
+            },
             RegistrationObject: {
                 type: 'map',
                 typeDef: '<text, text>',
@@ -64,42 +74,55 @@ class SubscriberModel extends Model {
                     const dbMan = require('../databaseManager')
                     var name = this.Email;
                     var context = { c: 'sending', k1: keys.userEmailEncrypt(name), k2: uuidv1() }
-                    mailer.mailEmialConfirmationUrl(this.Email, context.k1, context.k2).then(function () {
-                        context.c = 'awaiting'
-                        dbMan.models.instance.patient.update({ Username: name }, { RegistrationObject: context });
-                    }).catch(function (e) {
-                        logger.error(e)
-                        context.c = 'failed'
-                        dbMan.models.instance.patient.update({ Username: name }, { RegistrationObject: context });
-                    })
+                    //TODO fix this
+                    //mailer.mailEmialConfirmationUrl(this.Email, context.k1, context.k2).then(function () {
+                    //    context.c = 'awaiting'
+                    //    dbMan.models.instance.subscriber.update({ : name }, { RegistrationObject: context });
+                    //}).catch(function (e) {
+                    //    logger.error(e)
+                    //    context.c = 'failed'
+                    //    dbMan.models.instance.subscriber.update({ Username: name }, { RegistrationObject: context });
+                    //})
+
                     return context
                 }
+            },
+            FlagPasswordEncrypted: {
+                type: 'boolean'
             }
 	    },
-	    this.key = ["Email"]
-		this.methods = {
+	    key: ["Email"],
+        methods: {
 		    verifyPassword: function (value) {
 		        return decrypt(this.Password) === value
-		    }
-		}
-		this.after_save = function (instance, options, next) {
-		    const dbMan = require('../databaseManager')
-		    //Encrypt password
-		    dbMan.models.instance.patient.update(
-		        { Username: instance.Email },
-		        { Password: encrypt(instance.Password) },
-		        function (err) {
-		            if (err) {
-		                console.log(err); next(err)
-		            } else { next() }
-		        });
+            },
+            getPassword: function () { return this.Password },
+            addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
+            addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
+            addToSubscriberList: userManagerUtil.addToSubscriberList,
+            addToPatientList: userManagerUtil.addToPatientList,
+            removeFromSubscriberList: userManagerUtil.removeFromSubscriberList,
+            removeFromPatientList: userManagerUtil.removeFromPatientList,
+            pubSubRequestOnDecision: userManagerUtil.pubSubRequestOnDecision,
+            getPassword: function () { return this.Password },
+            getType: function () { return userManagerUtil.enum.userType.subscriber }
+        },
+        after_save: function (instance, options, next) {
+            const dbMan = require('../databaseManager')
+            //Why is express cassandra so shitty? nothing is working as expected
+            if (!instance.FlagPasswordEncrypted) {
+                dbMan.models.instance.subscriber.update(
+                    { Email: instance.Email },
+                    { Password: encrypt(instance.Password), FlagPasswordEncrypted: true },
+                    function (err) {
+                        if (err) {
+                            console.log(err); next(err)
+                        } else { next() }
+                    });
+            } else {
+                pubSubBindingService.update(instance.Email, instance.PubSubBindingConfirmationMap, instance.PatientList, instance.SubscriberList)
+                next()
+            }
+            
 		}
 	}
-}
-var thing = new SubscriberModel()
-var obj = {}
-
-for (var k in thing) {
-    obj[k] = thing[k]
-}
-module.exports = obj

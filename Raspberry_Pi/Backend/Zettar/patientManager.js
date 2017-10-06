@@ -24,6 +24,9 @@ var accessKey = "4]),`~>{CKjv(E@'d:udH6N@/G4n(}4dn]Mi"
 var keys = require('./lib/keys')
 var sharedKeys = require('../Shared/sharedKeys')
 
+
+var subscriberManager = require("./subscriberManager")
+
 /**EXAMPLE USE
  * Encrypt 
  *var ciphertext = CryptoJS.AES.encrypt('my message', 'secret key 123');
@@ -72,26 +75,29 @@ var patientManager = module.exports = {
             dbMan.try().then(function () {
                  dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
                     if (err) {
+                        err = err || { clientSafe: 'Could not find ' + _patient.Username }
+                        logger.error(err)
                         reject(err)
-                    }
-                    if(!found){
-                        var newPatient = new dbMan.models.instance.patient(_patient)
-                        newPatient.save(function (err) {
-                            if (err) {
-                                logger.error(err)
-                                reject(err)
-                            } else {
-                                logger.debug('Patient Added Successfully!')
-                                resolve(newPatient)
-                            }
-                        })
-                        //resolve(found)
+                    }{
+                        if(!found){
+                            var newPatient = new dbMan.models.instance.patient(_patient)
+                            newPatient.save(function (err) {
+                                if (err) {
+                                    logger.error(err)
+                                    reject(err)
+                                } else {
+                                    logger.debug('Patient Added Successfully!')
+                                    resolve(newPatient)
+                                }
+                            })
+                            //resolve(found)
 
-                    }else{
-                        //WARNING USER NAME IS TAKEN code goes here
-                        logger.debug('ERROR: ' + found.Username + " already exists")
-                        reject( found.Username + ' already exists')
-                        //resolve(null);
+                        }else{
+                            //WARNING USER NAME IS TAKEN code goes here
+                            logger.debug('ERROR: ' + found.Username + " already exists")
+                            reject( found.Username + ' already exists')
+                            //resolve(null);
+                        }
                     }
                 });
             }).catch((err)=>{
@@ -99,7 +105,80 @@ var patientManager = module.exports = {
             })
         })
     },
+    getDeviceMap: function(_patient){
+        return new Promise((resolve, reject) => {
+            dbMan.try().then(function () {
+                var q = {}
+                if (_patient.Email) {
+                    q.Email = _patient.Email
+                } else {
+                    q.Username = _patient.Username
+                }
+                dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
+                    if (err || !found) {
+                        err = err || { clientSafe: 'Could not find ' + _patient.Username }
+                        logger.error(err)
+                        reject(err)
+                    } else {
+                        logger.debug('Found patient: ' + found.Username)
+                        console.log(found.DeviceMap);
+                        resolve(found.DeviceMap)
+                    }
+                })
+            }).catch((err) => {
+                reject(err)
+            })
+        })
+        
+    },
+    addToDeviceMap: function(_patient, deviceName, On){
+        return new Promise((resolve, reject) => {
+            dbMan.try().then(function () {
+                //Find 
+                console.log(_patient.Username)
+                dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
+                   if (err || !found) {
+                        err = err || { clientSafe: 'Could not find ' + _patient.Username }
+                        logger.error(err)
+                        reject(err)
+                    } else {
+                        //if user does not exist
+                        if(!found){
+                            resolve("NotFound");
+                        }
+                        if(found == "undefined"){
+                            resolve("NotFound");
+                        }
+    console.log("found");
+                        var updateValue ;
+                        if(found.DeviceMap == null){
+                            //if list does not exist
+                            console.log("inner")
+                            updateValue = {};
+                            updateValue[deviceName] =  On;
+                        }else{
+                            updateValue = found.DeviceMap;
+                            //toggle value to on or off
+                            updateValue[deviceName] = On;
+                        }
+                        
+                        console.log(updateValue);
+                        // var query_object = {Username: _patient.Username};
+                        // var update_values_object = {DeviceMap: updateValue};
+                        found.DeviceMap = updateValue;
+                        found.save(function (err) {
+                            resolve(found)
+                        })
+                        // dbMan.models.instance.patient.update(query_object, update_values_object, null, function(err){
+                        //     if(err) console.log(err);
+                        //     else console.log('Yuppiie!');
+                        // });
+                    }
+                })
+            })
+        })
 
+    },
     /**
      *@brief gets a user from the database
      *
@@ -110,7 +189,7 @@ var patientManager = module.exports = {
             dbMan.try().then(function () {
                 var q = {}
                 if (_patient.Email) {
-                    q.Email = _patient.Emai
+                    q.Email = _patient.Email
                 } else {
                     q.Username = _patient.Username
                 }
@@ -161,7 +240,7 @@ var patientManager = module.exports = {
      *
      *@return a promise passing the newly added user to the function called back
      */
-    addToSubscriberList: function(_patient,_newSubscriber){
+  /*  addToSubscriberList: function(_patient,_newSubscriber){
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
                 //Validate email:
@@ -174,44 +253,48 @@ var patientManager = module.exports = {
 
                 //Find 
                 dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
-                    if (err) {
+                    if (err || ! found) {
+                        err = err || { clientSafe: 'Could not find ' + _patient.Username }
                         logger.error(err)
                         reject(err)
-                    }
-                    //now update
-                    logger.debug('Found patient: ' + found.SubscriberList)
-                    
-                    //is that subscriber already on the list?
-                    var updateValue;
-                    if(found.SubscriberList == null){
-                        updateValue = [_newSubscriber]
-                    }else{
-                        updateValue = found.SubscriberList
-                        if(updateValue.indexOf(_newSubscriber) > -1){
-                            //already on list
-                            reject(null);
-                            return null;
+                    } else {
+                        //now update
+                        logger.debug('Found patient: ' + found.SubscriberList)
+                        
+                        //is that subscriber already on the list?
+                        var updateValue;
+                        if(found.SubscriberList == null){
+                            updateValue = [_newSubscriber]
+                        }else{
+                            updateValue = found.SubscriberList
+                            if(updateValue.indexOf(_newSubscriber) > -1){
+                                //already on list
+                                reject(null);
+                                return null;
+                            }
+                            updateValue.push(_newSubscriber)
                         }
-                        updateValue.push(_newSubscriber)
+
+
+                        //store updated value
+                        console.log(updateValue)
+                        found.SubscriberList = updateValue;
+                        found.save(function(err){});
+                        // var query_object = {Username: _patient.Username};
+                        // var update_values_object = {SubscriberList: updateValue};
+                        // dbMan.models.instance.patient.update(query_object, update_values_object, null, function(err){
+                        //     if(err) console.log(err);
+                        //     else console.log('Yuppiie!');
+                        // });
+                        resolve(found)
                     }
-
-
-                    //store updated value
-                    console.log(updateValue)
-                    var query_object = {Username: _patient.Username};
-                    var update_values_object = {SubscriberList: updateValue};
-                    dbMan.models.instance.patient.update(query_object, update_values_object, null, function(err){
-                        if(err) console.log(err);
-                        else console.log('Yuppiie!');
-                    });
-                    resolve(found)
                 })
 
             }).catch((err) => {
                 reject(err)
             })
         })
-    },
+    },*/
 
 
     /**
@@ -219,47 +302,51 @@ var patientManager = module.exports = {
      *
      *@return a promise passing the newly added user to the function called back
      */
-    removeFromSubscriberList: function(_patient,_oldSubscriber){
+    /*removeFromSubscriberList: function(_patient,_oldSubscriber){
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
                   //Find 
                 dbMan.models.instance.patient.findOne({ Username: _patient.Username }, function (err, found) {
-                    if (err) {
+                    if (err || ! found) {
+                        err = err || { clientSafe: 'Could not find ' + _patient.Username }
                         logger.error(err)
                         reject(err)
-                    }
-                    //now remove
-                    logger.debug('Found patient: ' + found.SubscriberList)
-                    
-                    //is that subscriber on the list?
-                    var updateValue;
-                    if(found.SubscriberList == null){
-                        resolve("notOnList");
-                        return null;
-                    }else{
-                        updateValue = found.SubscriberList
-                        if(updateValue.indexOf(_oldSubscriber) < -1){
-                            //already on list
+                    } else{
+                        //now remove
+                        logger.debug('Found patient: ' + found.SubscriberList)
+                        
+                        //is that subscriber on the list?
+                        var updateValue;
+                        if(found.SubscriberList == null){
                             resolve("notOnList");
                             return null;
+                        }else{
+                            updateValue = found.SubscriberList
+                            if(updateValue.indexOf(_oldSubscriber) < -1){
+                                //already on list
+                                resolve("notOnList");
+                                return null;
+                            }
+                            updateValue.splice(_oldSubscriber.indexOf(_oldSubscriber),1)
                         }
-                        updateValue.splice(_oldSubscriber.indexOf(_oldSubscriber),1)
+                        //store updated value
+                        console.log(updateValue)
+                        found.SubscriberList = updateValue;
+                        found.save(function(err){});
+                        // var query_object = {Username: _patient.Username};
+                        // var update_values_object = {SubscriberList: updateValue};
+                        // dbMan.models.instance.patient.update(query_object, update_values_object, null, function(err){
+                        //     if(err) console.log(err);
+                        //     else console.log('Yuppiie!');
+                        // });
+                        resolve(found)
                     }
-                    //store updated value
-                    console.log(updateValue)
-                    var query_object = {Username: _patient.Username};
-                    var update_values_object = {SubscriberList: updateValue};
-                    dbMan.models.instance.patient.update(query_object, update_values_object, null, function(err){
-                        if(err) console.log(err);
-                        else console.log('Yuppiie!');
-                    });
-                    resolve(found)
                 })
             }).catch((err) => {
                 reject(err)
             })
         })
-    },
+    },*/
     /**
      * @brief bind the patients Zettalet's URI to the specific user
      **/
@@ -316,11 +403,20 @@ var patientManager = module.exports = {
             })
         })
     },
-    bindSubscriberListInofHook: function (userInfo, cb) {
+    triggerUpdateForSubscriberListInfoHook: function (pat, newSub) {
+        if (SubscriberListInofHookMap[pat.Username]) {
+            var list = pat.getSubscriberList()
+            if (list.indexOf(newSub) == -1) {
+                list.push(newSub)
+            }
+            SubscriberListInofHookMap[pat.Username](list)
+        }
+    },
+    bindSubscriberListInfoHook: function (userInfo, cb) {
         var userUid = userInfo.Username || userInfo.Email
         if (SubscriberListInofHookMap[userUid]) {
             try {
-                throw "@PatientManager.bindSubscriberListInofHook: already hooked for " + JSON.stringify(userInfo)
+                throw "@PatientManager.bindSubscriberListInfoHook: already hooked for " + JSON.stringify(userInfo)
             } catch (e) {
                 logger.warn(e)
             }
@@ -331,7 +427,7 @@ var patientManager = module.exports = {
             SubscriberListInofHookMap[pat.Username](pat.getSubscriberList())
         }).catch(() => { })
     },
-    unbindSubscriberListInofHook: function (userInfo, cb) {
+    unbindSubscriberListInfoHook: function (userInfo, cb) {
         var userUid = userInfo.Username || userInfo.Email
         if (SubscriberListInofHookMap[userUid]) {
             delete SubscriberListInofHookMap[userUid]

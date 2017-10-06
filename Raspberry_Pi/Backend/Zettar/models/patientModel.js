@@ -5,8 +5,11 @@
  **/
 
 
+const pubSubBindingService = require('../services/PubSubBindingService')
 var util = require('util')
 var uuidv1 = require('uuid/v1')
+
+const userManagerUtil = require('../userManagerUtil')
 
 var CryptoJS = require("crypto-js");
 const ENCRYPT_KEY = "xP{}Lk.x#3V2S?F2p'q{kqd[Qu{7/S-d*bzt"
@@ -24,11 +27,9 @@ var keys = require('../lib/keys')
 var logger = require('../revaLog')
 
 var Model = require('../lib/modelClass')
-class PatientModel extends Model {
-    constructor() {
-        super()
+module.exports = {
 //-------------------------------begin fields---------------------------------//
-        this.fields = {
+        fields: {
             Username: 'text',
             Password: {
                 type: "text",
@@ -46,6 +47,10 @@ class PatientModel extends Model {
             SubscriberList: {
                 type: "list",
                 typeDef: "<text>"
+            },
+            PatientList     : {
+                    type: "list",
+                    typeDef: "<text>"
             },
             ZettaletUuid: {
                 type: 'text'
@@ -95,6 +100,10 @@ class PatientModel extends Model {
                     message: 'Reason is not included in the set of reasons.'
                 }
             },
+            PubSubBindingConfirmationMap: {
+                type: 'map',
+                typeDef: '<text, text>'
+            },
             RegistrationObject: {
                 type: 'map',
                 typeDef: '<text, text>',
@@ -118,14 +127,18 @@ class PatientModel extends Model {
                 type: 'map',
                 typeDef: '<text, boolean>',
                 default: function () { return {} }
+            },
+            FlagPasswordEncrypted: {
+                type: 'boolean'
             }
-        }
+        },
 //-------------------------------End fields---------------------------------//
-        this.key = ["Username"]
-        this.methods = {
+        key : ["Username"],
+        methods: {
             verifyPassword: function (value) {
                 return decrypt(this.Password) === value
             },
+            getPassword: function () { return this.Password },
             connectDevice: function (deviceKey) {
                 connectDeviceStore[this.Email] || (connectDeviceStore[this.Email] = {})
                 //concurrency problem fix
@@ -155,22 +168,41 @@ class PatientModel extends Model {
                     ret.push(this.SubscriberList[i])
                 }
                 return ret
-            }
-        }
-        this.after_save = function (instance, options, next) {
+            },
+            getType: function () { return userManagerUtil.enum.userType.patient },
+            addPubSubRequestAsRequester: userManagerUtil.addPubSubRequestAsRequester,
+            addPubSubRequestAsTarget: userManagerUtil.addPubSubRequestAsTarget,
+            addToSubscriberList: userManagerUtil.addToSubscriberList,
+            addToPatientList: userManagerUtil.addToPatientList,
+            removeFromPatientList: userManagerUtil.removeFromPatientList,
+            removeFromSubscriberList: userManagerUtil.removeFromSubscriberList,
+            pubSubRequestOnDecision: userManagerUtil.pubSubRequestOnDecision
+        },
+        before_save: function (instance, options, next) {
+            //instance.Password = encrypt(instance.Password)
+            next()
+        },
+        after_save: function (instance, options, next) {
             const dbMan = require('../databaseManager')
             //Encrypt password
-            dbMan.models.instance.patient.update(
-                { Username: instance.Username },
-                { Password: encrypt(instance.Password) },
-                function (err) {
-                    if (err) {
-                        console.log(err); next(err)
-                    } else { next() }
-                });
+            //Why is express cassandra so shitty? nothing is working as expected
+            if (!instance.FlagPasswordEncrypted) {
+                dbMan.models.instance.patient.update(
+                    { Username: instance.Username },
+                    { Password: encrypt(instance.Password), FlagPasswordEncrypted: true },
+                    function (err) {
+                        if (err) {
+                            console.log(err); next(err)
+                        } else { next() }
+                    });
+            } else {
+                pubSubBindingService.update(instance.Username, instance.PubSubBindingConfirmationMap, instance.PatientList, instance.SubscriberList)
+                next()
+            }
+
         }
     }
-}
+/*
 var thing = new PatientModel()
 var obj = {}
 
@@ -179,7 +211,7 @@ for (var k in thing) {
 }
 module.exports = obj
 module.exports.class = PatientModel
-
+*/
 
 var dbMan;
 setTimeout(function () { dbMan = require('../databaseManager') }, 0)

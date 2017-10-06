@@ -7,7 +7,7 @@
  * @arg --test-keepAlive is a stdin argument that will prevent the server from killing itestlf after execution
  * @arg --test-drop is a stdin argument that will cause the database to be automatically dropped after execution
  **/
-
+require('./services/LoadServices')
 
 var zetta = require('zetta');
 var url = require('url');
@@ -23,7 +23,7 @@ var dbManager1 = require("./userManager");
 var patientManager = require("./patientManager");
 var patientDataManager = require("./patientDataManager");
 
-const realtimeDataService = require('./lib/realtimeDataService')
+const realtimeDataService = require('./services/RealtimeDataService')
 
 
 //init zetta as usual, but dont call link yet
@@ -46,22 +46,22 @@ var hook = new Hook(initializedZetta)
         topicName: 'vitals',
         cb: function (info, response) {
             realtimeDataService.publish(info, response);
-            //patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.type, TimeStamp: response.timestamp, Value: parseFloat(response.data) });
+            patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.name, TimeStamp: parseFloat(response.timestamp), Value: parseFloat(response.data) });
         },
         errcb: function (e) {
             console.log(e)
         },
         connect: function (peer) {
-            realtimeDataService.connectHopper(peer.name)
+            realtimeDataService.connectZettalet(peer.name)
         },
         disconnect: function (peer) {
-            realtimeDataService.disconnectHopper(peer.name)
+            realtimeDataService.disconnectZettalet(peer.name)
             patientManager.getPatient({ Username: peer.name }).then(function (pat) {
                 pat.disconnectAllDevices();
             })
         },
         deviceConnect: function (info) {
-            realtimeDataService.informDeviceConnect(info.from, info)
+            realtimeDataService.connectDevice(info.from, info)
             patientManager.getPatient({ Username: info.from }).then(function (pat) {
                 pat.connectDevice(info.name);
             })

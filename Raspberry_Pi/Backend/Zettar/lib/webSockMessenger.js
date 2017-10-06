@@ -29,7 +29,7 @@ const META_KEY = "|#|"
 var USER_ANONYMOUS = '--ANONYMOUS--'
 
 
-var requiered = ['connect', 'close', 'sub']
+var requiered = ['connect', 'close', 'receiver']
 
 var subServiceOptionsMap = {}
 
@@ -58,90 +58,114 @@ const webSockMessenger = module.exports = {
             }
         }
         subServiceOptionsMap[key] = options
-        MetaHandlerMap[key] = new MetaHandler
-        return MetaHandlerMap[key];
+        if (options.subListUpdater) {
+            PublisherHandlerMap[key] = new PublisherHandler(key, options.subListUpdater)
+            return PublisherHandlerMap[key]
+        } else {
+            return null
+        }
     },
-    getUserSocketContextMap: function () { return userSocketContextMap },
-    getUserSocketContext: function (user) { return userSocketContextMap[user] }
+    transmitTo: function (serviceKey, userUid, msg, errcb) {
+        for (var deviceUid in userSocketContextMap[userUid]) {
+            var context = userSocketContextMap[userUid][deviceUid]
+            var transmitter = context.subServiceMap[serviceKey]
+            transmitter.transmit(msg, errcb)
+        }
+    },
+    getTransmitterArr: function (serviceKey, userUid) {
+        var list = []
+        for (var deviceUid in userSocketContextMap[userUid]) {
+            var context = userSocketContextMap[userUid][deviceUid]
+            var transmitter = context.subServiceMap[serviceKey]
+            list.push(transmitter)
+        }
+        return list
+    }
 }
 var userSocketContextMap = {}
-var MetaHandlerMap = {}
-function MetaHandler() {
-    this.metaMap = {}
+var PublisherHandlerMap = {}
+
+function PublisherHandler(serviceKey, subListUpdater) {
+    this.serviceKey = serviceKey
     this.publisherMap = {}
+    this.subListUpdater = subListUpdater
 }
-MetaHandler.prototype.newMeta = function (metaKey) {
-    if (this.metaMap[metaKey]) {
-        return this.metaMap[metaKey]
+PublisherHandler.prototype.getPublisher = function (publisherUsername) {
+    if (!this.publisherMap[publisherUsername]) {
+        this.publisherMap[publisherUsername] = new Publisher(this, publisherUsername)
     }
-    this.metaMap[metaKey] = new Meta(metaKey, this)
-    return this.metaMap[metaKey]
-}
-MetaHandler.prototype.bindPublisher = function (metaKey, pub) {
-    this.newMeta(metaKey).bindPublisher(pub)
-}
-MetaHandler.prototype.unbindPublisher = function (metaKey, pub) {
-    this.metaMap[metaKey].unbindPublisher(pub)
+    return this.publisherMap[publisherUsername]
 }
 
-function Meta(metaKey, metaHandler) {
-    this.metaKey = metaKey
-    this.publisherMap = {}
-    this.meta = {}
-    this.metaHandler = metaHandler
-}
-Meta.prototype.bindPublisher = function (pub) {
-    this.publisherMap[pub.context.userUid] = { publisher: pub, timeout: undefined };
-    this.pullMeta(pub.context.userUid)
-}
-Meta.prototype.unbindPublisher = function (pub) {
-    delete this.publisherMap[pub.context.userUid]
-}
-Meta.prototype.getMeta = function () {
-    return this.meta
-}
-Meta.prototype.setMeta = function (obj) {
-    this.meta = obj
-    this.pushMeta()
-}
-Meta.prototype.updateMeta = function (obj) {
-    this.meta = Object.assign(obj, this.meta)
-    this.pushMeta()
-}
-Meta.prototype.pushMeta = function () {
-    for (var pupUserUid in this.publisherMap) {
-        this.pullMeta(pupUserUid)
-    }
-}
-Meta.prototype.pullMeta = function (pupUserUid) {
+function Publisher(PublisherHandler, publisherUsername) {
+    this.publisherHandler = PublisherHandler
+    this.publisherUsername = publisherUsername
+    this.subscriberList = []
+    this.subscriberTransmitterMap = {}
+    this.meta = new Meta(this)
     try {
-        var map = this.publisherMap[pupUserUid]
-        if (map) {
-            if (!map.timeout) {
-                map.timeout = setTimeout(() => {
-                    try {
-                        var publisher = this.publisherMap[pupUserUid].publisher
-                        publisher.publish({ [META_KEY]: { [this.metaKey]: this.meta } })//, null, true)
-                        map.timeout = undefined
-                    } catch (e) { }
-                }, 128)
+        this.publisherHandler.subListUpdater(this.publisherUsername, subList => {
+            this.subscriberList = subList
+        });
+    } catch (e) { logger.error(e) }
+}
+Publisher.prototype.publish = function (msg, errcb) {
+    try {
+        for (var i in this.subscriberList) {
+            var subUid = this.subscriberList[i]
+            for (var deviceUid in userSocketContextMap[subUid]) {
+                var context = userSocketContextMap[subUid][deviceUid]
+                var transmitter = context.subServiceMap[this.publisherHandler.serviceKey]
+                transmitter.transmit(msg, errcb)
+                if (transmitter.lastMetaId != this.meta.metaSetId && transmitter.transmit(this.meta.obj, errcb)) {
+                    transmitter.lastMetaId = this.meta.metaSetId
+                }
             }
         }
-    } catch (e) { logger.debug(e) }
+    } catch (e) { logger.error(e) }
 }
-Meta.prototype.free = function () {
-    this.setMeta({})
+Publisher.prototype.setMeta = function (obj) {
+    this.meta.setMeta(obj)
+}
+Publisher.prototype.setMetaField = function (key, value) {
+    this.meta.setFiled(key, value)
+}
+Publisher.prototype.getUsername = function () {
+    return this.publisherUsername
 }
 
 
-function getGreeting() {
-    return JSON.stringify({
-        init: { webSockMessenger: 'succsess' }
-    })
+
+function Meta(publisher) {
+    this.metaSetId = 0;
+    this.obj = {}
+    this.publisher = publisher
+}
+Meta.prototype.formatMsg = function(obj){
+    this.obj = { [META_KEY]: { [this.publisher.getUsername()]: obj } }
+    return this.obj 
+}
+Meta.prototype.setMeta = function (obj) {
+    this.metaSetId++
+    this.formatMsg(obj);
+    this.publisher.publish(this.obj)
+}
+Meta.prototype.setFiled = function (key, value) {
+    this.metaSetId++
+    var map = this.obj
+    if (!map[META_KEY]) {
+        map[META_KEY] = {}
+        map = this.obj[META_KEY]
+        if (!map[this.publisher.getUsername()]) {
+            map[this.publisher.getUsername()] = {}
+        }
+    }
+    this.obj[META_KEY][this.publisher.getUsername()][key] = value
+    this.publisher.publish(this.obj)
 }
 
 
-//TODO deviceUid / serviceinstanceuuid is madetory
+
 function parseAuthorizationHeader(header) {
     authField = header.authorization
     return new Promise(function (res, rej) {
@@ -161,12 +185,13 @@ function authorize(ws) {
         return parseAuthorizationHeader(ws.upgradeReq.headers).then(function (auth) {
             var userUid = auth.Username;
             var ret = { ws: ws, user: auth.Username, serviceInstanceUuid: auth.serviceInstanceUuid }
-            if (auth.Username === '' || auth.Username == USER_ANONYMOUS) {
+            if (auth.Username == '' || auth.Username == USER_ANONYMOUS) {
                 ret.user = USER_ANONYMOUS
                 res(ret)
             } else {
                 return PatientManager.getPatient(auth).then(function (pat) {
                     if (pat.verifyPassword(auth.Password)) {
+                        ret.userType = 'patient'//why should this module ceep track of who is what kind of user? there are so much that is shared by the two principle users they should have been managed as one accout as I intally proposed!
                         res(ret)
                     } else {
                         ret.user = USER_ANONYMOUS
@@ -179,8 +204,8 @@ function authorize(ws) {
                     //HONESTLY DON'T KNOW WHY THE INITIAL DESIGN WAS NOT FOLLOWED (MAYBE IT IS JUST ME THAT IS INCAPABLE TO COMPREHEND THE CURRENT LAYOUT)
                     auth.Email = auth.Username
                     return SubscriberManager.getsubscriber(auth).then(function (thisIsSoWrong) {
-                        //todo validate password
                         if (thisIsSoWrong.verifyPassword(auth.Password)) {
+                            ret.userType = 'subscriber'//why should this module ceep track of who is what kind of user? there are so much that is shared by the two principle users they should have been managed as one accout as I intally proposed!
                             res(ret)
                         } else {
                             ret.user = USER_ANONYMOUS
@@ -189,7 +214,7 @@ function authorize(ws) {
                         }
                     }).catch(function (e) {
                         ret.user = USER_ANONYMOUS
-                        ret.tmpAuthError = { text: "No such account", field: "userUid" }
+                        ret.tmpAuthError = { text: "No such account. Note that capitalization is important.", field: "userUid" }
                         res(ret)
                     })
                 })
@@ -200,17 +225,17 @@ function authorize(ws) {
     })
 }
 
-function ServicePublisher(context, key, options) {
+function ServiceTransmitter(context, key, options) {
     this.context = context
     this.enabled = options.defaultEnabled
     this.serviceBound = options.requirePersistentLink//deprected!! (for now)
     this.queue = []
     this.key = key
-    this.metaKeys = []
+    this.lastMetaId = -1
 }
-ServicePublisher.prototype.publish = function (msg, errcb, force) {
+ServiceTransmitter.prototype.transmit = function (msg, errcb, force) {
     if (!force && !this.enabled) {
-        return
+        return false
     }
     this.queue.push(msg)
     if (!this.timeOut) {
@@ -220,24 +245,15 @@ ServicePublisher.prototype.publish = function (msg, errcb, force) {
             this.timeOut = null
         }, 16)//for accumalting data befor sending
     }
+    return true
 }
-ServicePublisher.prototype.registerMeta = function (metaKey) {
-    MetaHandlerMap[this.key] && MetaHandlerMap[this.key].bindPublisher(metaKey, this)
-    this.metaKeys.push(metaKey)
-}
-
-ServicePublisher.prototype.deregisterMeta = function () {
-    for (var i in this.metaKeys) {
-        metaKey = this.metaKeys[i]
-        MetaHandlerMap[this.key] && MetaHandlerMap[this.key].unbindPublisher(metaKey, this)
-    }
-    this.metaKeys = []
-}
+ServiceTransmitter.prototype.getUserUid = function () { return this.context.userUid }
+ServiceTransmitter.prototype.getUserType = function () { return this.context.userType }
 
 function pushMessage (ws, key, msg, errcb, context) {
     msgObj = { [key]: msg }
     msg = JSON.stringify(msgObj)
-    logger.silly('on-publish', key, msg)
+    logger.silly('on-transmit', key, msg)
     if (errcb) {
         ws.send(msg, errcb)
     } else {
@@ -258,13 +274,14 @@ function UserSocketContext(clientBindingInfo) {
     this.userUid = clientBindingInfo.user
     this.deviceUid = clientBindingInfo.serviceInstanceUuid
     this.subServiceMap = {}
+    this.userType = clientBindingInfo.userType
     var tmpAuthError = clientBindingInfo.tmpAuthError
     tmpAuthError && (this.tmpAuthError = tmpAuthError)
     if (userSocketContextMap[this.userUid] && userSocketContextMap[this.userUid][this.deviceUid]) {
 
         var subServiceMap = userSocketContextMap[this.userUid][this.deviceUid].subServiceMap
         for (var key in subServiceMap) {
-            subServiceOptionsMap[key].close(userSocketContextMap[this.userUid][this.deviceUid].publishers[key])
+            subServiceOptionsMap[key].close(userSocketContextMap[this.userUid][this.deviceUid].transmitters[key])
         }
        // userSocketContextMap[this.userUid][this.deviceUid].ws.close()
        // delete userSocketContextMap[this.userUid][this.deviceUid]
@@ -273,33 +290,39 @@ function UserSocketContext(clientBindingInfo) {
         c = logger.warn('@WebSocketMessenger$userSocketContext:userSocketContextMap duplicate keys', clientBindingInfo)
         clientBindingInfo.ws = ws
         ws.send(JSON.stringify({ RCC: { ERROR: 'DUP_DEVICE_UID' } }))
-        ws.close()
+        setTimeout(()=>ws.close(), 2000)
         return
     }
     this.ws = ws
     userSocketContextMap[this.userUid] || (userSocketContextMap[this.userUid] = {})
     userSocketContextMap[this.userUid][this.deviceUid] = this;
 
-    this.publishers = {}
+    this.transmitters = {}
     this.rcc_service_bound = false
     for (var key in subServiceOptionsMap) {
-        this.subServiceMap[key] = new ServicePublisher(this, key, subServiceOptionsMap[key])
-        subServiceOptionsMap[key].connect(this.subServiceMap[key])
+        var transmitter = new ServiceTransmitter(this, key, subServiceOptionsMap[key])
+        this.subServiceMap[key] = transmitter
+        subServiceOptionsMap[key].connect(transmitter)
     }
     ws.on('message', message => {
-        //TODO set publisher to be users socket.send
+        //TODO set transmitter to be users socket.send
         logger.debug('on-message', message)
         try {
             var json = JSON.parse(message)
             for (var key in json) {
-                var subscriber = subServiceOptionsMap[key].sub
+                var subscriber = subServiceOptionsMap[key].receiver
                 if (subscriber) {
-                    var publisher = this.subServiceMap[key]
+                    var transmitter = this.subServiceMap[key]
                     if (json[key] instanceof Array) {
                         for (var msgNum = 0; msgNum < json[key].length; msgNum++) {
-                            subscriber(this.subServiceMap[key], json[key][msgNum]);
+                            if (subServiceOptionsMap[key].channels instanceof Object && json[key][msgNum][CHANNEL_KEY]) {
+                                DispatchChannels(subServiceOptionsMap[key].channels, this.subServiceMap[key], json[key][msgNum])
+                            } else {
+                                subscriber(this.subServiceMap[key], json[key][msgNum]);
+                            }
                         }
                     } else {
+                        throw("Server cannot prase outterm essage ojects that is not in an array on: " + message)
                         subscriber(this.subServiceMap[key], json[key]);
                     }
                 } else {
@@ -331,9 +354,6 @@ function UserSocketContext(clientBindingInfo) {
 }
 UserSocketContext.prototype.deleteContext = function () {
     try {
-        for (var key in subServiceOptionsMap) {
-            this.subServiceMap[key].deregisterMeta()
-        }
         delete userSocketContextMap[this.userUid][this.deviceUid]
     } catch (e) { }
 }
@@ -358,6 +378,36 @@ function buildError(key, errObject) {
     return { ERROR: { [key]: errObject } }
 }
 
+function DispatchChannels(channel, transmitter, rootMsg, channeler) {
+    var obj = rootMsg[CHANNEL_KEY]
+    if (obj) {
+        try {
+            for (var key in obj) {
+                for (var id in obj[key]) {
+
+                    function channeler(msg, errcb) {
+                        transmitter.transmit({ [CHANNEL_KEY]: { [id]: msg } }, errcb)
+                    }
+                    var msg = obj[key][id]
+                    try {
+                        DispatchChannelKeys(channel[key], transmitter, msg, channeler)
+                    }catch(e){
+                        logger.error("invalid channel or key with: " + key + "\n", e)
+                    }
+                }
+            }
+        } catch (e) {
+            logger.debug(e, obj)
+        }
+    }
+}
+
+function DispatchChannelKeys(handlers, transmitter, rootMsg, channeler) {
+    for (var key in rootMsg) {
+        var msg = rootMsg[key]
+        handlers[key](transmitter, msg, key, channeler)
+    }
+}
 
 
 
@@ -365,52 +415,51 @@ function buildError(key, errObject) {
 
 var RCC_EXCLUDE_PAUS_RESUME_MAP = { RCC: true, UserManager: true }
 webSockMessenger.attach('RCC', {
-    connect: function (publisher) {
-        publisher.publish({ CONNECTED: { USER_UID: publisher.context.userUid, ERROR: publisher.context.tmpAuthError }, RCC_REDIRECT: ["UserManager"] })
-        delete publisher.context.tmpAuthError;
+    connect: function (transmitter) {
+        transmitter.transmit({ CONNECTED: { USER_TYPE: transmitter.getUserType(), USER_UID: transmitter.context.userUid, ERROR: transmitter.context.tmpAuthError }, RCC_REDIRECT: ["UserManager"] })
+        delete transmitter.context.tmpAuthError;
     },
-    close: function (publisher) {
+    close: function (transmitter) {
     },
-    sub: function (publisher, obj) {
+    receiver: function (transmitter, obj) {
         logger.info("RCC", obj)
         try {
             var boundCount = obj.SERVICE_BOUND_COUNT
             if (boundCount !== undefined) {
                 if (boundCount <= 1) {
-                    publisher.context.rcc_service_bound = false
+                    transmitter.context.rcc_service_bound = false
                 } else {
-                    publisher.context.rcc_service_bound = true
+                    transmitter.context.rcc_service_bound = true
                 }
             }
             if (obj.PAUSE_RESUME) {
                 try {
                     var key = obj.PAUSE_RESUME.SERVICE_KEY
                     if (!RCC_EXCLUDE_PAUS_RESUME_MAP[key]) {
-                        var servicePlisher = publisher.context.subServiceMap[key]
-                        servicePlisher.enabled = Boolean(obj.PAUSE_RESUME.ENABLEMENT).valueOf()
-                        for (var i in servicePlisher.metaKeys) {
-                            var metaKey = servicePlisher.metaKeys[i]
-                            var metaObj = MetaHandlerMap[servicePlisher.key].metaMap[metaKey]
-                            for (var i in servicePlisher.metaKeys) {
-                                metaObj && metaObj.pullMeta(servicePlisher.metaKeys[i])
-                            }
-                        }
+                        var serviceTransmitter = transmitter.context.subServiceMap[key]
+                        serviceTransmitter.enabled = Boolean(obj.PAUSE_RESUME.ENABLEMENT).valueOf()
+                        serviceTransmitter.lastMetaId = -1
                     }
                 } catch (e) {
                     logger.error('WebSocketMessenger$RCC#obj.PAUS_RESUME: ', e)
                 }
             }
+            var key
             if (obj.SERVICE_BINDING) {
                 try {
-                    var key = obj.SERVICE_BINDING.SERVICE_KEY
+                    key = obj.SERVICE_BINDING.SERVICE_KEY
 
-                    if (subServiceOptionsMap[publisher.key].requirePersistentLink) {
-                        publisher.context.subServiceMap[key].serviceBound = true
+                    if (subServiceOptionsMap[transmitter.key].requirePersistentLink) {
+                        transmitter.context.subServiceMap[key].serviceBound = true
                     } else {
-                        publisher.context.subServiceMap[key].serviceBound = Boolean(obj.PAUSE_RESUME.ENABLEMENT).valueOf()
+                        transmitter.context.subServiceMap[key].serviceBound = Boolean(obj.PAUSE_RESUME.ENABLEMENT).valueOf()
+                    }
+                    if (transmitter.context.subServiceMap[key].serviceBound){
+                        var serviceTransmitter = transmitter.context.subServiceMap[key]
+                        subServiceOptionsMap[key].onEnable && subServiceOptionsMap[key].onEnable(serviceTransmitter);
                     }
                 } catch (e) {
-                    logger.error('WebSocketMessenger$RCC#obj.SERVICE_BINDING: ', e)
+                    logger.error('WebSocketMessenger$RCC#obj.SERVICE_BINDING: on key: ' + key + '\n', e)
                 }
             }
         } catch (e) {
@@ -423,150 +472,4 @@ webSockMessenger.attach('RCC', {
 
 
 
-function DispatchChannels(handlers, publisher, rootMsg, channeler) {
-    var obj = rootMsg[CHANNEL_KEY]
-    if (obj) {
-        try {
-            for (var key in obj) {
-                for (var id in obj[key]) {
 
-                    function channeler(msg, errcb) {
-                        publisher.publish({ [CHANNEL_KEY]: { [id]: msg } }, errcb)
-                    }
-                    var msg = obj[key][id]
-                    handlers[key](publisher, msg, key, channeler)
-                }
-            }
-        } catch (e) {
-            logger.debug(e, obj)
-        }
-    }
-}
-
-function DispatchMessages(handlers, publisher, rootMsg, channeler) {
-    try {
-        for (var key in rootMsg) {
-            var msg = rootMsg[key]
-            handlers[key](publisher, msg, key, channeler)
-        }
-    } catch (e) {
-        logger.debug(e, rootMsg)
-    }
-}
-
-
-
-var userManagerChannels = {
-    REGISTER: function (publisher, msg, key, channeler) {
-        DispatchMessages({
-
-            VALIDATE_EMAIL: function (publisher, msg, key) {
-                channeler({ PASS: true })
-                //channeler({ PASS: false, ERROR: "This email address is not available" })
-            },
-            REGISTER_PATIENT: function (publisher, msg, key) {
-                var obj = msg;
-                //TODO: Move to patiantManager
-                function deserialize(obj) {
-                    var test = require('../models/patientModel').fields
-                    for (var key in test) {
-                        switch (test[key].type) {
-                            case 'int': { obj[key] && (obj[key] = parseInt(obj[key])) } break
-                            case 'float': { obj[key] && (obj[key] = parseFloat(obj[key])) } break
-                        }
-                    }
-                }
-                deserialize(obj)
-                PatientManager.getPatient(obj)
-                    .then(function () {
-                        channeler({ PATIENT_ERROR: 'This username has been taken', PATIENT_PASS: false })
-                    }).catch(function () {
-                        return PatientManager.addPatient(obj).then(function (pat) {
-                            channeler({ PATIENT_PASS: true })
-                        }).catch(function (e) {
-                            channeler({ PATIENT_ERROR: e.message || e, PATIENT_PASS: false })
-                        })
-                    }).catch(function (e) {
-                        logger.error('@webSockMessenger$UserManager#sub:KEY_REGISTER_USER', e)
-                        channeler({ PATIENT_ERROR: 'something went wrong', PATIENT_PASS: false })
-                    })
-            },
-            REGISTER_NON_PATIENT: function (publisher, msg, key) {
-                var obj = msg;
-                //TODO: Move to patiantManager
-                function deserialize(obj) {
-                    var test = require('../models/patientModel').fields
-                    for (var key in test) {
-                        switch (test[key].type) {
-                            case 'int': { obj[key] && (obj[key] = parseInt(obj[key])) } break
-                            case 'float': { obj[key] && (obj[key] = parseFloat(obj[key])) } break
-                        }
-                    }
-                }
-                deserialize(obj)
-                SubscriberManager.getsubscriber(obj)
-                    .then(function () {
-                        //ugly prot i.e. copy and paste mostly form patient
-                        channeler({ NON_PATIENT_ERROR: 'This email has been taken', NON_PATIENT_PASS: false })
-                    }).catch(function () {
-                        return SubscriberManager.addSubscriber(obj).then(function (pat) {
-                            channeler({ NON_PATIENT_PASS: true })
-                        }).catch(function (e) {
-                            channeler({ NON_PATIENT_ERROR: e.message || e, NON_PATIENT_PASS: false })
-                        })
-                    }).catch(function (e) {
-                        logger.error('@webSockMessenger$UserManager#sub:KEY_REGISTER_USER', e)
-                        channeler({ NON_PATIENT_ERROR: 'something went wrong', NON_PATIENT_PASS: false })
-                    })
-            }
-        }, publisher, msg)
-    }
-}
-
-webSockMessenger.attach('UserManager', {
-    connect: function (publisher) {
-        //publisher.publish("--HELLO-- ");
-    },
-    close: function (publisher) {
-    },
-    sub: function (publisher, obj) {
-        DispatchChannels(userManagerChannels, publisher, obj)
-
-        /*
-        if (obj.TEST_EMAIL_AVAILABLE) {
-            //obj.TEST_EMAIL_AVAILABLE = 'This email address is not available'
-            obj.TEST_EMAIL_AVAILABLE = ''
-            publisher.publish(obj);
-        } else if (obj.KEY_REGISTER_USER) {
-            delete obj.KEY_REGISTER_USER
-            //TODO: Move to patiantManager
-            function deserialize(obj) {
-                var test = require('../models/patientModel').fields
-                for (var key in test) {
-                    switch (test[key].type) {
-                        case 'int': { obj[key] && (obj[key] = parseInt(obj[key])) } break
-                        case 'float': { obj[key] && (obj[key] = parseFloat(obj[key])) } break
-                    }
-                }
-            }
-            deserialize(obj)
-            PatientManager.getPatient(obj)
-                .then(function () {
-                    publisher.publish({ KEY_REGISTER_USER: { Username: 'This username has been taken' } })
-                }).catch(function () {
-                    return PatientManager.addPatient(obj).then(function (pat) {
-                        publisher.publish({ KEY_REGISTER_USER: true })
-                    }).catch(function (e) {
-                        publisher.publish({ KEY_REGISTER_USER: { ERROR: e.message || e } })
-                    })
-                }).catch(function (e) {
-                    logger.error('@webSockMessenger$UserManager#sub:KEY_REGISTER_USER', e)
-                    publisher.publish({ KEY_REGISTER_USER: { ERROR: 'something went wrong' } })
-                })
-        }
-        logger.info(obj);
-        */
-    },
-    requirePersistentLink: true,
-    defaultEnabled: true
-})

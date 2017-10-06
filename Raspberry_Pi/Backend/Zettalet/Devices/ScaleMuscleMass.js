@@ -16,7 +16,7 @@ ScaleMuscleMass.prototype.init = function(config)
 {
     config
       .type('bluetooth_device')
-      .name('scale_MuscleMass')
+      .name('scale_muscle_mass')
       .monitor('vitals');
 }
 

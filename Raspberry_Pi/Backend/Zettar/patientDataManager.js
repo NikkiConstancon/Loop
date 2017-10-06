@@ -33,15 +33,16 @@ var patientDataManager = module.exports = {
     getInstance: function (name) {
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
-                dbMan.models.instance.patientData.findOne({ name: name }, function (err, found) {
+                dbMan.models.instance.patientData.findOne({ PatientUsername: name }, function (err, found) {
                     if (err) {
                         logger.error(err)
                         reject(err)
+                    } else {
+                        //Note that returned variable john here is an instance of your model,
+                        //so you can also do john.delete(), john.save() type operations on the instance.
+                        logger.debug('Found Instance: ' + found.PatientUsername)
+                        resolve(found)
                     }
-                    //Note that returned variable john here is an instance of your model,
-                    //so you can also do john.delete(), john.save() type operations on the instance.
-                    logger.debug('Found Instance: ' + found.name)
-                    resolve(found)
                 })
             }).catch((err) => {
                 reject(err)
@@ -81,22 +82,38 @@ TimeStamp*/
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
 
-
+console.log("Getting Graph Points");
+                var minimum = Number.POSITIVE_INFINITY;
+                var maximum = Number.NEGATIVE_INFINITY;
+                var avg = 0.0;
+                var count = 0;
                 var result = []
-
+                var start = _info.StartTime;
+                var end = _info.EndTime;
+                console.log(start);
+                console.log(end);
                 var query = {
                     PatientUsername: _info.Username,
-                    DeviceID: _info.DeviceId,
-                    TimeStamp : { '$gt':_info.StartTime, '$lte':_info.EndTime }
+                    //DeviceID: _info.DeviceId,
+                    TimeStamp : { '$gt':start, '$lte':end}
                 }
-
                 dbMan.models.instance.patientData.stream(query, {raw: true, allow_filtering: true}, function(data){
                     //data is an array of plain objects satisfying the query conditions above
                     var row;
                     while (row = data.readRow()) {
-                        result.push({ x: row.TimeStamp , y : row.Value})
+                         count ++;
+                        avg += row.Value;
+                        if(row.Value > maximum)
+                            maximum = row.Value;
+                        
+                        if(row.Value < minimum)
+                            minimum = row.Value;
+
+                        result.push({ x: row.TimeStamp , y : row.Value, device: row.DeviceID})
                     }
 
+                    result.push({Min: minimum, Max: maximum, Avg: (avg/count) })
+                    
                     //need to sort it.
 
                     result.sort(function(first, second) {
@@ -104,49 +121,20 @@ TimeStamp*/
                     });
 
                     //need to find averages according to the interval
-                    console.log(result);
-
-
-                 /*   var endInterval = new Date(_info.StartTime) //marks the end of the current interval
-                    //var currentTime = new Date(_info.StartTime) //marks the 
-                    var tempEndDate = new Date(_info.EndTime)
-                    var tempResult = [];
-
-                    tempResult.push({x: endInterval, y: 0})
-
-                    //add the interval to the time
-                    addMinutes(endInterval,_info.Interval)
-
-
-                    //Keep it up until we boom
-                    while(endInterval < tempEndDate){
-
-                    }*/
-
-
+                    //console.log("Result: ");
+                    //console.log(result);
+                    console.log("END")
                     resolve(result);
 
                 }, function(err){
                     reject(err);
                     //emitted when all rows have been retrieved and read
                 });
-
-
-
-
             }).catch((err) => {
                 reject(err)
             })
         })
 
 
-    }
+    },
 }
-/*models.instance.Person.stream({Name: 'John'}, {raw: true}, function(reader){
-    var row;
-    while (row = reader.readRow()) {
-        //process row
-    }
-}, function(err){
-    //emitted when all rows have been retrieved and read
-});*/

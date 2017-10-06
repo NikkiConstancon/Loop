@@ -6,6 +6,7 @@ var query = module.exports.query ={
     Password: 'Password',
     Email: "COS332.Marthinus@gmail.com",
     Address: '42 Dale Avenue Hempton 1765',
+    SubscriberList: ["nikki"],
     Age: 42,
     Weight: 23,
     Height: 32,
@@ -33,6 +34,7 @@ query = module.exports.query = {
     Password: 'Password',
     Email: "COS332.Marthinus@gmail.com",
     Address: '42 Dale Avenue Hempton 1765',
+    SubscriberList: ["greg"],
     Age: 42,
     Weight: 23,
     Height: 32,
@@ -56,6 +58,7 @@ PatientManager
     query = module.exports.query = {
     Username: 'rinus',
     Password: 'Password',
+    SubscriberList: ["rinus"],
     Email: "COS332.Marthinus@gmail.com",
     Address: '42 Dale Avenue Hempton 1765',
     Age: 42,
@@ -78,7 +81,33 @@ PatientManager
 
         })
 
+    query = module.exports.query = {
+    Username: 'juan',
+    Password: 'Password',
+    SubscriberList: ["juan"],
+    Email: "COS332.Marthinus@gmail.com",
+    Address: '42 Dale Avenue Hempton 1765',
+    Age: 42,
+    Weight: 23,
+    Height: 32,
+    Reason: 'Disability'
+}
 
+PatientManager
+    .addPatient(query).catch(function (err) {
+        //console.info(err)
+    }).then(function () {
+        PatientManager.getPatient({ Username: 'juan' }).then(function (pat) {
+            if (process.argv.indexOf('--verbose') != -1) {
+                console.log(query)
+                pat.printFields()
+            }
+        })
+    }).catch(function (e) {
+
+        })
+    
+    
 SubscriberManager
     .addSubscriber({
         Email: 'what@sub.com',

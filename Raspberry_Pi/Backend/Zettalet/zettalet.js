@@ -1,7 +1,6 @@
 var zetta = require('zetta');
-var scout = require('./scout.js');
-//var scout = require('zetta-serial-device-driver');
-//var display = require('./display.js');
+var scout = require('./nikkiScout.js');
+var display = require('./display.js');
 
 
 var port = Math.floor(Math.random() * (65535 - 1024) + 1024)
@@ -12,9 +11,9 @@ if (process.argv.indexOf('--test') >= 0) {
 }
 
 zetta()
-    .name("juan")//.name(require('./name'))
+    .name("granny")//.name(require('./name'))
 	.use(scout)
-//	.use(display)
+	.use(display)
     .link(linkAddress)
     .listen(port, function(){
 	});

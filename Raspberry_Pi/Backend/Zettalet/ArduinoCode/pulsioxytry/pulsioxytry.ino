@@ -36,6 +36,243 @@ uint8_t getPulsioximeterMicro() code is in the public domain.
 SoftwareSerial mySerial(8, 9); // RX, TX
 
 uint8_t getPulsioximeterMicro();
+void spo2_micro_send_init_frame();
+
+uint8_t getStatusPulsioximeterGeneral()
+{
+  //habilito UART y vacio contenido de la uart anterior
+
+  //control.SerialFlush();
+
+  //Envio trama inicial
+  spo2_micro_send_init_frame();
+  
+  uint8_t buffer_uart[100];
+  memset(buffer_uart, 0x00, sizeof(buffer_uart));
+  uint8_t i = 0;
+  bool exit_while = 0;
+  unsigned long previous = millis();
+  //capturo buffer tras haberle enviado el mensaje de inicio
+  while (((millis() - previous) < 5) && exit_while == 0)
+  {
+    if (mySerial.available() > 0)
+    {
+      buffer_uart[i] = mySerial.read();
+      i++;
+      //No escribir mas alla de mi buffer, chafaria otras cosas indeterminadas
+      if (i == 100)
+      {
+        exit_while = 1;
+      }
+    }
+
+    //avoid millis overflow problem after approximately 50 days
+    if ( millis() < previous ) previous = millis();
+  }
+
+  /*
+    for (int i = 0; i < 100; i++)
+    {
+    Serial.print("Byte ");
+    Serial.print(i);
+    Serial.print(":");
+    Serial.println(buffer_uart[i], HEX);
+
+    }
+  */
+
+  //Primero compruebo si el buffer esta vacio por completo
+  bool empty_buffer = 1;
+
+  for (uint8_t j = 0; j < 100; j++)
+  {
+    if (buffer_uart[j] != 0)
+    {
+      empty_buffer = 0;
+      break;
+    }
+  }
+
+  if (empty_buffer == 1)
+  {
+    return 0;
+  }
+
+
+  //No buscar hasta el final del buffer, si la cadena ocupa 4 bytes, solo buscar hasta final menos 4
+  for (uint8_t j = 0; j < 100 - 4; j++)
+  {
+    //Mensaje de inicio que contesta spo2 micro
+    if (buffer_uart[j] == 0x0C)
+    {
+      if (buffer_uart[j + 1] == 0x80)
+      {
+        if (buffer_uart[j + 2] == 0x0C)
+        {
+          if (buffer_uart[j + 3] == 0x80)
+          {
+            //Serial.println("Razon 1");
+            return 1;
+          }
+        }
+      }
+    }
+
+
+    //Segundo Mensaje de inicio que contesta spo2 micro
+    if (buffer_uart[j] == 0x02)
+    {
+      if (buffer_uart[j + 1] == 0x80)
+      {
+        if (buffer_uart[j + 2] == 0x80)
+        {
+          if (buffer_uart[j + 3] == 0xa0)
+          {
+            //Serial.println("Razon 2");
+            return 1;
+          }
+        }
+      }
+    }
+
+
+
+    //Tercer Mensaje que contesta spo2 micro si ya esta iniciado de antes
+    //entender un mensaje de dato que de micro directamente
+    //no solo el de entrada, porque podria pillarlo arrancado ya
+    
+    //Init byte in real time data package is 0x01 (bit 7 is 0)
+    //The next 8 bytes always have bit 7 = 1
+
+    //Detect init byte of a real time data package
+        if (buffer_uart[j] == 0x01)
+        {
+          if ((buffer_uart[j + 1] & 0b10000000) == 0x80) //bit 7 must be 1
+      { 
+        
+       if ((buffer_uart[j + 2] & 0b10000000) == 0x80) //bit 7 must be 1
+       {
+        if ((buffer_uart[j + 3] & 0b10000000) == 0x80) //bit 7 must be 1
+          { 
+          
+          if ((buffer_uart[j + 4] & 0b10000000) == 0x80) //bit 7 must be 1
+              { 
+            
+              if ((buffer_uart[j + 5] & 0b10000000) == 0x80) //bit 7 must be 1
+                  { 
+              
+              if ((buffer_uart[j + 6] & 0b10000000) == 0x80) //bit 7 must be 1
+                       { 
+                 
+                 if ((buffer_uart[j + 7] & 0b10000000) == 0x80) //bit 7 must be 1
+                           { 
+                   
+                   if ((buffer_uart[j + 8] & 0b10000000) == 0x80) //bit 7 must be 1
+                               { 
+         
+                     //Detect init byte of the next real time data package
+                     if (buffer_uart[j + 9] == 0x01)
+                     {
+                       //Serial.println("Razon 3");
+                                            return 1;
+                     }
+                   }
+                 } 
+               }       
+            }        
+          }          
+          }
+       } 
+       }
+          
+        }
+  
+  }
+
+
+  //Si despues del bucle anterior sigo aqui, es que hay algo no reconocido conectado
+  //podria ser el sensor mini asi que voy a comprobarlo
+
+  memset(buffer_uart, 0x00, sizeof(buffer_uart));
+  i = 0;
+  exit_while = 0;
+
+  //capturo buffer
+  while (((millis() - previous) < 100) && exit_while == 0)
+  {
+    if (mySerial.available() > 0)
+    {
+      buffer_uart[i] = mySerial.read();
+      i++;
+      //No escribir mas alla de mi buffer, chafaria otras cosas indeterminadas
+      if (i == 100)
+      {
+        exit_while = 1;
+      }
+    }
+
+    //avoid millis overflow problem after approximately 50 days
+    if ( millis() < previous ) previous = millis();
+  }
+
+  /*
+    for (int i = 0; i < 100; i++)
+    {
+    Serial.print("Byte ");
+    Serial.print(i);
+    Serial.print(":");
+    Serial.println(buffer_uart[i], HEX);
+
+    }
+  */
+
+  //Busco la estructura de paquete del SPO2 mini
+  for (uint8_t j = 0; j < 100 - 4; j++)
+  {
+    //Hago mascara para solo mirar el primer bit del byte
+
+    //si es "1", chequear el del siguiente byte
+    if ((buffer_uart[j] & 0b10000000) != 0)
+    {
+      //si entro, es que si era 1
+
+      //si es "0", chequear el del siguiente byte
+      if ((buffer_uart[j + 1] & 0b10000000) == 0)
+      {
+        //si entro, es que si era 0
+       
+        //si es "0", chequear el del siguiente byte
+        if ((buffer_uart[j + 2] & 0b10000000) == 0)
+        {
+          //si entro, es que si era 0
+   
+          //si es "0", chequear el del siguiente byte
+          if ((buffer_uart[j + 3] & 0b10000000) == 0)
+          {
+            //si entro, es que si era 0
+
+            //si es "0", chequear el del siguiente byte
+            if ((buffer_uart[j + 4] & 0b10000000) == 0)
+            {
+              //si entro, es que si era 0
+            
+              //si es "0", chequear el del siguiente byte
+              if ((buffer_uart[j + 5] & 0b10000000) != 0)
+              {
+                //si entro, es que si era 1, he encontrado un paquete entero de spo2 mini
+                return 2;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return 0;
+}
+
+
 void spo2_micro_send_init_frame()
 {
   byte m1[] = {0x7D, 0x81};
@@ -191,15 +428,17 @@ void setup() {
   Serial.println("Goodnight moon!");
 
   // set the data rate for the SoftwareSerial port
-  mySerial.begin(115200s);
+  mySerial.begin(115200);
 }
 
 void loop() { // run over and over
+
   Serial.print("status is: ");
-  Serial.println(getPulsioximeterMicro(), HEX  );
-  if (mySerial.available())
-  {
-    Serial.println("gotsomething");
+  Serial.println(getStatusPulsioximeterGeneral(), HEX  );
+  getPulsioximeterMicro();
+  //if (mySerial.available())
+  //{
+  //  Serial.println("gotsomething");
   //spo2_micro_send_init_frame();
    // while (mySerial.available()) 
    // { 
@@ -207,13 +446,14 @@ void loop() { // run over and over
    //}
 
     
-      Serial.println();
-  }
+    //  Serial.println();
+  //}
 
 //////////////////
 //mySerial.println("heyyy");
-    Serial.print("data: ");
+    Serial.print("PULSE");
     Serial.println(pulsioximeterData.BPM);
-    pulsioximeterData.O2;
-  delay(1000);
+    Serial.print("OXYO2");
+    Serial.println(pulsioximeterData.O2);
+  delay(500);
 }

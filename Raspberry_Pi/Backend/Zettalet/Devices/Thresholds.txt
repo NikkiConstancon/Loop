@@ -1,0 +1,26 @@
+	Device							Min		Max
+
+Blood Pressure:
+	blood_pressure_pulse_monitor	60		100
+	diastolic_pressure_monitor		60		79
+	systolic_pressure_monitor		90		119
+
+Pulsioximeter:
+	blood_oxygen_monitor			75		100
+	pulse_monitor					60		100
+
+Electrocardiograph:
+	electrocardiogram_signal		0		6
+
+Scale:
+	scale_body_fat					18		31
+	scale_body_water				45		65
+	scale_calories					900		1000
+	scale_bone						45		65
+	scale_muscle_mass				13		21	
+	scale_visceral_fat				0		13
+	scale_weight					45		200
+
+Spirometer:
+	spirometer_airflow				376		525
+	spirometer_air_volume			2		5

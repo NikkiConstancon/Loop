@@ -3,36 +3,20 @@ const Readline = SerialPort.parsers.Readline;
 const parser = new Readline();
 const portName = '/dev/ttyACM0';
 
-
-
 var ArduinoController = module.exports = function() 
-{	
-	this.data = 0;	
+{
+	
+	this.data = 0;
+	
 	this.toMonitor = 0;
 	this.devices = [];
-	this.connected = false;
-
 	this.port = new SerialPort(portName, {
-			baudRate: 9600, autoOpen: false
-		});	
-	this.port.pipe(parser);	
-}
-
-ArduinoController.prototype.connect = function()
-{
-	var self = this;
-	if (!self.port.isOpen)
-	{
-		self.port.open(function(err){
-			console.log("Error: Could not connect. Plug in arduino to USB port: " + portName);
-			self.connected = false;
-		});
-	}
-	else if (self.connected == false)
-	{			
-		self.connected = true;
-		console.log("Successfully connected to: " + portName);	
-	}
+		baudRate: 9600
+	});
+	this.port.pipe(parser);
+//console.log("in controller constructor");
+	
+	
 }
 
 ArduinoController.prototype.addDevice = function(newDevice)
@@ -42,7 +26,10 @@ ArduinoController.prototype.addDevice = function(newDevice)
 
 ArduinoController.prototype.onChange = function(cb)
 {
+	
 	var self = this;
+	
+//	console.log("\tin onChange: " + self.data);
 	parser.on('data', function (data) {
 		console.log('Data from arduino:', data);
 		if (data.length > 5 && data.length < 10)
@@ -54,6 +41,8 @@ ArduinoController.prototype.onChange = function(cb)
 			for (var i = 0; i < self.devices.length; i++) {
 				self.devices[i].setVitals(self.toMonitor, self.data);
 			};
+			//self.devices[0].setVitals(self.toMonitor, self.data);
+			//console.log("device data changed to: " + self.devices[0].vitals);
 		}
 		cb();
 	});	

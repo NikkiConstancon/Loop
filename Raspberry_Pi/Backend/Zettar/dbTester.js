@@ -7,7 +7,7 @@
 
 // var dbManager = require("./databaseManager");
 // var dbManager1 = require("./dataManager");
-var PatientManager = require("./patientManager");
+var patientManager = require("./patientManager");
 var subscriberManager = require("./subscriberManager")
 var PatientDataManager = require("./patientDataManager")
 
@@ -15,13 +15,57 @@ var CryptoJS = require("crypto-js");
 
 setTimeout(function() {
 	console.log("Testing");
-    PatientDataManager.getGraphPoints({
-       Username: ''  ,
-       DeviceId: "thermometer/2f15a253-46c1-45c3-b940-291afe275537/vitals" ,
-       StartTime:  "2017-09-12 18:14:55.391000+0000",
-       EndTime:  "2017-09-12 18:14:57.503000+0000",
-       Interval: 1
+
+    //Test Patient
+    // PatientManager.addPatient()
+    //console.log(PatientDataManager.getInstance("greg"));
+    patientManager.getDeviceMap({ Username: 'greg' }).then(function (pat) { 
+        PatientDataManager.getGraphPoints({
+            Username: 'greg'  ,
+            StartTime:  parseFloat(1407101299972),
+            EndTime:  parseFloat(1607101300500),
+        }).then(function(result){
+            
+            
+            
+            //console.log(result);
+            
+            var endResult = []
+            for(var i= 0; i < Object.keys(pat).length - 1; i ++){
+                    if(pat[Object.keys(pat)[i]] == true){
+                        var subResult = [];
+                        // add device type
+                        subResult.push({deviceID: Object.keys(pat)[i]});
+                        //go through result...
+                        for(var j = 0; j <  Object.keys(result).length - 1; j++){
+                            //console.log("Device: " + result[Object.keys(result)[j]].device)
+                            //console.log("Compare: " + Object.keys(pat)[i])
+                            if(result[Object.keys(result)[j]].device == Object.keys(pat)[i]){
+                                //console.log("here: ");
+                                //console.log(result[Object.keys(result)[j]].device)
+                                subResult.push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
+                            }
+                        }
+                        endResult.push(subResult);
+                        
+                        
+                    }
+            }
+            console.log(endResult);
+            
+            
+        })
     })
+    
+     /*PatientManager.addToDeviceMap(
+         {'Username': 'greg'},
+         "Kicks", true
+     )*/
+    //(patientManager.getPatient({Username:"greg"})).then(function(hu){hu.addToPatientList("NEW1")});
+    // (subscriberManager.getsubscriber({Email:"what@sub.com"})).then(function(hu){hu.addToPatientList("rinus")})
+    // Patient.addToPatientList("no.@e");
+    
+
 
   }, 0);
  /*   subscriberManager.addSubscriber({
