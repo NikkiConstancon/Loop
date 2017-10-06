@@ -66,7 +66,7 @@ public class StatFragment extends android.support.v4.app.Fragment
 
         //Nikki
 
-        long start = new java.util.Date().getTime() - 1000000000;
+        long start = new java.util.Date().getTime() - 1000;
         long end = new java.util.Date().getTime();
 //MainActivity-- for stats
         JSONObject obj = new JSONObject();
@@ -168,7 +168,8 @@ public class StatFragment extends android.support.v4.app.Fragment
                     try {
                         Map<String, Map<String, Double>> stats = (Map<String, Map<String, Double>>) obj;
                         for (Map.Entry<String, Map<String, Double>> stat : stats.entrySet()) {
-                            Log.d("ENTRY", stat.getKey() + stat.getKey());
+                            Log.d("ENTRYK", stat.getKey());
+                            Log.d("ENTRYV", ""+ stat.getValue());
                         }
                     } catch (ClassCastException e ) {
                         Log.e("BIGD", e.toString());

@@ -25,7 +25,7 @@
     <string name="webSocketServerPort">8080</string>
     <!--string name="serverURL">192.168.1.101</string-->
     <!--string name="serverURL">192.168.56.1</string-->
-    <string name="serverURL">192.168.56.1</string>
+    <string name="serverURL">iomt.dedicated.co.za</string>
     <string name="vitals_prompt">Choose a vital to view</string>
     <string name="simp_stat_prompt">Choose a statistic to view</string>
     <string name="stat_interval_prompt">Choose an interval</string>
