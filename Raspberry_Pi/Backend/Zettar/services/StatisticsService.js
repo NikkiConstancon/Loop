@@ -42,7 +42,8 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                         EndTime:tmp.EndTime,
                     }).then(function(result){
 //console.log(result);                        
-//console.log(Object.keys(pat).length - 1);                        var endResult = {};
+//console.log(Object.keys(pat).length - 1);
+                        var endResult = {};
                         for(var i= 0; i < Object.keys(pat).length - 1; i ++){
 //console.log(pat[Object.keys(pat)[i]]);
 //console.log(Object.keys(pat)[i]);                            

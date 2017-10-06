@@ -67,7 +67,7 @@ var hook = new Hook(initializedZetta)
 //            console.log(response.data);
             realtimeDataService.publish(info, response)
             notificationDataService.analyze(info, response)
-           // patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.name, TimeStamp: parseFloat(response.timestamp), Value: parseFloat(response.data) });
+            patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.name, TimeStamp: parseFloat(response.timestamp), Value: parseFloat(response.data) });
         },
         errcb: function (e) {
             console.log(e)
