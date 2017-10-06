@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -31,6 +32,7 @@ import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.graphics.Color.GRAY;
 import static android.graphics.Color.GREEN;
 import static android.graphics.Color.RED;
 import static android.graphics.Color.YELLOW;
@@ -49,7 +51,7 @@ public class notifications extends android.support.v4.app.Fragment
     private Context context;
     private int counter = 0;
     private int notifs = 0;
-    public final String sharedPrefId = "MyPref";
+    static public final String sharedPrefId = "MyPref";
 
 
     /**
@@ -96,12 +98,36 @@ public class notifications extends android.support.v4.app.Fragment
         adapter.notifyDataSetChanged();
 
 
+        if(notificationsService == null) {
+            notificationsService = new NotificationsService(
+                    getActivity(),
+                    new NotificationsService.Worker() {
+                        @Override
+                        public void onNotification(final NotificationsService.Notification note) {
+                            Log.d("---Notifications---Note", "here");
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    boolean isPatient = notificationsService.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
+                                    addNotification(
+                                            note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
+                                            note.message,
+                                            "?",
+                                            note.level
+                                    );
+                                }
+                            });
+                        }
+                    }
+            );
+        }
         notificationsService.bind(getContext());
         return view;
     }
     @Override public void onDestroyView(){
         super.onDestroyView();
         notificationsService.unbind(getContext());
+        notificationsService = null;
     }
 
     public ArrayList<NotificationsObject> list;
@@ -186,20 +212,19 @@ public class notifications extends android.support.v4.app.Fragment
 
         notifs++;
 
-        systemNotification(getContext(), res, notifs);
     }
 
     static int getIconResource(String devName){
         //TODO change to final trings
         switch(devName){
-            case "Heart": return R.drawable.heart;
-            case "Temperature": return R.drawable.thermometer1;
-            case "Glucose": return R.drawable.glucose;
-            case "Insulin": return R.drawable.insulin1;
+            case "Heart Rate": return R.drawable.heart;
+            case "Body Temperature": return R.drawable.thermometer1;
+            case "Body Glucose": return R.drawable.glucose;
+            case "Body Insulin": return R.drawable.insulin1;
             default: return  R.mipmap.reva;
         }
     }
-    static void systemNotification(Context context, int res, int noteId){
+    static void systemNotification(Context context, int res, int noteId, String body, int level){
         Intent dismissIntent = new Intent(context, MainActivity.class);
         dismissIntent.setAction(Intent.ACTION_DEFAULT);
         dismissIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -207,12 +232,14 @@ public class notifications extends android.support.v4.app.Fragment
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(res)
+                        .setSmallIcon(R.mipmap.reva_white)
                         .setContentTitle("ReVA Alert")
-                        .setContentText("Deviations from the norm")
+                        .setContentText(body)
                         .setDefaults(Notification.DEFAULT_ALL) // must requires VIBRATE permission
                         .setPriority(NotificationCompat.PRIORITY_HIGH)//must give priority to High, Max which will considered as heads-up notification
-                        .setAutoCancel(true);
+                        .setAutoCancel(true)
+                        .setColor(getColorFromLevel(level));
+
 
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
                 dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -227,30 +254,18 @@ public class notifications extends android.support.v4.app.Fragment
      */
     public notifications(){}
 
-    public static String createJson(String title, String content, String resource, int level)
-    {
-        int res = R.drawable.ic_dashboard_black_24dp;
+    public static int getColorFromLevel(int level){
+        switch (level){
+            case 1: return GREEN;
+            case 2: return YELLOW;
+            case 3: return RED;
+            default: return GRAY;
+        }
+    }
 
-        if(resource.equalsIgnoreCase("Heart"))
-        {
-            res = R.drawable.heart;
-        }
-        else if(resource.equalsIgnoreCase("Temperature"))
-        {
-            res = R.drawable.thermometer1;
-        }
-        else if(resource.equalsIgnoreCase("Glucose"))
-        {
-            res = R.drawable.glucose;
-        }
-        else if(resource.equalsIgnoreCase("Insulin"))
-        {
-            res = R.drawable.insulin1;
-        }
-        else
-        {
-            res = R.mipmap.reva;
-        }
+    public static void persistAndNotifyNotification(Context context, int noteId, String title, String content, String resource, int level)
+    {
+        int res = getIconResource(resource);
 
         int severity = 0;
 
@@ -269,7 +284,15 @@ public class notifications extends android.support.v4.app.Fragment
 
         String json = "{'noteTitle' : '" + title + "', 'noteContent' : '" + content + "', 'imageSource' : " + res + ", 'severity': " + severity + "}";
 
-        return json;
+        systemNotification(context, res, noteId, content, level);
+
+        SharedPreferences saved_values = context.getSharedPreferences(sharedPrefId, MODE_PRIVATE);
+        SharedPreferences.Editor editor=saved_values.edit();
+        int counter = saved_values.getInt("counter", 0);
+        editor.putString(Integer.toString(counter++), json);
+        editor.putInt("counter", counter);
+
+        editor.commit();
     }
 
     @Override
@@ -321,24 +344,5 @@ public class notifications extends android.support.v4.app.Fragment
 
 
 
-    NotificationsService notificationsService = new NotificationsService(
-            getActivity(),
-            new NotificationsService.Worker(){
-                @Override  public void onNotification(final NotificationsService.Notification note){
-                    Log.d("---Notifications---Note", "here");
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            boolean isPatient = notificationsService.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
-                            addNotification(
-                                    note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
-                                    note.message,
-                                    "?",
-                                    note.level
-                            );
-                        }
-                    });
-                }
-            }
-    );
+    NotificationsService notificationsService = null;
 }

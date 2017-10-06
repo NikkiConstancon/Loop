@@ -34,6 +34,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zetta.android.R;
 import com.zetta.android.lib.Interval;
 import com.zetta.android.lib.RevaNotificationManager;
+import com.zetta.android.revaServices.NotificationsService;
 import com.zetta.android.revaServices.PubSubBindingService;
 import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.CloudAwaitObject;
@@ -48,6 +49,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static com.zetta.android.revaServices.NotificationsService.isNotificationsEnabled;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    int pendingRequestCount;
 
     private static final String TAG = "MainActivity";
     private ProgressDialog dialog;
@@ -129,6 +133,11 @@ public class MainActivity extends AppCompatActivity {
         public final String name;
     }
 
+    String shutUpYouAnnoyingNotificationsName(){
+        return isNotificationsEnabled(this) ? "Disable Notifications" : "Enable Notifications";
+    }
+
+    PrimaryDrawerItem drawerItemMe = null;
     void bootstrap(final String userUid) {
         zettaUser = userUid;//getIntent().getStringExtra("Username");
 
@@ -146,9 +155,10 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem patient = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
         if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
             patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
-            adder = new PrimaryDrawerItem().withName("My vitals").withTag(new PatientTag(userUid)).withIcon(R.drawable.ic_profile);
+            drawerItemMe = adder = new PrimaryDrawerItem().withName("My vitals").withTag(new PatientTag(userUid)).withIcon(R.drawable.ic_profile);
+            if(UserManager.getViewedUser().compareTo(userManagerEndpoint.getService().getAuthId()) == 0)
+                drawerItemMe.withSetSelected(true);
             dList.setUser(getUser());
-
         }
 
         setupViewPager(mViewPager);
@@ -159,9 +169,21 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem signOutItem = new SecondaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut).withIcon(R.drawable.ic_sign_out);
         signOutItem.withTag(R.string.drawerNameSignOut);
 
-        SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1).withName("My Connections").withIcon(R.drawable.ic_user_manage);
-        settings.withTag(5);
+        SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1)
+                .withName("My Connections" + (pendingRequestCount > 0 ? " (" + Integer.toString(pendingRequestCount) + ")" : ""))
+                .withIcon(R.drawable.ic_user_manage)
+                .withTag(5);
 
+        if(pendingRequestCount > 0){
+            settings.withName("My Connections   (" + Integer.toString(pendingRequestCount) + ")")
+                    .withTextColor(getResources().getColor(R.color.colorAccent));
+        }
+
+        final int shutUpYouAnnoyingNotificationsItemId = 600;
+        final SecondaryDrawerItem shutUpYouAnnoyingNotificationsItem = new SecondaryDrawerItem()
+                .withIdentifier(shutUpYouAnnoyingNotificationsItemId)
+                .withName(shutUpYouAnnoyingNotificationsName())
+                .withIcon(R.drawable.ic_notification);
 
         SectionDrawerItem header = new SectionDrawerItem().withName("Patients");
         PrimaryDrawerItem tmpItemForNikki = new PrimaryDrawerItem().withIdentifier(1).withName("For Nikki");
@@ -209,6 +231,14 @@ public class MainActivity extends AppCompatActivity {
                             setupViewPager(mViewPager);
                             UserManager.setViewedUser(((PatientTag)tag).name);
                             result.closeDrawer();
+                        }
+
+                        switch ((int)drawerItem.getIdentifier()){
+                            case shutUpYouAnnoyingNotificationsItemId:{
+                                NotificationsService.toggleNotificationsEnabled(MainActivity.this);
+                                result.closeDrawer();
+                                bootstrap(userUid);
+                            }break;
                         }
 
                         if(tag != null && tag instanceof Integer){
@@ -268,10 +298,9 @@ public class MainActivity extends AppCompatActivity {
         result.addItems(
                 new DividerDrawerItem(),
                 settings,
+                shutUpYouAnnoyingNotificationsItem,
                 signOutItem
         );
-
-
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -346,7 +375,17 @@ public class MainActivity extends AppCompatActivity {
                         subbedTo.add(names);
                     }
                 }
-                @Override public void doneCallback(){
+                @Override
+                public void doneCallback(
+                        List<String> patientList,
+                        List<String> subscriberList,
+                        List<PubSubBindingService.PubSubReqInfo> reqInfoList
+                ) {
+                    boolean isOpen = result.isDrawerOpen();
+                    result.closeDrawer();
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
                     Log.d("----doneCallback---", "--done--");
                     if(userManagerEndpoint.getUserType() != RevaWebSocketService.USER_TYPE.PATIENT){
                         if (subbedTo.isEmpty()) {
@@ -358,11 +397,18 @@ public class MainActivity extends AppCompatActivity {
                             dList.setUser(subbedTo.iterator().next());
                         }
                     }
-
+                    pendingRequestCount = 0;
+                    for(PubSubBindingService.PubSubReqInfo req : reqInfoList){
+                        if(req.type == PubSubBindingService.PubSubReqInfo.TYPE.TARGET){
+                            pendingRequestCount++;
+                        }
+                    }
+                    if(pendingRequestCount > 0){
+                    }
                     userManagerEndpoint.resumeGuardActivityByVerifiedUser(workOnUser);
 
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
+                    if(isOpen){
+                        result.openDrawer();
                     }
                 }
             }

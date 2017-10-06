@@ -44,8 +44,9 @@ public abstract class CloudAwaitObject {
     public CloudAwaitObject(String channelKey_) {
         channelKey = channelKey_;
         publisher = new ChannelPublisher(channelKey);
-        //TODO implement use this in uther classes
-        silent = true;
+        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.LOLLIPOP){
+            silent = true;
+        }
     }
     public CloudAwaitObject(String channelKey_, boolean silent_) {
         channelKey = channelKey_;

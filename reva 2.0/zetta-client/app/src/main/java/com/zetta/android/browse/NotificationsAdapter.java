@@ -170,10 +170,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     editor.putInt("counter", counter);
 
                     editor.commit();
-                    Toast.makeText(myCont, "Notification has been removed", Toast.LENGTH_SHORT).show();
-                    editor.commit();
-
-                    Toast.makeText(myCont, "Notification has been removed", Toast.LENGTH_SHORT).show();
 
                 }catch(Exception e){
                     e.printStackTrace();

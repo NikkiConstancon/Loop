@@ -269,6 +269,7 @@ public class RevaWebSocketService extends Service {
 
                 @Override
                 public void newReq(PubSubBindingService.PubSubReqInfo info) {
+                    /*
                     Intent dismissIntent = new Intent(RevaWebSocketService.this, settingsPage.class);
                     dismissIntent.setAction(Intent.ACTION_DEFAULT);
                     dismissIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -290,7 +291,7 @@ public class RevaWebSocketService extends Service {
                     builder.setContentIntent(contentIntent);
                     NotificationManager notificationManager = (NotificationManager) RevaWebSocketService.this.getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.notify(0, builder.build());
-
+                    */
                 }
 
                 @Override
@@ -415,6 +416,7 @@ public class RevaWebSocketService extends Service {
         super.onCreate();
         runSouct = true;
 
+        /*
         Toast.makeText(this, "WebSocketService Started ", Toast.LENGTH_LONG).show();
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -424,6 +426,7 @@ public class RevaWebSocketService extends Service {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(001, mBuilder.build());
+        */
 
         initScout();
         rccPublisher = rccEndpoint.bind(RevaWebSocketService.this);
