@@ -44,7 +44,7 @@ public class MoreGraph extends AppCompatActivity {
 
         List<Entry> entries = new ArrayList<Entry>();
         for (int i = 0; i < ontray.size(); i++) {
-            entries.add(new Entry(ontray.get(i).x(), ontray.get(i).y()));
+            entries.add(new Entry(ontray.get(i).getX(), ontray.get(i).getY()));
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "First Graph");
