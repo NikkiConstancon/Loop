@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.zetta.android.R;
+import com.zetta.android.revaServices.NotificationsService;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 
 import java.util.ArrayList;
 
@@ -100,7 +103,12 @@ public class notifications extends android.support.v4.app.Fragment
         adapter.notifyDataSetChanged();
 
 
+        notificationsService.bind(getContext());
         return view;
+    }
+    @Override public void onDestroyView(){
+        super.onDestroyView();
+        notificationsService.unbind(getContext());
     }
 
     public ArrayList<NotificationsObject> list;
@@ -242,4 +250,22 @@ public class notifications extends android.support.v4.app.Fragment
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
     }
+
+
+
+    NotificationsService notificationsService = new NotificationsService(
+            getActivity(),
+            new NotificationsService.Worker(){
+                @Override  public void onNotification(NotificationsService.Notification note){
+                    Log.d("---Notifications---Note", "here");
+                    boolean isPatient = notificationsService.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
+                    addNotification(
+                            note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
+                            note.message,
+                            "?",
+                            note.level
+                    );
+                }
+            }
+    );
 }

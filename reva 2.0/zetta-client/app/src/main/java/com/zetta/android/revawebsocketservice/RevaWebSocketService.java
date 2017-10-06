@@ -144,11 +144,11 @@ public class RevaWebSocketService extends Service {
         }
     }
 
-    protected void rccPauseService(String key) {
+    public void rccPauseService(String key) {
         rccPublishPauseResume(key, false);
     }
 
-    protected void rccResumeService(String key) {
+    public void rccResumeService(String key) {
         rccPublishPauseResume(key, true);
     }
     // ------------------------------ END PUBLICS -------------------------------------------

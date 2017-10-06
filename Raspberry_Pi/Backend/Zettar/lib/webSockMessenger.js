@@ -117,9 +117,11 @@ Publisher.prototype.publish = function (msg, errcb) {
                 var context = userSocketContextMap[subUid][deviceUid]
                 var transmitter = context.subServiceMap[this.publisherHandler.serviceKey]
                 transmitter.transmit(msg, errcb)
+                /**
                 if (transmitter.lastMetaId != this.meta.metaSetId && transmitter.transmit(this.meta.obj, errcb)) {
                     transmitter.lastMetaId = this.meta.metaSetId
                 }
+                **/
             }
         }
     } catch (e) { logger.error(e) }

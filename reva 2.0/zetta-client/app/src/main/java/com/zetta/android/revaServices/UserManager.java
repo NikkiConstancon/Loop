@@ -17,6 +17,7 @@ import com.zetta.android.browse.Registration_Patient;
 import com.zetta.android.browse.login_activity;
 import com.zetta.android.lib.Interval;
 import com.zetta.android.lib.NotifyCloudAwait;
+import com.zetta.android.lib.RevaNotificationManager;
 import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
@@ -33,12 +34,15 @@ import java.util.TreeMap;
 public class UserManager extends RevaService {
     public static final String SERVICE_KEY = "UserManager";
 
-    static String viewedUser = "";
+    static String viewedUser = null;
 
     static public void setViewedUser(String viewedUser_){
         viewedUser = viewedUser_;
     }
     static public String getViewedUser(){
+        if(viewedUser == null) {
+            return "";
+        }
         return viewedUser;
     }
     private UserManager() {
@@ -54,6 +58,7 @@ public class UserManager extends RevaService {
     }
 
 
+    private static MainActivityEndpoint mainActivityEndpoint = null;
     public static class MainActivityEndpoint extends RevaWebsocketEndpoint {
         public RevaWebSocketService.USER_TYPE getUserType(){
             return webService.getUserType();
@@ -65,10 +70,17 @@ public class UserManager extends RevaService {
         public String key() {
             return "UserManager";
         }
+        @Override public void onOpen(String headerJson) {
+            if(webService != null){webService.rccResumeService("RTDS");}
+        }
         public MainActivityEndpoint(
                 Activity activity_
         ){
             activity = activity_;
+
+            if(mainActivityEndpoint == null){
+                mainActivityEndpoint = this;
+            }
         }
 
         Interval validateUserUidInterval;
@@ -90,6 +102,9 @@ public class UserManager extends RevaService {
                         @Override
                         public void run() {
                             if (webService.isLoggedIn()) {
+                                if(webService.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT) {
+                                    viewedUser = webService.getAuthId();
+                                }
                                 then.work(webService.getAuthId());
                             } else {
                                 triggerLoginIntent();
