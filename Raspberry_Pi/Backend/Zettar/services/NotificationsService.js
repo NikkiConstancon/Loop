@@ -13,7 +13,15 @@ const THRESHOLD_MAP = {
     "Body_insulin": new Threshold(0, 1000, defaultSmoothFactor, true),
     "Heart-rate": new Threshold(0, 1000, defaultSmoothFactor, true),
     "Body_glucose": new Threshold(37.2, 38.9, defaultSmoothFactor, true),
+
+
+
+    "dummy dev": new Threshold(37.2, 38.9, defaultSmoothFactor, true),
 }
+
+setInterval(function () {
+    sevice.analyze({ from: "Dummy", name: "dummy dev" }, { data: 10000000000 })
+}, 3000)
 
 function Threshold(min, max, smoothFactor, flagRealtimeAnalysis){
     this.min = min
@@ -44,10 +52,7 @@ Analyser.prototype.analyze = function (now) {
                 this.smooth = now
             }
             this.updateSmooth(now)
-
-            if (this.deviceName == "Body_glucose") {
-                stop = 1
-            }
+            
             if (this.smooth < this.threshold.min) {
                 this.publishThresholdDeviation(1, this.deviceName + " is below the set threshold at " + this.valueWithUnit(now))
             } else if (this.smooth > this.threshold.max) {
