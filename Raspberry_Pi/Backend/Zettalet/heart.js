@@ -34,7 +34,7 @@ util.inherits(Heart, Device);
 Heart.prototype.init = function(config) {
   config
     .type('Heart')
-    .name('Heart-rate')
+    .name('Heart Rate')
 
 
     .monitor('vitals')

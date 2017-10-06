@@ -33,7 +33,7 @@ util.inherits(Thermometer, Device);
 Thermometer.prototype.init = function(config) {
   config
     .type('thermometer')
-    .name('Body_temperature')
+    .name('Body Temperature')
     .state('safe')
     .monitor('vitals')
     .when('safe', {allow: ['isLow','isHigh']})
