@@ -277,7 +277,7 @@ public class notifications extends android.support.v4.app.Fragment
                     addNotification(
                             note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
                             note.message,
-                            "Heart",
+                            "?",
                             note.level
                     );
                 }
