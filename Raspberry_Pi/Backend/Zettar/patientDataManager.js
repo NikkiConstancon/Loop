@@ -112,13 +112,12 @@ TimeStamp*/
                         result.push({ x: row.TimeStamp , y : row.Value, device: row.DeviceID})
                     }
 
-                    result.push({Min: minimum, Max: maximum, Avg: (avg/count) })
-                    
                     //need to sort it.
 
                     result.sort(function(first, second) {
                       return first.x - second.x;
                     });
+        		result.push({Min: minimum, Max: maximum, Avg: (avg/count) })
 
                     //need to find averages according to the interval
                     //console.log("Result: ");

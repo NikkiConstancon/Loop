@@ -44,20 +44,18 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
 //console.log(result);                        
 //console.log(Object.keys(pat).length - 1);
                         var endResult = {};
-                        for(var i= 0; i < Object.keys(pat).length - 1; i ++){
+                        for(var i= 0; i < Object.keys(pat).length; i ++){
 //console.log(pat[Object.keys(pat)[i]]);
 //console.log(Object.keys(pat)[i]);                            
 //                                if(pat[Object.keys(pat)[i]] == true){
                                     
                                     endResult[Object.keys(pat)[i]] = [];
                                     for(var j = 0; j <  Object.keys(result).length - 1; j++){
-                                        
-                                        if(result[Object.keys(result)[j]].device == Object.keys(pat)[i]){
-                                            
-                                            endResult[Object.keys(pat)[i]].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
-                                        }
+                                        endResult[Object.keys(pat)[i]].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
                                     }
-  //                              }
+
+                                 //}
+				endResult[Object.keys(pat)[i]].push({Min: result[Object.keys(result)[j]].Min, Max: result[Object.keys(result)[j]].Max, Avg: result[Object.keys(result)[j]].Avg});
                         }
 //console.log(endResult);
                         channel(endResult);

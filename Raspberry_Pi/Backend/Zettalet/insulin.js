@@ -14,7 +14,7 @@ function degToRad(x) {
 var Insulin = module.exports = function(opts) {
   Device.call(this);
   this.vitals = 0;
-  this.units = "BPM";
+  this.units = "IU";
   this._opts = opts || {};
   this._increment = this._opts['increment'] || 15;
   this._timeOut = null;
@@ -33,7 +33,7 @@ util.inherits(Insulin, Device);
 Insulin.prototype.init = function(config) {
   config
     .type('insulin')
-    .name('Body_insulin')
+    .name('Body Insulin')
 
 
     .monitor('vitals')
