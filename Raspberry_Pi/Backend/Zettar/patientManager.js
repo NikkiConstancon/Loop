@@ -121,7 +121,7 @@ var patientManager = module.exports = {
                         reject(err)
                     } else {
                         logger.debug('Found patient: ' + found.Username)
-                        console.log(found.DeviceMap);
+//                        console.log(found.DeviceMap);
                         resolve(found.DeviceMap)
                     }
                 })

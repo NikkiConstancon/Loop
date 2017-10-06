@@ -15,7 +15,7 @@ var sevice = module.exports = {
             setTimeout(() => {
                 publisher.publish({ [info.from]: publisher.realTimeCollectorMap })
                 publisher.realTimeCollectorMap = null
-            }, 750)
+            }, 1)
         }
         publisher.realTimeCollectorMap[info.name] = response.data.toPrecision(3)
     },
