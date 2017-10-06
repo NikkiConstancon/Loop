@@ -25,7 +25,9 @@ import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
 import com.zetta.android.browse.MainActivity;
 import com.zetta.android.browse.login_activity;
+import com.zetta.android.browse.notifications;
 import com.zetta.android.lib.Interval;
+import com.zetta.android.revaServices.NotificationsService;
 import com.zetta.android.revaServices.PubSubBindingService;
 import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.settings.settingsPage;
@@ -239,6 +241,17 @@ public class RevaWebSocketService extends Service {
     ;
     USER_TYPE userType;
 
+
+    NotificationsService notificationsService = new NotificationsService(
+            this,
+            new NotificationsService.Worker(){
+                @Override  public void onNotification(NotificationsService.Notification note){
+                    Log.d("---Notifications---SOCK", note.message);
+                }
+            }
+    );
+
+
     PubSubBindingService pubSubBindingService = new PubSubBindingService(this,
             new PubSubBindingService.PubSubWorker() {
                 @Override
@@ -414,6 +427,7 @@ public class RevaWebSocketService extends Service {
 
         initScout();
         rccPublisher = rccEndpoint.bind(RevaWebSocketService.this);
+        notificationsService.bind(this);
         pubSubBindingService.bind(this);
     }
 
