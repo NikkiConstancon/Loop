@@ -11,7 +11,7 @@ function compress(StartTime, EndTime, endResult){
         var result = {};
     for(var device in endResult){
         result[device] = [];
-        var segment = (EndTime - StartTime ) / 60000;
+        var segment = (EndTime - StartTime ) / 600;
         var midEnd = StartTime;
         var midStart = StartTime;
         while(midStart < EndTime){ //for each segment that is there
@@ -31,11 +31,16 @@ function compress(StartTime, EndTime, endResult){
                 }
                     
             }
-            if(count == 0)
-                count = 1;
-            avgX /= count;
-            avgY /= count;
-            result[device].push({x: avgX, y:avgY});  
+            if(count == 0){
+                avgX = (midEnd + midStart ) / 2
+  //              console.log('pushing : ' + avgX + "  " + avgY);
+//                result[device].push({x: avgX, y:0});  
+            } else{
+                avgX /= count;
+                avgY /= count;
+                result[device].push({x: avgX, y:avgY});  
+                
+            } 
             midStart = midEnd;
         }
         result[device].push(minMaxAvg); 
@@ -69,10 +74,17 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
         },
         GRAPH_POINTS: {
             RAW: function (transmitter, msg, key, channel) {
+<<<<<<< HEAD
+                var tmp = msg.nameValuePairs
+                //channel(false) && false && 
+                channel(false) && false && patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
+                    dataManager.getGraphPoints({
+=======
                 var tmp = msg.nameValuePairs;
                 var params
                 if(!tmp.DeviceID){
                         params = {
+>>>>>>> 6d1fd5c16013dd2245a68846159bb4bd3b48693e
                         Username: tmp.Username  ,
                         StartTime:  tmp.StartTime,
                         EndTime:tmp.EndTime,
@@ -105,7 +117,7 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                             
                             endResult[id].push({Min: result[Object.keys(result)[j]].Min, Max: result[Object.keys(result)[j]].Max, Avg: result[Object.keys(result)[j]].Avg});
                         }
-                        //endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
+                        endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
                         console.log(endResult);
                         channel(endResult);
                     }).catch(function (e) {

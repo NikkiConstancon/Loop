@@ -58,8 +58,10 @@ function Analyser(threshold, publisher, info) {
     this.value = null
     this.smooth = null
     this.lastTimeNotificationSent = 0
-    this.thrashGuardDelay = 30 * 1000
+    this.thrashGuardDelay = 0 * 30 * 1000
 }
+
+
 
 Analyser.prototype.analyze = function (now) {
     if (((new Date()).getTime() - this.lastTimeNotificationSent) > this.thrashGuardDelay) {
@@ -95,7 +97,9 @@ Analyser.prototype.updateSmooth = function (now) {
     this.smooth = fac * now + (1 - fac) * this.smooth
 }
 Analyser.prototype.publishThresholdDeviation = function (level, message) {
-    this.publisher.publish({ ThresholdDeviation: { userUid: this.info.from, deviceName: this.deviceName, value: "" + this.value.toPrecision(3), noteLevel: "" + level, message: message } })
+    var id = new Date().getTime();
+    id = i & 0xffffffff;
+    this.publisher.publish({ ThresholdDeviation: { userUid: this.info.from, deviceName: this.deviceName, value: "" + this.value.toPrecision(3), noteLevel: "" + level, message: message, id: id } })
     this.lastTimeNotificationSent = (new Date()).getTime()
 }
 

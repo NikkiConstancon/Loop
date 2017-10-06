@@ -134,46 +134,53 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             @Override
             public void onClick(View view)
             {
-                int pos = position;
+                try {
+                    int pos = position;
 
-                if(position == notifs.size())
-                {
-                    while(pos >= notifs.size())
-                    {
-                        pos--;
+                    if (position == notifs.size()) {
+                        while (pos >= notifs.size()) {
+                            pos--;
+                        }
                     }
-                }
 
-                notifs.remove(pos);
+                    notifs.remove(pos);
 
-                notifyItemRemoved(pos);
+                    notifyItemRemoved(pos);
 
-                notifyItemRangeChanged(pos, notifs.size());
+                    notifyItemRangeChanged(pos, notifs.size());
 
-                Gson gson = new Gson();
-                String json;
+                    Gson gson = new Gson();
+                    String json;
 
-                //MyPref is the place holder for the username (change it with username of current user)
-                SharedPreferences saved_values = myCont.getSharedPreferences(sharedPrefId, MODE_PRIVATE);
-                SharedPreferences.Editor editor=saved_values.edit();
-                int counter = 0;
+                    //MyPref is the place holder for the username (change it with username of current user)
+                    SharedPreferences saved_values = myCont.getSharedPreferences(sharedPrefId, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = saved_values.edit();
+                    int counter = 0;
 
-                if(notifs != null) {
-                    for (int i = 0; i < notifs.size(); i++) {
-                        json = gson.toJson(notifs.get(i));
-                        editor.putString(Integer.toString(counter), json);
-                        counter++;
+                    if (notifs != null) {
+                        for (int i = 0; i < notifs.size(); i++) {
+                            json = gson.toJson(notifs.get(i));
+                            editor.putString(Integer.toString(counter), json);
+                            counter++;
+                        }
+                    } else {
+                        counter = -1;
                     }
-                }
-                else
-                {
-                    counter = -1;
-                }
 
-                editor.putInt("counter", counter);
+                    editor.putInt("counter", counter);
 
+<<<<<<< HEAD
                 editor.commit();
                 Toast.makeText(myCont,"Notification has been removed" ,Toast.LENGTH_SHORT).show();
+=======
+                    editor.commit();
+
+                    Toast.makeText(myCont, "Notification has been removed", Toast.LENGTH_SHORT).show();
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+>>>>>>> 6f19e47db5dd09bdc712384da3e53a61f1b19be3
             }
         });
     }

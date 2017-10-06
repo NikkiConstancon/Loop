@@ -6,6 +6,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.zetta.android.browse.notifications;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
 import java.util.ArrayList;
@@ -52,24 +54,24 @@ public class NotificationsService extends RevaWebsocketEndpoint {
         if(obj.containsKey("ThresholdDeviation")){
             Map<String, String> map = (Map<String, String>)obj.get("ThresholdDeviation");
 
-            final Notification notification = new Notification(
+            final Notification note = new Notification(
                     map.get("userUid"),
                     map.get("deviceName"),
                     map.get("message"),
                     map.get("value"),
                     map.get("noteLevel")
             );
-            notificationList.add(notification);
-            if(context instanceof Activity) {
-                ((Activity)context).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        worker.onNotification(notification);
-                    }
-                });
-            }else{
-                worker.onNotification(notification);
-            }
+
+            boolean isPatient = getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
+            notifications.createJson(
+                    note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
+                    note.message,
+                    "?",
+                    note.level
+            );
+
+
+            worker.onNotification(note);
         }
     }
     final Context context;

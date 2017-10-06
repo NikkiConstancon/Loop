@@ -118,28 +118,7 @@ public class notifications extends android.support.v4.app.Fragment
 
     public void addNotification(String title, String content, String resource, int level)
     {
-        int res = R.drawable.ic_dashboard_black_24dp;
-
-        if(resource.equalsIgnoreCase("Heart"))
-        {
-            res = R.drawable.heart;
-        }
-        else if(resource.equalsIgnoreCase("Temperature"))
-        {
-            res = R.drawable.thermometer1;
-        }
-        else if(resource.equalsIgnoreCase("Glucose"))
-        {
-            res = R.drawable.glucose;
-        }
-        else if(resource.equalsIgnoreCase("Insulin"))
-        {
-            res = R.drawable.insulin1;
-        }
-        else
-        {
-            res = R.mipmap.reva;
-        }
+        int res = getIconResource(resource);
 
         int severity = 0;
 
@@ -203,7 +182,24 @@ public class notifications extends android.support.v4.app.Fragment
         editor.putInt("counter", counter);
 
         editor.commit();
+        rv.smoothScrollBy(1,0);
 
+        notifs++;
+
+        systemNotification(getContext(), res, notifs);
+    }
+
+    static int getIconResource(String devName){
+        //TODO change to final trings
+        switch(devName){
+            case "Heart": return R.drawable.heart;
+            case "Temperature": return R.drawable.thermometer1;
+            case "Glucose": return R.drawable.glucose;
+            case "Insulin": return R.drawable.insulin1;
+            default: return  R.mipmap.reva;
+        }
+    }
+    static void systemNotification(Context context, int res, int noteId){
         Intent dismissIntent = new Intent(context, MainActivity.class);
         dismissIntent.setAction(Intent.ACTION_DEFAULT);
         dismissIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -221,15 +217,9 @@ public class notifications extends android.support.v4.app.Fragment
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
                 dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-
         builder.setContentIntent(contentIntent);
-
-//set intents and pending intents to call service on click of "dismiss" action button of notification
-// Gets an instance of the NotificationManager service
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//to post your notification to the notification bar with a id. If a notification with same id already exists, it will get replaced with updated information.
-        notificationManager.notify(notifs, builder.build());
-        notifs++;
+        notificationManager.notify(noteId, builder.build());
     }
 
     /**
@@ -334,15 +324,20 @@ public class notifications extends android.support.v4.app.Fragment
     NotificationsService notificationsService = new NotificationsService(
             getActivity(),
             new NotificationsService.Worker(){
-                @Override  public void onNotification(NotificationsService.Notification note){
+                @Override  public void onNotification(final NotificationsService.Notification note){
                     Log.d("---Notifications---Note", "here");
-                    boolean isPatient = notificationsService.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
-                    addNotification(
-                            note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
-                            note.message,
-                            "?",
-                            note.level
-                    );
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            boolean isPatient = notificationsService.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
+                            addNotification(
+                                    note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
+                                    note.message,
+                                    "?",
+                                    note.level
+                            );
+                        }
+                    });
                 }
             }
     );
