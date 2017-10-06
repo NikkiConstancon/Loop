@@ -191,6 +191,11 @@ public class notifications extends android.support.v4.app.Fragment
      */
     public notifications(){}
 
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -203,6 +208,11 @@ public class notifications extends android.support.v4.app.Fragment
         SharedPreferences saved_values = context.getSharedPreferences("MyPref", MODE_PRIVATE);
         SharedPreferences.Editor editor=saved_values.edit();
         counter = 0;
+
+        int glucose = R.drawable.glucose;
+        int heart = R.drawable.heart;
+        int insulin = R.drawable.insulin1;
+        int temperature = R.drawable.thermometer1;
 
         if(list != null) {
             for (int i = 0; i < list.size(); i++) {
