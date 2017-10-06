@@ -169,10 +169,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
                     editor.putInt("counter", counter);
 
-<<<<<<< HEAD
-                editor.commit();
-                Toast.makeText(myCont,"Notification has been removed" ,Toast.LENGTH_SHORT).show();
-=======
+                    editor.commit();
+                    Toast.makeText(myCont, "Notification has been removed", Toast.LENGTH_SHORT).show();
                     editor.commit();
 
                     Toast.makeText(myCont, "Notification has been removed", Toast.LENGTH_SHORT).show();
@@ -180,7 +178,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 }catch(Exception e){
                     e.printStackTrace();
                 }
->>>>>>> 6f19e47db5dd09bdc712384da3e53a61f1b19be3
             }
         });
     }

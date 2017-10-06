@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
 
     void bootstrap(final String userUid) {
         zettaUser = userUid;//getIntent().getStringExtra("Username");
-        UserManager.setViewedUser(userUid);//view self at start
 
         Log.d("--for stats--", UserManager.getViewedUser());
 
@@ -305,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         adapter.addFragment(dList, "Vitals");
-        adapter.addFragment(new StatFragment(), "Stats");
+        //adapter.addFragment(new StatFragment(), "Stats");
         adapter.addFragment(new notifications(), "Alerts");
         viewPager.setAdapter(adapter);
     }
@@ -351,9 +350,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("----doneCallback---", "--done--");
                     if(userManagerEndpoint.getUserType() != RevaWebSocketService.USER_TYPE.PATIENT){
                         if (subbedTo.isEmpty()) {
+                            UserManager.setViewedUser("");
                             dList.setUser("new");
                         }
                         else {
+                            UserManager.setViewedUser(subbedTo.iterator().next());
                             dList.setUser(subbedTo.iterator().next());
                         }
                     }
