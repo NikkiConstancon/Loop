@@ -22,6 +22,7 @@ import com.zetta.android.R;
 import com.zetta.android.revaServices.NotificationsService;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -146,7 +147,7 @@ public class notifications extends android.support.v4.app.Fragment
         }
         else
         {
-            res = R.drawable.ic_help_black_24dp;
+            res = R.mipmap.reva;
         }
 
         int severity = 0;
@@ -176,9 +177,17 @@ public class notifications extends android.support.v4.app.Fragment
         }
         else
         {
-            list.add(newNotif);
+            ArrayList<NotificationsObject> newList = new ArrayList<NotificationsObject>();
+            for(int i = 0; i < list.size(); i++)
+            {
+                newList.add(list.get(i));
+            }
 
-            adapter.notifyItemInserted(list.size()-1);
+            newList.add(newNotif);
+
+            adapter.updateList(newList);
+
+            list = newList;
         }
 
         adapter.notifyDataSetChanged();
@@ -238,7 +247,7 @@ public class notifications extends android.support.v4.app.Fragment
         }
         else
         {
-            res = R.drawable.ic_help_black_24dp;
+            res = R.mipmap.reva;
         }
 
         int severity = 0;
@@ -316,7 +325,7 @@ public class notifications extends android.support.v4.app.Fragment
                 @Override  public void onNotification(NotificationsService.Notification note){
                     Log.d("---Notifications---Note", "here");
                     boolean isPatient = notificationsService.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
-                    addNotification(
+                    notifications.this.addNotification(
                             note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
                             note.message,
                             "?",
