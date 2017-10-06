@@ -1,5 +1,5 @@
 var zetta = require('zetta');
-var scout = require('./nikkiScout.js');
+var scout = require('./rinusScout.js');
 var display = require('./display.js');
 
 
