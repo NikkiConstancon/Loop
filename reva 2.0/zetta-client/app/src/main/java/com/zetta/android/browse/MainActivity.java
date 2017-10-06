@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
 
         adapter.addFragment(dList, "Vitals");
         adapter.addFragment(new StatFragment(), "Stats");
-        //adapter.addFragment(new notifications(), "Alerts");
+        adapter.addFragment(new notifications(), "Alerts");
         viewPager.setAdapter(adapter);
     }
 
