@@ -123,7 +123,7 @@ public class notifications extends android.support.v4.app.Fragment
         list.add(new NotificationsObject("Glucose", "reva has detected moderate deviations from the norm. Consider contacting a medical professional.", R.drawable.ic_help_black_24dp, YELLOW));
     }
 
-    public void addNotification(String title, String content, String resource, int severity)
+    public void addNotification(String title, String content, String resource, int level)
     {
         int res = R.drawable.ic_dashboard_black_24dp;
 
@@ -143,9 +143,24 @@ public class notifications extends android.support.v4.app.Fragment
         {
             res = R.drawable.insulin1;
         }
-        else if(resource.equalsIgnoreCase("Blood Pressure"))
+        else
         {
             res = R.drawable.ic_help_black_24dp;
+        }
+
+        int severity = 0;
+
+        if(level == 1)
+        {
+            severity = GREEN;
+        }
+        else if(level == 2)
+        {
+            severity = YELLOW;
+        }
+        else
+        {
+            severity = RED;
         }
 
         NotificationsObject newNotif = new NotificationsObject(title, content, res, severity);
@@ -262,7 +277,7 @@ public class notifications extends android.support.v4.app.Fragment
                     addNotification(
                             note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
                             note.message,
-                            "?",
+                            "Heart",
                             note.level
                     );
                 }
