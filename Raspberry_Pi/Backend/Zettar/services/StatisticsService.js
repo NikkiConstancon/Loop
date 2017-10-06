@@ -11,7 +11,7 @@ function compress(StartTime, EndTime, endResult){
         var result = {};
     for(var device in endResult){
         result[device] = [];
-        var segment = (EndTime - StartTime ) / 60000;
+        var segment = (EndTime - StartTime ) / 600;
         var midEnd = StartTime;
         var midStart = StartTime;
         while(midStart < EndTime){ //for each segment that is there
@@ -31,11 +31,16 @@ function compress(StartTime, EndTime, endResult){
                 }
                     
             }
-            if(count == 0)
-                count = 1;
-            avgX /= count;
-            avgY /= count;
-            result[device].push({x: avgX, y:avgY});  
+            if(count == 0){
+                avgX = (midEnd + midStart ) / 2
+  //              console.log('pushing : ' + avgX + "  " + avgY);
+//                result[device].push({x: avgX, y:0});  
+            } else{
+                avgX /= count;
+                avgY /= count;
+                result[device].push({x: avgX, y:avgY});  
+                
+            } 
             midStart = midEnd;
         }
         result[device].push(minMaxAvg); 
@@ -112,7 +117,7 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                             
                             endResult[id].push({Min: result[Object.keys(result)[j]].Min, Max: result[Object.keys(result)[j]].Max, Avg: result[Object.keys(result)[j]].Avg});
                         }
-                        //endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
+                        endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
                         console.log(endResult);
                         channel(endResult);
                     }).catch(function (e) {
