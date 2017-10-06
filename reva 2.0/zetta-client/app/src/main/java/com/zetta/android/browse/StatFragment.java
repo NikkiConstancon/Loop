@@ -29,6 +29,8 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +50,8 @@ public class StatFragment extends android.support.v4.app.Fragment
     private StatListAdapter statListAdapter;
     private List<StatItem> cards = new ArrayList<>();
     private static StatTmpForNikkiEndpoint endpoint = new StatTmpForNikkiEndpoint();
-
+    long start = new java.util.Date().getTime() - 100000;
+    long end = new java.util.Date().getTime();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -66,13 +69,11 @@ public class StatFragment extends android.support.v4.app.Fragment
 
         //Nikki
 
-        long start = new java.util.Date().getTime() - 1000;
-        long end = new java.util.Date().getTime();
+
 //MainActivity-- for stats
         JSONObject obj = new JSONObject();
         try {
             obj.put("Username", "greg");
-            obj.put("DeviceId", "thermometer1");
             obj.put("StartTime", start);
             obj.put("EndTime", end);
         } catch (JSONException e) {
@@ -88,24 +89,9 @@ public class StatFragment extends android.support.v4.app.Fragment
         //getFab(StatFragment.this.getContext(), (ViewGroup)view.getParent());
         // MOCK DATA STARTS HERE
         String timeStamp = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date());
-        cards.add(new SimpleStatItem("Temperature", "http://i.imgur.com/R9xBixo.png", "average", timeStamp, timeStamp, "C", 37.34 ));
-        LinkedList<GraphEntry> entries = new LinkedList<GraphEntry>();
-        entries.add(new GraphEntry(1.0f, 56.3f));
-        entries.add(new GraphEntry(2.0f, 78.3f));
-        entries.add(new GraphEntry(3.0f, 43.16f));
-        entries.add(new GraphEntry(4.0f, 88.3f));
-        entries.add(new GraphEntry(5.0f, 100.3f));
-        entries.add(new GraphEntry(6.0f, 67.3f));
-        entries.add(new GraphEntry(7.0f, 43.3f));
-        entries.add(new GraphEntry(8.0f, 104.3f));
-        entries.add(new GraphEntry(9.0f, 55.3f));
-        entries.add(new GraphEntry(10.0f, 67.3f));
-        cards.add(new GraphStatItem("Heart-rate", "", "line-graph", timeStamp, timeStamp, "BPM", entries ));
-        // MOCK DATA ENDS HERE
-
-        cards.add(new SimpleStatItem("Heart-rate", "", "average", timeStamp, timeStamp, "C", 57.34 ));
-        cards.add(new SimpleStatItem("That thing", "", "min", timeStamp, timeStamp, "C", 27.34 ));
-        cards.add(new SimpleStatItem("That one", "http://i.imgur.com/R9xBixo.png", "max", timeStamp, timeStamp, "C", 67.34 ));
+//        cards.add(new SimpleStatItem("Heart-rate", "", "average", timeStamp, timeStamp, "C", 57.34 ));
+//        cards.add(new SimpleStatItem("That thing", "", "min", timeStamp, timeStamp, "C", 27.34 ));
+//        cards.add(new SimpleStatItem("That one", "http://i.imgur.com/R9xBixo.png", "max", timeStamp, timeStamp, "C", 67.34 ));
 
         statList = (RecyclerView) view.findViewById(R.id.stats_list);
 
@@ -166,10 +152,34 @@ public class StatFragment extends android.support.v4.app.Fragment
                 @Override
                 public void run() {
                     try {
-                        Map<String, Map<String, Double>> stats = (Map<String, Map<String, Double>>) obj;
-                        for (Map.Entry<String, Map<String, Double>> stat : stats.entrySet()) {
+                        Map<String, List<Map<String, Double>>> stats = (Map<String, List<Map<String, Double>>>) obj;
+                        List<StatItem> items = new ArrayList<>();
+                        for (Map.Entry<String, List<Map<String, Double>>> stat : stats.entrySet()) {
                             Log.d("ENTRYK", stat.getKey());
                             Log.d("ENTRYV", ""+ stat.getValue());
+                            LinkedList<GraphEntry> entries = new LinkedList<GraphEntry>();
+                            Boolean x = true;
+                            for (Map<String, Double> point : stat.getValue()) {
+
+                                //GraphEntry tmp = new GraphEntry((float)point.values().toArray()[0], (float)point.values().toArray()[1]);
+                                Iterator<Double> doubleIterator = point.values().iterator();
+                                double tmpX = 0.0;
+                                double tmpY = 0.0;
+                                while (doubleIterator.hasNext()) {
+                                    if (x) {
+                                        tmpX =  doubleIterator.next();
+                                        x = false;
+                                    } else {
+                                        tmpY =  doubleIterator.next();
+                                        x = true;
+                                    }
+                                }
+                                entries.add(new GraphEntry((float)tmpX, (float)tmpY));
+                            }
+                            String startDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(start));
+                            String endDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(end));
+                            items.add(new GraphStatItem(stat.getKey(), "", "line-graph", startDate, endDate, "NA", entries ));
+                            statListAdapter.updateList(items);
                         }
                     } catch (ClassCastException e ) {
                         Log.e("BIGD", e.toString());

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zetta.android.R;
+import com.zetta.android.settings.SettingsItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,6 +146,18 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 Toast.makeText(myCont,"Notification has been removed" ,Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void updateList (ArrayList<NotificationsObject> items) {
+
+        if (notifs != null) {
+            notifs.clear();
+            notifs.addAll(items);
+        }
+        else {
+            notifs = items;
+        }
+        notifyDataSetChanged();
     }
 
     @Override

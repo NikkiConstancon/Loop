@@ -39,6 +39,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.zetta.android.ImageLoader;
 import com.zetta.android.R;
 import com.zetta.android.StatItem;
+import com.zetta.android.settings.SettingsItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,22 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public StatListAdapter(List<StatItem> cards, MyAdapterListener listener ) {
         this.cards = cards;
         this.onClickListener = listener;
+    }
+
+    public List<StatItem> getCards() {
+        return cards;
+    }
+
+    public void updateList (List<StatItem> items) {
+
+        if (cards != null) {
+            cards.clear();
+            cards.addAll(items);
+        }
+        else {
+            cards = items;
+        }
+        notifyDataSetChanged();
     }
 
     @Override
@@ -231,7 +248,7 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             List<Entry> entries = new ArrayList<Entry>();
             for (int i = 0; i < item.getEntries().size(); i++) {
-                entries.add(new Entry(item.getEntries().get(i).x(), item.getEntries().get(i).y()));
+                entries.add(new Entry(item.getEntries().get(i).getX(), item.getEntries().get(i).getY()));
             }
 
             // ALL THAT FOLLOWS IS STYLING FOR THE GRAPH

@@ -44,6 +44,8 @@ public abstract class CloudAwaitObject {
     public CloudAwaitObject(String channelKey_) {
         channelKey = channelKey_;
         publisher = new ChannelPublisher(channelKey);
+        //TODO implement use this in uther classes
+        silent = true;
     }
     public CloudAwaitObject(String channelKey_, boolean silent_) {
         channelKey = channelKey_;

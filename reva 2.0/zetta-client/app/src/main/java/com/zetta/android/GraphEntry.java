@@ -9,8 +9,8 @@ import java.io.Serializable;
 
 public class GraphEntry implements Serializable
 {
-    private final Float x;
-    private final Float y;
+    private Float x;
+    private Float y;
 
     /**
      *
@@ -23,15 +23,23 @@ public class GraphEntry implements Serializable
         y = aValue;
     }
 
-    /**
-     *
-     * @return x value
-     */
-    public Float x()   { return x; }
+    public GraphEntry() {
+        this(0f,0f);
+    }
 
-    /**
-     *
-     * @return y value
-     */
-    public Float y() { return y; }
+    public void setX(Float x) {
+        this.x = x;
+    }
+
+    public void setY(Float y) {
+        this.y = y;
+    }
+
+    public Float getX() {
+        return x;
+    }
+
+    public Float getY() {
+        return y;
+    }
 }

@@ -34,9 +34,11 @@ const THRESHOLD_MAP = {
     
     "Airflow": new Threshold(376, 525, defaultSmoothFactor, false),
     "Air Volume": new Threshold(2, 5, defaultSmoothFactor, false),
-    
-    
 }
+
+setInterval(function () {
+    sevice.analyze({ from: "Dummy", name: "dummy dev" }, { data: 10000000000 })
+}, 3000)
 
 function Threshold(min, max, smoothFactor, flagRealtimeAnalysis){
     this.min = min
@@ -68,7 +70,7 @@ Analyser.prototype.analyze = function (now) {
         if (this.threshold.flagRealtimeAnalysis) {
            
             this.updateSmooth(now)
-
+            
             if (this.smooth < this.threshold.min) {
                 this.publishThresholdDeviation(1, this.deviceName + " is below the set threshold at " + this.valueWithUnit(now))
             } else if (this.smooth > this.threshold.max) {

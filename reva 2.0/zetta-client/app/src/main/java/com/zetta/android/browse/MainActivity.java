@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private SectionsPageAdapter mSectionsPageAdapter;
 
     private ViewPager mViewPager;
+    private Drawer result;
 
     private String m_Text = "";
 
@@ -128,11 +129,9 @@ public class MainActivity extends AppCompatActivity {
         public final String name;
     }
 
-    void test(Drawer d){}
-
-    Drawer result;
     void bootstrap(final String userUid) {
         zettaUser = userUid;//getIntent().getStringExtra("Username");
+        UserManager.setViewedUser(userUid);//view self at start
 
         Log.d("--for stats--", UserManager.getViewedUser());
 
@@ -144,21 +143,14 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPageAdapter);
 
-
-        SectionDrawerItem header = new SectionDrawerItem().withName("Patients");
         PrimaryDrawerItem adder = null;
         PrimaryDrawerItem patient = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
         if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
-            header = new SectionDrawerItem().withName("Friends and Family");
             patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
-            if(UserManager.getViewedUser().compareTo(userUid) != 0) {
-                adder = new PrimaryDrawerItem().withName("Back to my vitals")
-                        .withTag(new PatientTag(userUid))
-                        .withIcon(R.drawable.ic_person_black_24dp)
-                        .withTextColor(getResources().getColor(R.color.colorPrimaryText));
-            }
+            adder = new PrimaryDrawerItem().withName("My vitals").withTag(new PatientTag(userUid)).withIcon(R.drawable.ic_profile);
+            dList.setUser(getUser());
+
         }
-        dList.setUser(UserManager.getViewedUser());
 
         setupViewPager(mViewPager);
 
@@ -172,7 +164,16 @@ public class MainActivity extends AppCompatActivity {
         settings.withTag(5);
 
 
+        SectionDrawerItem header = new SectionDrawerItem().withName("Patients");
+        PrimaryDrawerItem tmpItemForNikki = new PrimaryDrawerItem().withIdentifier(1).withName("For Nikki");
+        tmpItemForNikki.withTag(1234);
 
+        final int tmpItemForAcceptId = 521;
+        PrimaryDrawerItem tmpItemForAccept = new PrimaryDrawerItem().withIdentifier(tmpItemForAcceptId)
+                .withName("tmpItemForAccept");
+        final int tmpItemForDeclineId = 522;
+        PrimaryDrawerItem tmpItemForDecline = new PrimaryDrawerItem().withIdentifier(tmpItemForDeclineId)
+                .withName("tmpItemForDecline");
 
 
 
@@ -193,9 +194,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         //create the drawer and remember the `Drawer` result object
-        if(result != null){
-            result.closeDrawer();
-        }
         result = new DrawerBuilder().withAccountHeader(headerResult)
                 .withActivity(this)
                 .withToolbar(toolbar)
@@ -208,10 +206,9 @@ public class MainActivity extends AppCompatActivity {
                         String name = drawerItem.toString();
                         Log.d("--Name of name", name);
                         if(tag instanceof PatientTag){
-                            UserManager.setViewedUser(((PatientTag)tag).name);
-                            //dList.setUser(((PatientTag)tag).name);
+                            dList.setUser(((PatientTag)tag).name);
                             setupViewPager(mViewPager);
-                            bootstrap(userUid);
+                            UserManager.setViewedUser(((PatientTag)tag).name);
                             result.closeDrawer();
                         }
 
@@ -254,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).build();
 
-
         if (adder != null) {
             result.addItem(adder);
         }
@@ -265,16 +261,9 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        for(String name : subbedTo){
-            PrimaryDrawerItem item = new PrimaryDrawerItem().withName(name).withTag(new PatientTag(name)).withLevel(1);
-            if(UserManager.getViewedUser().compareTo(name) == 0) {
-                item.withIcon(R.drawable.ic_patient_24dp)
-                        .withTextColor(getResources().getColor(R.color.colorSecondaryText))
-                        .withLevel(2);
-            }else{
-                item.withIcon(R.drawable.ic_patient_24dp).withTextColor(getResources().getColor(R.color.colorPrimaryText));
-            }
-            result.addItem(item);
+        for(String name : subbedTo)
+        {
+            result.addItem(new PrimaryDrawerItem().withName(name).withTag(new PatientTag(name)).withIcon(R.drawable.ic_profile));
         }
 
         result.addItems(
@@ -324,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
     UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(this);
 
 
-   PubSubBindingService pubSubBinderEndpoint = new PubSubBindingService(this,
+    PubSubBindingService pubSubBinderEndpoint = new PubSubBindingService(this,
             new PubSubBindingService.PubSubWorker(){
                 @Override public void sendRequestCallback(final String msg){
                     //You no longer need to do the ugly runOnUiThread
@@ -343,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
             new PubSubBindingService.PubSubInfoWorker(){
                 @Override public void onConnect(Map<String,PubSubBindingService.PubSubReqInfo> infoMap){
                     for(Map.Entry<String,PubSubBindingService.PubSubReqInfo> entry : infoMap.entrySet()){
-                       PubSubBindingService.PubSubReqInfo info =  entry.getValue();
+                        PubSubBindingService.PubSubReqInfo info =  entry.getValue();
                         Log.d("----ALL-PUB-SUB-REQ---", info.userUid + " " + info.state.toString() + " " + info.type.toString());
                     }
                 }
@@ -362,12 +351,10 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("----doneCallback---", "--done--");
                     if(userManagerEndpoint.getUserType() != RevaWebSocketService.USER_TYPE.PATIENT){
                         if (subbedTo.isEmpty()) {
-                            //dList.setUser("new");
+                            dList.setUser("new");
                         }
                         else {
-                            if(UserManager.getViewedUser().compareTo("") == 0) {
-                                dList.setUser(subbedTo.iterator().next());
-                            }
+                            dList.setUser(subbedTo.iterator().next());
                         }
                     }
 
