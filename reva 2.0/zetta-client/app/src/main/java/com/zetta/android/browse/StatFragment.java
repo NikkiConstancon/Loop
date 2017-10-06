@@ -20,6 +20,7 @@ import com.zetta.android.GraphEntry;
 import com.zetta.android.MoreGraph;
 import com.zetta.android.R;
 import com.zetta.android.StatItem;
+import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.CloudAwaitObject;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 
@@ -48,32 +49,85 @@ public class StatFragment extends android.support.v4.app.Fragment
     public static final String Tag = "StatFragment";
     private RecyclerView statList;
     private StatListAdapter statListAdapter;
+
+    Button min5;
+    Button hour1;
+    Button hour24;
+    Button week1;
+    Button month1;
+    Button all;
+
     private List<StatItem> cards = new ArrayList<>();
     private static StatTmpForNikkiEndpoint endpoint = new StatTmpForNikkiEndpoint();
-    long start = new java.util.Date().getTime() - 100000;
+    long start = new java.util.Date().getTime() - 300000; //3500000; // close to an hour ago
     long end = new java.util.Date().getTime();
+
+    private void setColor(Button btn) {
+        min5.setTextColor(getResources().getColor(R.color.textColorPrimary));
+        hour1.setTextColor(getResources().getColor(R.color.textColorPrimary));
+        hour24.setTextColor(getResources().getColor(R.color.textColorPrimary));
+        week1.setTextColor(getResources().getColor(R.color.textColorPrimary));
+        month1.setTextColor(getResources().getColor(R.color.textColorPrimary));
+        all.setTextColor(getResources().getColor(R.color.textColorPrimary));
+
+        btn.setTextColor(getResources().getColor(R.color.primary));
+    }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.stat_hist_fragment, container, false);
         super.onCreate(savedInstanceState);
-        final FloatingActionButton myFab = (FloatingActionButton) view.findViewById(R.id.myFAB);
+        //final FloatingActionButton myFab = (FloatingActionButton) view.findViewById(R.id.myFAB);
         endpoint.bind(view.getContext());
 
-        myFab.setOnClickListener(new View.OnClickListener() {
+        min5 = (Button) view.findViewById(R.id.min5);
+        hour1 = (Button) view.findViewById(R.id.hour1);
+        hour24 = (Button) view.findViewById(R.id.hour24);
+        week1 = (Button) view.findViewById(R.id.week1);
+        month1 = (Button) view.findViewById(R.id.month1);
+        all = (Button) view.findViewById(R.id.all);
+
+        min5.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-                Intent toAddStat = new Intent(getActivity(), AddSimpleStat.class);
-                startActivityForResult(toAddStat, 0);
+                setColor(min5);
             }
         });
-
-        //Nikki
-
+        hour1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setColor(hour1);
+            }
+        });
+        hour24.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setColor(hour24);
+            }
+        });
+        week1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setColor(week1);
+            }
+        });
+        month1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setColor(month1);
+            }
+        });
+        all.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setColor(all);
+            }
+        });
 
 //MainActivity-- for stats
         JSONObject obj = new JSONObject();
         try {
-            obj.put("Username", "greg");
+            obj.put("Username", UserManager.getViewedUser());
             obj.put("StartTime", start);
             obj.put("EndTime", end);
         } catch (JSONException e) {
@@ -154,31 +208,46 @@ public class StatFragment extends android.support.v4.app.Fragment
                     try {
                         Map<String, List<Map<String, Double>>> stats = (Map<String, List<Map<String, Double>>>) obj;
                         List<StatItem> items = new ArrayList<>();
+                        String startDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(start));
+                        String endDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(end));
                         for (Map.Entry<String, List<Map<String, Double>>> stat : stats.entrySet()) {
                             Log.d("ENTRYK", stat.getKey());
                             Log.d("ENTRYV", ""+ stat.getValue());
                             LinkedList<GraphEntry> entries = new LinkedList<GraphEntry>();
                             Boolean x = true;
+                            double first = 0;
+                            boolean isFirst = true;
                             for (Map<String, Double> point : stat.getValue()) {
-
                                 //GraphEntry tmp = new GraphEntry((float)point.values().toArray()[0], (float)point.values().toArray()[1]);
                                 Iterator<Double> doubleIterator = point.values().iterator();
                                 double tmpX = 0.0;
                                 double tmpY = 0.0;
-                                while (doubleIterator.hasNext()) {
-                                    if (x) {
-                                        tmpX =  doubleIterator.next();
-                                        x = false;
-                                    } else {
-                                        tmpY =  doubleIterator.next();
-                                        x = true;
+                                if (point.keySet().size() == 2) {
+                                    while (doubleIterator.hasNext()) {
+                                        if (x) {
+                                            tmpX =  doubleIterator.next();
+                                            if (isFirst) {
+                                                first = tmpX;
+                                                isFirst = false;
+                                            }
+                                            tmpX -= first;
+
+                                            x = false;
+                                        } else {
+                                            tmpY =  doubleIterator.next();
+                                            x = true;
+                                        }
                                     }
+                                    entries.add(new GraphEntry((float)tmpX, (float)tmpY));
+                                } else if (point.keySet().size() == 3){
+                                    items.add(new SimpleStatItem(stat.getKey(), "", "min", startDate, endDate, "", doubleIterator.next()));
+                                    items.add(new SimpleStatItem(stat.getKey(), "", "max", startDate, endDate, "", doubleIterator.next()));
+                                    items.add(new SimpleStatItem(stat.getKey(), "", "avg", startDate, endDate, "", doubleIterator.next()));
                                 }
-                                entries.add(new GraphEntry((float)tmpX, (float)tmpY));
+
                             }
-                            String startDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(start));
-                            String endDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(end));
-                            items.add(new GraphStatItem(stat.getKey(), "", "line-graph", startDate, endDate, "NA", entries ));
+
+                            items.add(new GraphStatItem(stat.getKey(), "", "line-graph", startDate, endDate, "", entries ));
                             statListAdapter.updateList(items);
                         }
                     } catch (ClassCastException e ) {

@@ -10,21 +10,57 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/stats_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp"/>
     <!-- android:onClick="onFabFoo" -->
 
-    <android.support.design.widget.FloatingActionButton
-        app:layout_behavior="com.zetta.android.ScrollAwareFABBehavior"
-        android:id="@+id/myFAB"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_add_black_24dp"
-        app:elevation="4dp"
-        app:fabSize="normal"
-        android:layout_gravity="bottom|right"
-        android:layout_margin="16dp"
-        android:tint="@android:color/white"
-        android:clickable="true"
-         />
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:elevation="20dp">
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:textColor="@color/primary"
+            android:text="5M"
+            android:id="@+id/min5"/>
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:text="1H"
+            android:id="@+id/hour1"
+            />
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:text="24H"
+            android:id="@+id/hour24"/>
+        <Button
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:text="1W"
+            android:id="@+id/week1"/>
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:text="1M"
+            android:id="@+id/month1"/>
+        <Button
+            android:layout_width="62dp"
+            android:layout_height="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:text="ALL"
+            android:id="@+id/all"/>
+
+
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
