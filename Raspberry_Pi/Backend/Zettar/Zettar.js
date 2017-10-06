@@ -24,6 +24,7 @@ var patientManager = require("./patientManager");
 var patientDataManager = require("./patientDataManager");
 
 const realtimeDataService = require('./services/RealtimeDataService')
+const notificationDataService = require('./services/NotificationsService')
 
 
 //init zetta as usual, but dont call link yet
@@ -64,7 +65,8 @@ var hook = new Hook(initializedZetta)
         cb: function (info, response) {
 //            console.log(this.result.state);
 //            console.log(response.data);
-            realtimeDataService.publish(info, response);
+            realtimeDataService.publish(info, response)
+            notificationDataService.analyze(info, response)
             patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.name, TimeStamp: parseFloat(response.timestamp), Value: parseFloat(response.data) });
         },
         errcb: function (e) {

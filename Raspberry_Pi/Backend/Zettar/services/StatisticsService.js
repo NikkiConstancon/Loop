@@ -35,17 +35,19 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
         GRAPH_POINTS: {
             RAW: function (transmitter, msg, key, channel) {
                 var tmp = msg.nameValuePairs
-                 patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
+                patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
                     dataManager.getGraphPoints({
                         Username: tmp.Username  ,
                         StartTime:  tmp.StartTime,
                         EndTime:tmp.EndTime,
                     }).then(function(result){
-                        
+//console.log(result);                        
+//console.log(Object.keys(pat).length - 1);
                         var endResult = {};
                         for(var i= 0; i < Object.keys(pat).length - 1; i ++){
-                            
-                                if(pat[Object.keys(pat)[i]] == true){
+//console.log(pat[Object.keys(pat)[i]]);
+//console.log(Object.keys(pat)[i]);                            
+//                                if(pat[Object.keys(pat)[i]] == true){
                                     
                                     endResult[Object.keys(pat)[i]] = [];
                                     for(var j = 0; j <  Object.keys(result).length - 1; j++){
@@ -55,8 +57,9 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                                             endResult[Object.keys(pat)[i]].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
                                         }
                                     }
-                                }
+  //                              }
                         }
+//console.log(endResult);
                         channel(endResult);
                     }).catch(function (e) {
                         logger.error('GraphRetievalError', e)

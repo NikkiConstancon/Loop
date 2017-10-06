@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.zetta.android.R;
+import com.zetta.android.revaServices.NotificationsService;
+import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 
 import java.util.ArrayList;
 
@@ -40,6 +43,7 @@ public class notifications extends android.support.v4.app.Fragment
     private Context context;
     private int counter = 0;
     private int notifs = 0;
+    public final String sharedPrefId = "MyPref";
 
 
     /**
@@ -78,7 +82,7 @@ public class notifications extends android.support.v4.app.Fragment
         list = new ArrayList<NotificationsObject>();
 
         //MyPref is the place holder for the username (change it with username of current user)
-        SharedPreferences saved_values = context.getSharedPreferences("MyPref", MODE_PRIVATE);
+        SharedPreferences saved_values = context.getSharedPreferences(sharedPrefId, MODE_PRIVATE);
 
         String json;
         counter = saved_values.getInt("counter", -1);
@@ -100,7 +104,12 @@ public class notifications extends android.support.v4.app.Fragment
         adapter.notifyDataSetChanged();
 
 
+        notificationsService.bind(getContext());
         return view;
+    }
+    @Override public void onDestroyView(){
+        super.onDestroyView();
+        notificationsService.unbind(getContext());
     }
 
     public ArrayList<NotificationsObject> list;
@@ -115,7 +124,7 @@ public class notifications extends android.support.v4.app.Fragment
         list.add(new NotificationsObject("Glucose", "reva has detected moderate deviations from the norm. Consider contacting a medical professional.", R.drawable.ic_help_black_24dp, YELLOW));
     }
 
-    public void addNotification(String title, String content, String resource, int severity)
+    public void addNotification(String title, String content, String resource, int level)
     {
         int res = R.drawable.ic_dashboard_black_24dp;
 
@@ -135,12 +144,28 @@ public class notifications extends android.support.v4.app.Fragment
         {
             res = R.drawable.insulin1;
         }
-        else if(resource.equalsIgnoreCase("Blood Pressure"))
+        else
         {
             res = R.drawable.ic_help_black_24dp;
         }
 
+        int severity = 0;
+
+        if(level == 1)
+        {
+            severity = GREEN;
+        }
+        else if(level == 2)
+        {
+            severity = YELLOW;
+        }
+        else
+        {
+            severity = RED;
+        }
+
         NotificationsObject newNotif = new NotificationsObject(title, content, res, severity);
+
         if(list == null)
         {
             list = new ArrayList<NotificationsObject>();
@@ -191,6 +216,56 @@ public class notifications extends android.support.v4.app.Fragment
      */
     public notifications(){}
 
+    public static String createJson(String title, String content, String resource, int level)
+    {
+        int res = R.drawable.ic_dashboard_black_24dp;
+
+        if(resource.equalsIgnoreCase("Heart"))
+        {
+            res = R.drawable.heart;
+        }
+        else if(resource.equalsIgnoreCase("Temperature"))
+        {
+            res = R.drawable.thermometer1;
+        }
+        else if(resource.equalsIgnoreCase("Glucose"))
+        {
+            res = R.drawable.glucose;
+        }
+        else if(resource.equalsIgnoreCase("Insulin"))
+        {
+            res = R.drawable.insulin1;
+        }
+        else
+        {
+            res = R.drawable.ic_help_black_24dp;
+        }
+
+        int severity = 0;
+
+        if(level == 1)
+        {
+            severity = GREEN;
+        }
+        else if(level == 2)
+        {
+            severity = YELLOW;
+        }
+        else
+        {
+            severity = RED;
+        }
+
+        String json = "{'noteTitle' : '" + title + "', 'noteContent' : '" + content + "', 'imageSource' : " + res + ", 'severity': " + severity + "}";
+
+        return json;
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -200,7 +275,7 @@ public class notifications extends android.support.v4.app.Fragment
         String json;
 
         //MyPref is the place holder for the username (change it with username of current user)
-        SharedPreferences saved_values = context.getSharedPreferences("MyPref", MODE_PRIVATE);
+        SharedPreferences saved_values = context.getSharedPreferences(sharedPrefId, MODE_PRIVATE);
         SharedPreferences.Editor editor=saved_values.edit();
         counter = 0;
 
@@ -232,4 +307,22 @@ public class notifications extends android.support.v4.app.Fragment
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
     }
+
+
+
+    NotificationsService notificationsService = new NotificationsService(
+            getActivity(),
+            new NotificationsService.Worker(){
+                @Override  public void onNotification(NotificationsService.Notification note){
+                    Log.d("---Notifications---Note", "here");
+                    boolean isPatient = notificationsService.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
+                    addNotification(
+                            note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
+                            note.message,
+                            "?",
+                            note.level
+                    );
+                }
+            }
+    );
 }

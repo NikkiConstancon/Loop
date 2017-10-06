@@ -277,14 +277,14 @@ public class settingsPage extends AppCompatActivity {
                     boolean isPatient = pubSubBinderEndpoint.getService().getUserType() == RevaWebSocketService.USER_TYPE.PATIENT;
 
                     if (reqList.size() > 0) {
-                        tmp.add(new TitleItem("New Requests"));
+                        tmp.add(new TitleItem("New requests"));
                         tmp.addAll(reqList);
                     }
                     boolean flagGotConnections = patList.size() > 0 || subList.size() > 0;
                     tmp.add(new TitleItem(
                             flagGotConnections
-                                    ? (isPatient ? "Sharing my info with" : "Your Patients")
-                                    : (isPatient ? "You are not sharing your information with anyone" : "You have no patients")
+                                    ? (isPatient ? "Sharing my vitals with" : "Your Patients")
+                                    : (isPatient ? "You are not sharing your vitals with anyone" : "You have no patients")
                     ));
                     tmp.addAll(patList);
                     tmp.addAll(subList);
