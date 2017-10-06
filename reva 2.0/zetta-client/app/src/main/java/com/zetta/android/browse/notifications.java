@@ -1,5 +1,6 @@
 package com.zetta.android.browse;
 
+import android.app.Instrumentation;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,15 +8,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.test.InstrumentationTestCase;
+import android.test.TouchUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ScrollView;
 
 import com.google.gson.Gson;
 import com.zetta.android.R;
@@ -157,8 +163,7 @@ public class notifications extends android.support.v4.app.Fragment
             list = new ArrayList<NotificationsObject>();
             list.add(newNotif);
 
-            adapter = new NotificationsAdapter(context, list, sharedPrefId);
-            rv.setAdapter(adapter);
+            adapter.updateList(list);
             adapter.notifyDataSetChanged();
         }
         else
@@ -170,6 +175,8 @@ public class notifications extends android.support.v4.app.Fragment
             newList.add(newNotif);
             list = newList;
             adapter.updateList(newList);
+            adapter.notifyDataSetChanged();
+            adapter.notifyItemInserted(list.size());
         }
 
 
@@ -196,8 +203,6 @@ public class notifications extends android.support.v4.app.Fragment
         editor.putInt("counter", counter);
 
         editor.commit();
-
-        rv.smoothScrollBy(1,0);
 
         Intent dismissIntent = new Intent(context, MainActivity.class);
         dismissIntent.setAction(Intent.ACTION_DEFAULT);

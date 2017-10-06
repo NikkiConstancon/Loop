@@ -173,7 +173,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 editor.putInt("counter", counter);
 
                 editor.commit();
-
                 Toast.makeText(myCont,"Notification has been removed" ,Toast.LENGTH_SHORT).show();
             }
         });
@@ -191,7 +190,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             notifs.addAll(items);
         }
         else {
-            notifs = items;
+            notifs = new ArrayList<NotificationsObject>();
+            notifs.addAll(items);
         }
         notifyDataSetChanged();
     }
