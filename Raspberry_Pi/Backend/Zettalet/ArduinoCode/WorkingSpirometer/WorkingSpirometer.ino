@@ -59,7 +59,7 @@ void loop()
 
   for (int i = 0; i < MySignals.spir_measures; i++)
   {
-    
+     
     Serial.print("SPIAF");
     Serial.println(MySignals.spirometerData[i].spir_pef);
     delay(500);    
