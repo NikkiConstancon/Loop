@@ -98,7 +98,7 @@ Analyser.prototype.updateSmooth = function (now) {
 }
 Analyser.prototype.publishThresholdDeviation = function (level, message) {
     var id = new Date().getTime();
-    id = i & 0xffffffff;
+    id = id & 0xffffffff;
     this.publisher.publish({ ThresholdDeviation: { userUid: this.info.from, deviceName: this.deviceName, value: "" + this.value.toPrecision(3), noteLevel: "" + level, message: message, id: id } })
     this.lastTimeNotificationSent = (new Date()).getTime()
 }
