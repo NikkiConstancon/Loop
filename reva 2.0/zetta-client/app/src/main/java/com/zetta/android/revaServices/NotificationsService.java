@@ -71,17 +71,7 @@ public class NotificationsService extends RevaWebsocketEndpoint {
             );
 
 
-            notificationList.add(note);
-            if(context instanceof Activity) {
-                ((Activity)context).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        worker.onNotification(note);
-                    }
-                });
-            }else{
-                worker.onNotification(note);
-            }
+            worker.onNotification(note);
         }
     }
     final Context context;

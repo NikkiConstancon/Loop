@@ -9,65 +9,124 @@
 // var dbManager1 = require("./dataManager");
 var patientManager = require("./patientManager");
 var subscriberManager = require("./subscriberManager")
-var PatientDataManager = require("./patientDataManager")
+var dataManager = require("./patientDataManager")
 
 var CryptoJS = require("crypto-js");
 
-setTimeout(function() {
-	console.log("Testing");
-
-    //Test Patient
-    // PatientManager.addPatient()
-    //console.log(PatientDataManager.getInstance("greg"));
-    patientManager.getDeviceMap({ Username: 'greg' }).then(function (pat) { 
-        PatientDataManager.getGraphPoints({
-            Username: 'greg'  ,
-            StartTime:  parseFloat(1407101299972),
-            EndTime:  parseFloat(1607101300500),
-        }).then(function(result){
-            
-            
-            
-            //console.log(result);
-            
-            var endResult = []
-            for(var i= 0; i < Object.keys(pat).length - 1; i ++){
-                    if(pat[Object.keys(pat)[i]] == true){
-                        var subResult = [];
-                        // add device type
-                        subResult.push({deviceID: Object.keys(pat)[i]});
-                        //go through result...
-                        for(var j = 0; j <  Object.keys(result).length - 1; j++){
-                            //console.log("Device: " + result[Object.keys(result)[j]].device)
-                            //console.log("Compare: " + Object.keys(pat)[i])
-                            if(result[Object.keys(result)[j]].device == Object.keys(pat)[i]){
-                                //console.log("here: ");
-                                //console.log(result[Object.keys(result)[j]].device)
-                                subResult.push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
-                            }
-                        }
-                        endResult.push(subResult);
-                        
-                        
-                    }
+function compress(StartTime, EndTime, endResult){
+    var result = {};
+    for(var device in endResult){ //compress each device
+       // console.log("device ID: " + device);
+        result[device] = [];
+       // console.log("Start time : " + StartTime);
+       // console.log("End time : " + EndTime);
+        var segment = (EndTime - StartTime ) / 6;
+       // console.log("Segment: " + segment);
+        var midEnd = StartTime;
+        var midStart = StartTime;
+        while(midStart < EndTime){ //for each segment that is there
+            midEnd += segment;
+          //  console.log("Compress: " + midStart + "  " + midEnd);
+            var avgX = 0;
+            var avgY = 0;
+            var count = 0;
+            var minMaxAvg = {};
+            //console.log("device")
+            //console.log(endResult[device]);
+            for(var key in endResult[device]){
+                //console.log("KEY" + key);
+               // console.log("end")
+               // console.log(endResult[device][key]);
+                if(endResult[device][key].x > midStart && endResult[device][key].x < midEnd){
+                   // console.log("TRUE" );
+                    //key in range   
+                    count ++;
+                    avgX += endResult[device][key].x;
+                    avgY += endResult[device][key].y;
+                }else if(endResult[device][key].Min) {
+                    //console.log("HERE");
+                    //console.log(endResult[device][key]);
+                    minMaxAvg = endResult[device][key];
+                    
+                }
+                    
             }
+          //  console.log(avgX + "   " + avgY);
+            if(count == 0)
+                count = 1;
+            avgX /= count;
+            avgY /= count;
+         //   console.log(avgX + "   " + avgY);
+            result[device].push({x: avgX, y:avgY});  
+            midStart = midEnd;
+        }
+        result[device].push(minMaxAvg); 
+    }
+    return result;
+}
+
+function get(msg) {
+    var tmp = msg
+    var params
+    if(!tmp.DeviceID){
+            params = {
+            Username: tmp.Username  ,
+            StartTime:  tmp.StartTime,
+            EndTime:tmp.EndTime,
+        }
+    } else{
+        params = {
+            Username: tmp.Username  ,
+            DeviceID: tmp.DeviceID,
+            StartTime:  tmp.StartTime,
+            EndTime:tmp.EndTime,
+        }
+        
+    }
+    console.log(params);
+    patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
+        dataManager.getGraphPoints(params).then(function(result){
+            var endResult = {};
+            var size = 1;
+            if(!tmp.DeviceID)
+                size = Object.keys(pat).length;
+            console.log(size);
+            for(var i= 0; i < size; i ++){
+                var id = Object.keys(pat)[i];
+                if(tmp.DeviceID)
+                    id = tmp.DeviceID
+                endResult[id] = [];
+                for(var j = 0; j <  Object.keys(result).length - 1; j++){
+                    endResult[id].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
+                }
+                
+                endResult[id].push({Min: result[Object.keys(result)[j]].Min, Max: result[Object.keys(result)[j]].Max, Avg: result[Object.keys(result)[j]].Avg});
+            }
+            endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
             console.log(endResult);
-            
-            
-        })
-    })
+            //channel(endResult);
+        }).catch(function (e) {
+            console.log(e);
+            //logger.error('GraphRetievalError', e)
+           // channel(false)
+        }) 
+    }).catch(function (e) {
+        console.log(e);
+        //logger.error('DeviceMapRetievalError', e)
+        //channel(false)
+    }) 
+}
+setTimeout(function() {
+    var d = new Date();
+    var n = d.getTime();
+    console.log(n);
+    start = n - 10000000000;
+    end = n ;
+    console.log(start);
+    get({ Username: 'greg',StartTime: start ,EndTime:end,})
     
-     /*PatientManager.addToDeviceMap(
-         {'Username': 'greg'},
-         "Kicks", true
-     )*/
-    //(patientManager.getPatient({Username:"greg"})).then(function(hu){hu.addToPatientList("NEW1")});
-    // (subscriberManager.getsubscriber({Email:"what@sub.com"})).then(function(hu){hu.addToPatientList("rinus")})
-    // Patient.addToPatientList("no.@e");
-    
-
-
-  }, 0);
+}, 0);
+// DeviceID:"Body_temperature",
  /*   subscriberManager.addSubscriber({
         Email: "nikkiconstancon@gmail.com",
         Password: CryptoJS.AES.encrypt('Password', 'secret key 123').toString(),

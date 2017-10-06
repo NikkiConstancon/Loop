@@ -9,14 +9,31 @@ const serviceName = 'Notifications'
 const defaultSmoothFactor = 0.3 // (f * now) + (1-f)*last
 //"°C"
 const THRESHOLD_MAP = {
-    "Body_temperature": new Threshold(0, 1000, defaultSmoothFactor, true),
-    "Body_insulin": new Threshold(0, 1000, defaultSmoothFactor, true),
-    "Heart-rate": new Threshold(0, 1000, defaultSmoothFactor, true),
-    "Body_glucose": new Threshold(37.2, 38.9, defaultSmoothFactor, true),
-
-
-
-    "dummy dev": new Threshold(37.2, 38.9, defaultSmoothFactor, true),
+    "Body Temperature": new Threshold(0, 1000, defaultSmoothFactor, true),
+    "Body Insulin": new Threshold(0, 1000, defaultSmoothFactor, true),
+    "Heart Rate": new Threshold(0, 1000, defaultSmoothFactor, true),
+    "Body Glucose": new Threshold(37.2, 38.9, defaultSmoothFactor, true),
+    
+    
+    "Blood Pressure": new Threshold(60, 100, defaultSmoothFactor, false),
+    "Diastolic Pressure": new Threshold(60, 79, defaultSmoothFactor, false),
+    "Systolic Pressure": new Threshold(90, 119, defaultSmoothFactor, false),
+    
+    "Oxygen": new Threshold(75, 100, defaultSmoothFactor, true),
+    "Pulse": new Threshold(60, 100, defaultSmoothFactor, true),
+    
+    "ECG": new Threshold(0, 6, defaultSmoothFactor, true),
+    
+    "Body Fat": new Threshold(18, 31, defaultSmoothFactor, false),
+    "Bady water": new Threshold(45, 65, defaultSmoothFactor, false),
+    "Calories": new Threshold(900, 1000, defaultSmoothFactor, false),
+    "Bone Density": new Threshold(45, 65, defaultSmoothFactor, false),
+    "Muscle Mass": new Threshold(13, 21, defaultSmoothFactor, false),
+    "Visceral Fat": new Threshold(0, 13, defaultSmoothFactor, false),
+    "Weight": new Threshold(45, 200, defaultSmoothFactor, false),
+    
+    "Airflow": new Threshold(376, 525, defaultSmoothFactor, false),
+    "Air Volume": new Threshold(2, 5, defaultSmoothFactor, false),
 }
 
 setInterval(function () {
@@ -48,11 +65,12 @@ function Analyser(threshold, publisher, info) {
 
 Analyser.prototype.analyze = function (now) {
     if (((new Date()).getTime() - this.lastTimeNotificationSent) > this.thrashGuardDelay) {
-        if (this.threshold.flagRealtimeAnalysis) {
-            if (this.value == null) {
+         if (this.value == null) {
                 this.value = now
                 this.smooth = now
-            }
+        }
+        if (this.threshold.flagRealtimeAnalysis) {
+           
             this.updateSmooth(now)
             
             if (this.smooth < this.threshold.min) {
@@ -61,7 +79,11 @@ Analyser.prototype.analyze = function (now) {
                 this.publishThresholdDeviation(1, this.deviceName + " is above the set threshold at " + this.valueWithUnit(now))
             }
         } else {
-
+            if (this.value < this.threshold.min) {
+                this.publishThresholdDeviation(1, this.deviceName + " is below the set threshold at " + this.valueWithUnit(now))
+            } else if (this.value > this.threshold.max) {
+                this.publishThresholdDeviation(1, this.deviceName + " is above the set threshold at " + this.valueWithUnit(now))
+            }
         }
     }
 }

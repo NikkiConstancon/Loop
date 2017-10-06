@@ -7,6 +7,41 @@ const logger = require('../revaLog')
 
 const serviceName = 'Stats'
 
+function compress(StartTime, EndTime, endResult){
+        var result = {};
+    for(var device in endResult){
+        result[device] = [];
+        var segment = (EndTime - StartTime ) / 60000;
+        var midEnd = StartTime;
+        var midStart = StartTime;
+        while(midStart < EndTime){ //for each segment that is there
+            midEnd += segment;
+            var avgX = 0;
+            var avgY = 0;
+            var count = 0;
+            var minMaxAvg = {};
+            for(var key in endResult[device]){
+                if(endResult[device][key].x > midStart && endResult[device][key].x < midEnd){
+                    count ++;
+                    avgX += endResult[device][key].x;
+                    avgY += endResult[device][key].y;
+                }else if(endResult[device][key].Min) {
+                    minMaxAvg = endResult[device][key];
+                    
+                }
+                    
+            }
+            if(count == 0)
+                count = 1;
+            avgX /= count;
+            avgY /= count;
+            result[device].push({x: avgX, y:avgY});  
+            midStart = midEnd;
+        }
+        result[device].push(minMaxAvg); 
+    }
+    return result;
+}
 
 var sevice = module.exports = {
 }
@@ -34,31 +69,51 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
         },
         GRAPH_POINTS: {
             RAW: function (transmitter, msg, key, channel) {
+<<<<<<< HEAD
                 var tmp = msg.nameValuePairs
                 //channel(false) && false && 
                 channel(false) && false && patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
                     dataManager.getGraphPoints({
+=======
+                var tmp = msg.nameValuePairs;
+                var params
+                if(!tmp.DeviceID){
+                        params = {
+>>>>>>> 6d1fd5c16013dd2245a68846159bb4bd3b48693e
                         Username: tmp.Username  ,
                         StartTime:  tmp.StartTime,
                         EndTime:tmp.EndTime,
-                    }).then(function(result){
-//console.log(result);                        
-//console.log(Object.keys(pat).length - 1);
+                    }
+                } else{
+                    params = {
+                        Username: tmp.Username  ,
+                        DeviceID: tmp.DeviceID,
+                        StartTime:  tmp.StartTime,
+                        EndTime:tmp.EndTime,
+                    }
+                    
+                }
+                console.log(params);
+                patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
+                    dataManager.getGraphPoints(params).then(function(result){
                         var endResult = {};
-                        for(var i= 0; i < Object.keys(pat).length; i ++){
-//console.log(pat[Object.keys(pat)[i]]);
-//console.log(Object.keys(pat)[i]);                            
-//                                if(pat[Object.keys(pat)[i]] == true){
-                                    
-                                    endResult[Object.keys(pat)[i]] = [];
-                                    for(var j = 0; j <  Object.keys(result).length - 1; j++){
-                                        endResult[Object.keys(pat)[i]].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
-                                    }
-
-                                 //}
-				endResult[Object.keys(pat)[i]].push({Min: result[Object.keys(result)[j]].Min, Max: result[Object.keys(result)[j]].Max, Avg: result[Object.keys(result)[j]].Avg});
+                        var size = 1;
+                        if(!tmp.DeviceID)
+                            size = Object.keys(pat).length;
+                        console.log(size);
+                        for(var i= 0; i < size; i ++){
+                            var id = Object.keys(pat)[i];
+                            if(tmp.DeviceID)
+                                id = tmp.DeviceID
+                            endResult[id] = [];
+                            for(var j = 0; j <  Object.keys(result).length - 1; j++){
+                                endResult[id].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
+                            }
+                            
+                            endResult[id].push({Min: result[Object.keys(result)[j]].Min, Max: result[Object.keys(result)[j]].Max, Avg: result[Object.keys(result)[j]].Avg});
                         }
-//console.log(endResult);
+                        //endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
+                        console.log(endResult);
                         channel(endResult);
                     }).catch(function (e) {
                         logger.error('GraphRetievalError', e)
@@ -68,28 +123,6 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                     logger.error('DeviceMapRetievalError', e)
                     channel(false)
                 }) 
-                
-                
-                
-                
-                
-                
-                
-                /*//console.log("Stats Request sent" + msg.nameValuePairs)
-                var tmp = msg.nameValuePairs
-                patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) {
-                   
-                //console.log("Stats Request sent" + msg.nameValuePairs.Username)
-                    var obj = {Username: tmp.Username, DeviceId: tmp.DeviceId, StartTime: tmp.StartTime, EndTime: tmp.EndTime}
-                    //console.log(obj);
-                    dataManager.getGraphPoints(obj).then(function(result){
-                        //console.log("Graph points: ")
-                        console.log(result)
-                        //channel(result)
-                    }).catch(function () {
-                        logger.error('GraphRetievalError', e)
-                    })  
-                })*/
             }
         }
     }
