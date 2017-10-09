@@ -95,7 +95,7 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                 patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
                     dataManager.getGraphPoints(params).then(function(result){
                         if(result == false){
-                            cahnnel(false);
+                            channel(false);
                             
                         }else{
                             var endResult = {};
