@@ -297,7 +297,7 @@ public class StatFragment extends android.support.v4.app.Fragment
                             } else {
                                 Map<String, List<Map<String, Double>>> stats = (Map<String, List<Map<String, Double>>>) obj;
                                 List<StatItem> items = new ArrayList<>();
-                                items.add(new StatTitle(UserManager.getViewedUser() )); 
+                                items.add(new StatTitle(UserManager.getViewedUser() ));
 
                                 for (Map.Entry<String, List<Map<String, Double>>> stat : stats.entrySet()) {
                                     Log.d("ENTRYK", stat.getKey());
