@@ -23,6 +23,7 @@ import com.zetta.android.R;
 import com.zetta.android.ZettaDeviceId;
 import com.zetta.android.device.DeviceDetailsActivity;
 import com.zetta.android.device.actions.OnActionClickListener;
+import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.revawebsocketservice.RevaWebSocketService;
 import com.zetta.android.revawebsocketservice.RevaWebsocketEndpoint;
 import com.zetta.android.settings.SdkProperties;
@@ -66,7 +67,7 @@ public class DeviceListActivity extends Fragment {
         super.onCreate(savedInstanceState);
         sdkProperties = SdkProperties.newInstance(getActivity());
 
-        String myDataFromActivity = user;
+        String myDataFromActivity = UserManager.getViewedUser();
 
         String serverURI = getString(R.string.serverURL) + ":3009";
         sdkProperties.setUrl(serverURI);

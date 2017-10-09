@@ -25,7 +25,6 @@
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             style="?android:attr/borderlessButtonStyle"
-            android:textColor="@color/primary"
             android:text="5M"
             android:id="@+id/min5"/>
         <Button

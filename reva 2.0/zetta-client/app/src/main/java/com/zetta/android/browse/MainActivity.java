@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
     PrimaryDrawerItem drawerItemMe = null;
     void bootstrap(final String userUid) {
         zettaUser = userUid;//getIntent().getStringExtra("Username");
+        UserManager.setViewedUser(userUid);//view self at start
 
         Log.d("--for stats--", UserManager.getViewedUser());
 
@@ -350,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         adapter.addFragment(dList, "Vitals");
-        //adapter.addFragment(new StatFragment(), "Stats");
+        adapter.addFragment(new StatFragment(), "Stats");
         adapter.addFragment(new notifications(), "Alerts");
 
         viewPager.setAdapter(adapter);
@@ -412,8 +413,9 @@ public class MainActivity extends AppCompatActivity {
                             dList.setUser("new");
                         }
                         else {
-                            UserManager.setViewedUser(subbedTo.iterator().next());
-                            dList.setUser(subbedTo.iterator().next());
+                            String name = subbedTo.iterator().next();
+                            UserManager.setViewedUser(name);
+                            dList.setUser(name);
                         }
                     }
                     pendingRequestCount = 0;

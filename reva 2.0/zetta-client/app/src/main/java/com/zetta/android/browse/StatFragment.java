@@ -332,6 +332,7 @@ public class StatFragment extends android.support.v4.app.Fragment
             final String startDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(start));
             final String endDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(end));
             if (obj.toString().equals("false")) {
+                dialog.dismiss();
                 List<StatItem> items = new ArrayList<>();
                 items.add(new SimpleStatItem("No stats for given period", "", "", "", "", "", 0));
                 statListAdapter.updateList(items);

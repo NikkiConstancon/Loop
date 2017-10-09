@@ -42,8 +42,8 @@
                     android:layout_width="50dip"
                     android:layout_height="50dip"
                     android:importantForAccessibility="no"
-                    tools:src="@drawable/ic_heart"
-                    android:src="@drawable/ic_heart" />
+                    tools:src="@drawable/ic_chart"
+                    android:src="@drawable/ic_chart" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
