@@ -10,6 +10,7 @@ import java.util.LinkedList;
  */
 public class GraphStatItem extends SimpleStatItem {
     private LinkedList<GraphEntry> entries = new LinkedList<GraphEntry>();
+    float reference;
 
     public GraphStatItem(String deviceName,
                          String imgURL,
@@ -17,9 +18,15 @@ public class GraphStatItem extends SimpleStatItem {
                          String start,
                          String end,
                          String units,
-                         LinkedList<GraphEntry> entries) {
+                         LinkedList<GraphEntry> entries,
+                         float reference) {
         super(deviceName, imgURL, statName, start, end, units, 0);
         this.entries = entries;
+        this.reference = reference;
+    }
+
+    public Float getReference() {
+        return reference;
     }
 
     /**

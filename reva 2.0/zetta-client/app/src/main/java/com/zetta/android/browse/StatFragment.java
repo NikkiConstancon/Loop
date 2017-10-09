@@ -230,6 +230,7 @@ public class StatFragment extends android.support.v4.app.Fragment
                 Intent intent = new Intent(view.getContext(), MoreGraph.class);
                 intent.putExtra("title", card.getDeviceName() + " " + card.getStatName());
                 intent.putExtra("entries",  aray);
+                intent.putExtra("reference", card.getReference());
                 startActivityForResult(intent,1);
             }
         });
@@ -334,7 +335,7 @@ public class StatFragment extends android.support.v4.app.Fragment
 
                                     }
                                     if (entries.size() != 0)
-                                        items.add(new GraphStatItem(stat.getKey(), "", "line-graph", startDate, endDate, "", entries));
+                                        items.add(new GraphStatItem(stat.getKey(), "", "line-graph", startDate, endDate, "", entries, (float)first));
                                     // }
 
                                 }
