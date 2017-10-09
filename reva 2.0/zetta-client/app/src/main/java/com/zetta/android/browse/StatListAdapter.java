@@ -133,6 +133,11 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
                 return new NumberViewHolder(view);
+            case StatItem.TYPE_TITLE:
+                layoutIdForListItem = R.layout.list_item_server;
+
+                view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+                return new TitleViewHolder(view);
             default:
                 throw new IllegalStateException("Attempted to create view holder for a type you haven't coded for: " + viewType);
         }
@@ -157,6 +162,9 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             case StatItem.TYPE_SIMPLE_STAT:
                 ((NumberViewHolder) holder).bind((SimpleStatItem) cards.get(position));
+                break;
+            case StatItem.TYPE_TITLE:
+                ((TitleViewHolder) holder).bind((StatTitle) cards.get(position));
                 break;
             default:
                 throw new IllegalStateException("Attempted to bind a type you haven't coded for: " + holder.getItemViewType());
@@ -311,63 +319,18 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             chart.invalidate();
         }
     }
-    IAxisValueFormatter createDateFormatter() {
-        IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
+    class TitleViewHolder extends RecyclerView.ViewHolder {
+        private final TextView title;
 
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                Date date = new Date((long) value*1000);
+        public TitleViewHolder(View itemView) {
+            super(itemView);
 
-                SimpleDateFormat fmt;
+            title = (TextView) itemView.findViewById(R.id.list_item_server_name);
+        }
 
-
-//                switch (labelModeSelected) {
-//                    case HOURS_FORMAT:
-//                        fmt = new SimpleDateFormat("h:mm a");
-//                        break;
-//
-//                    case DAYS_FORMAT:
-//                        fmt = new SimpleDateFormat("E d");
-//                        break;
-//
-//                    case WEEKS_FORMAT:
-//                        fmt = new SimpleDateFormat("d MMM");
-//                        break;
-//
-//                    case MONTHS_FORMAT:
-//                        fmt = new SimpleDateFormat("MMM yyyy");
-//                        break;
-//
-//                    case YEARS_FORMAT:
-//                        fmt = new SimpleDateFormat("yyyy");
-//
-//                        break;
-//
-//                    default:
-//                        fmt = new SimpleDateFormat("E d MMM");
-//                        break;
-//                }
-
-
-                fmt = new SimpleDateFormat("H:mm"); //TODO remove after tests and add switch
-                fmt.setTimeZone(TimeZone.getDefault()); // sets time zone... I think I did this properly...
-
-
-                String s = fmt.format(date);
-
-
-                return s;
-            }
-
-            // we don't draw numbers, so no decimal digits needed
-            public int getDecimalDigits() {
-                return 0;
-            }
-
-
-        };
-
-        return formatter;
+        void bind (StatTitle title) {
+            this.title.setText(title.getTitle());
+        }
     }
 }

@@ -76,7 +76,7 @@ public class MoreGraph extends AppCompatActivity {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                Date date = new Date((long) (value + reference));
+                Date date = new Date((long) (value + reference)); //TODO: change the label mode so that it suits the time period selected
 
                 SimpleDateFormat fmt;
 
@@ -110,7 +110,7 @@ public class MoreGraph extends AppCompatActivity {
 
 
                 fmt = new SimpleDateFormat("H:mm");
-                fmt.setTimeZone(TimeZone.getDefault()); // sets time zone... I think I did this properly...
+                fmt.setTimeZone(TimeZone.getDefault());
 
 
                 String s = fmt.format(date);

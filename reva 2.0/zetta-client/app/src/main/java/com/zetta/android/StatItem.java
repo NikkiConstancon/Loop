@@ -13,6 +13,7 @@ import java.io.Serializable;
 public interface StatItem extends Serializable {
     int TYPE_SIMPLE_STAT = 0;
     int TYPE_LINE_GRAPH = 1;
+    int TYPE_TITLE = 2;
 
 
     int getType();

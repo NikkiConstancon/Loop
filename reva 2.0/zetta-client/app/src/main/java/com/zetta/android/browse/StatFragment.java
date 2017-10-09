@@ -196,6 +196,7 @@ public class StatFragment extends android.support.v4.app.Fragment
             obj.put("Username", UserManager.getViewedUser());
             obj.put("StartTime", start);
             obj.put("EndTime", end);
+            setColor(min5);
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -288,7 +289,7 @@ public class StatFragment extends android.support.v4.app.Fragment
                             if (obj.toString().equals("false")) {
                                 dialog.dismiss();
                                 List<StatItem> items = new ArrayList<>();
-                                items.add(new SimpleStatItem("No stats for given period", "", "", "", "", "", 0));
+                                items.add(new StatTitle(UserManager.getViewedUser() + " has no stats for given period"));
                                 statListAdapter.updateList(items);
                                 statListAdapter.notifyDataSetChanged();
                                 dialog.dismiss();
@@ -296,6 +297,7 @@ public class StatFragment extends android.support.v4.app.Fragment
                             } else {
                                 Map<String, List<Map<String, Double>>> stats = (Map<String, List<Map<String, Double>>>) obj;
                                 List<StatItem> items = new ArrayList<>();
+                                items.add(new StatTitle(UserManager.getViewedUser() )); 
 
                                 for (Map.Entry<String, List<Map<String, Double>>> stat : stats.entrySet()) {
                                     Log.d("ENTRYK", stat.getKey());
