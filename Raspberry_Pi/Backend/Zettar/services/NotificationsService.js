@@ -34,10 +34,17 @@ const THRESHOLD_MAP = {
     
     "Airflow": new Threshold(376, 525, defaultSmoothFactor, false),
     "Air Volume": new Threshold(2, 5, defaultSmoothFactor, false),
+
+
+
+    "dummy dev": new Threshold(2, 5, defaultSmoothFactor, false),
 }
 
 setInterval(function () {
-    sevice.analyze({ from: "Dummy", name: "dummy dev" }, { data: 10000000000 })
+    sevice.analyze({ from: "greg", name: "dummy dev" }, { data: 1 })
+    sevice.analyze({ from: "nikki", name: "dummy dev" }, { data: 2 })
+    sevice.analyze({ from: "juan", name: "dummy dev" }, { data: 3 })
+    sevice.analyze({ from: "rinus", name: "dummy dev" }, { data: 4 })
 }, 3000)
 
 function Threshold(min, max, smoothFactor, flagRealtimeAnalysis){
@@ -58,8 +65,10 @@ function Analyser(threshold, publisher, info) {
     this.value = null
     this.smooth = null
     this.lastTimeNotificationSent = 0
-    this.thrashGuardDelay = 30 * 1000
+    this.thrashGuardDelay = 40 * 1000
 }
+
+
 
 Analyser.prototype.analyze = function (now) {
     if (((new Date()).getTime() - this.lastTimeNotificationSent) > this.thrashGuardDelay) {
@@ -95,13 +104,33 @@ Analyser.prototype.updateSmooth = function (now) {
     this.smooth = fac * now + (1 - fac) * this.smooth
 }
 Analyser.prototype.publishThresholdDeviation = function (level, message) {
-    this.publisher.publish({ ThresholdDeviation: { userUid: this.info.from, deviceName: this.deviceName, value: "" + this.value.toPrecision(3), noteLevel: "" + level, message: message } })
+    var id = new Date().getTime();
+    id = id & 0xffffffff;
+    this.publisher.publish({ ThresholdDeviation: { userUid: this.info.from, deviceName: this.deviceName, value: "" + this.value.toPrecision(3), noteLevel: "" + level, message: message, id: id + "" } })
     this.lastTimeNotificationSent = (new Date()).getTime()
 }
 
 
+const memoryLeakMap = {}//just want to fix the bug (no time left)
 
-
+function Publisher(userUid) {
+    this.userUid = userUid
+}
+//this is not how WebSocketServes should have work :|
+//this is a quick fix 
+Publisher.prototype.publish = function (msg) {
+    patientManager.getPatient({ Username: this.userUid }).then(pat => {
+        var arr = pat.SubscriberList || []
+        arr.push(this.userUid)
+        for (var ii in arr) {
+            user = arr[ii]
+            transmitters = webSockMessenger.getTransmitterArr(serviceName, user)
+            for (var i in transmitters) {
+                transmitters[i].transmit(msg)
+            }
+        }
+    })
+}
 var sevice = module.exports = {
     analyze: function (info, response) {
         var threshold = THRESHOLD_MAP[info.name]
@@ -111,12 +140,11 @@ var sevice = module.exports = {
         }
 
         //setup for patient and leech onto publisher (this will be in ram but who cares at this time?)
-        var publisher = publisherHandler.getPublisher(info.from)
-        publisher[serviceName] || (publisher[serviceName] = {})
-        publisher[serviceName][info.from] || (publisher[serviceName][info.from] = {})
-        publisher[serviceName][info.from][info.name] || (publisher[serviceName][info.from][info.name] = threshold.newAnalyser(publisher, info))
+        memoryLeakMap[serviceName] || (memoryLeakMap[serviceName] = {})
+        memoryLeakMap[serviceName][info.from] || (memoryLeakMap[serviceName][info.from] = {})
+        memoryLeakMap[serviceName][info.from][info.name] || (memoryLeakMap[serviceName][info.from][info.name] = threshold.newAnalyser(new Publisher(info.from), info))
 
-        var analyser = publisher[serviceName][info.from][info.name]
+        var analyser = memoryLeakMap[serviceName][info.from][info.name]
         analyser.analyze(response.data)
         //console.log(this.result.state)
        /* publisher = publisherHandler.getPublisher(info.from)
@@ -130,7 +158,7 @@ var sevice = module.exports = {
         publisher.realTimeCollectorMap[info.name] = response.data.toPrecision(3)*/
     },
 }
-const publisherHandler = webSockMessenger.attach(serviceName, {
+webSockMessenger.attach(serviceName, {
     defaultEnabled: true,
     connect: function (transmiter) {
         //publisher = publisherHandler.getPublisher(transmiter.getUserUid())
@@ -140,10 +168,5 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
     },
     receiver: function (transmiter, obj) {
         transmiter.transmit(obj)
-    },
-    subListUpdater: function (pubName, next) {
-        patientManager.bindSubscriberListInfoHook({ Username: pubName }, (list) => {
-            next(list)
-        })
     }
 })

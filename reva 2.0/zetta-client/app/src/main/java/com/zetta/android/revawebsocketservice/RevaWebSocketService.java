@@ -25,7 +25,9 @@ import com.google.gson.internal.LinkedTreeMap;
 import com.zetta.android.R;
 import com.zetta.android.browse.MainActivity;
 import com.zetta.android.browse.login_activity;
+import com.zetta.android.browse.notifications;
 import com.zetta.android.lib.Interval;
+import com.zetta.android.revaServices.NotificationsService;
 import com.zetta.android.revaServices.PubSubBindingService;
 import com.zetta.android.revaServices.UserManager;
 import com.zetta.android.settings.settingsPage;
@@ -239,6 +241,17 @@ public class RevaWebSocketService extends Service {
     ;
     USER_TYPE userType;
 
+
+    NotificationsService notificationsService = new NotificationsService(
+            this,
+            new NotificationsService.Worker(){
+                @Override  public void onNotification(NotificationsService.Notification note){
+                    Log.d("---Notifications---SOCK", note.message);
+                }
+            }
+    );
+
+
     PubSubBindingService pubSubBindingService = new PubSubBindingService(this,
             new PubSubBindingService.PubSubWorker() {
                 @Override
@@ -256,6 +269,7 @@ public class RevaWebSocketService extends Service {
 
                 @Override
                 public void newReq(PubSubBindingService.PubSubReqInfo info) {
+                    /*
                     Intent dismissIntent = new Intent(RevaWebSocketService.this, settingsPage.class);
                     dismissIntent.setAction(Intent.ACTION_DEFAULT);
                     dismissIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -277,7 +291,7 @@ public class RevaWebSocketService extends Service {
                     builder.setContentIntent(contentIntent);
                     NotificationManager notificationManager = (NotificationManager) RevaWebSocketService.this.getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.notify(0, builder.build());
-
+                    */
                 }
 
                 @Override
@@ -402,6 +416,7 @@ public class RevaWebSocketService extends Service {
         super.onCreate();
         runSouct = true;
 
+        /*
         Toast.makeText(this, "WebSocketService Started ", Toast.LENGTH_LONG).show();
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -411,9 +426,11 @@ public class RevaWebSocketService extends Service {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(001, mBuilder.build());
+        */
 
         initScout();
         rccPublisher = rccEndpoint.bind(RevaWebSocketService.this);
+        notificationsService.bind(this);
         pubSubBindingService.bind(this);
     }
 
