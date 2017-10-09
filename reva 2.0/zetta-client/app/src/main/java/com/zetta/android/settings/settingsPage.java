@@ -64,6 +64,8 @@ public class settingsPage extends AppCompatActivity {
         settingsList.setLayoutManager(layoutManager);
         settingsList.setHasFixedSize(true);
 
+
+
         settingsListAdapter = new SettingsListAdapter(settings, new SettingsListAdapter.MyAdapterListener() {
             @Override
             public void buttonYesOnClick(View v, int position) {
@@ -107,6 +109,10 @@ public class settingsPage extends AppCompatActivity {
         });
 
         settingsList.setAdapter(settingsListAdapter);
+        List<SettingsItem> tmp = new ArrayList<>();
+        tmp.add(new TitleItem("Loading..."));
+
+        settingsListAdapter.updateList(tmp);
         pubSubBinderEndpoint.bind(this);
     }
 

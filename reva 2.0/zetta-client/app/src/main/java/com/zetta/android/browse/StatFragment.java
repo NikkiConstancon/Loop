@@ -58,8 +58,6 @@ public class StatFragment extends android.support.v4.app.Fragment
     Button hour1;
     Button hour24;
     Button week1;
-    Button month1;
-    Button all;
 
     private List<StatItem> cards = new ArrayList<>();
     private static StatTmpForNikkiEndpoint endpoint = new StatTmpForNikkiEndpoint();
@@ -71,8 +69,6 @@ public class StatFragment extends android.support.v4.app.Fragment
         hour1.setTextColor(getResources().getColor(R.color.textColorPrimary));
         hour24.setTextColor(getResources().getColor(R.color.textColorPrimary));
         week1.setTextColor(getResources().getColor(R.color.textColorPrimary));
-        month1.setTextColor(getResources().getColor(R.color.textColorPrimary));
-        all.setTextColor(getResources().getColor(R.color.textColorPrimary));
 
         btn.setTextColor(getResources().getColor(R.color.primary));
     }
@@ -90,8 +86,6 @@ public class StatFragment extends android.support.v4.app.Fragment
         hour1 = (Button) view.findViewById(R.id.hour1);
         hour24 = (Button) view.findViewById(R.id.hour24);
         week1 = (Button) view.findViewById(R.id.week1);
-        month1 = (Button) view.findViewById(R.id.month1);
-        all = (Button) view.findViewById(R.id.all);
 
         min5.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -194,53 +188,7 @@ public class StatFragment extends android.support.v4.app.Fragment
                 dialog.show();
             }
         });
-        month1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setColor(month1);
 
-
-                start = new java.util.Date().getTime() - 86400000*7*4;
-                end = new java.util.Date().getTime();
-
-                JSONObject tmp = new JSONObject();
-                try {
-                    tmp.put("Username", UserManager.getViewedUser());
-                    tmp.put("StartTime", start);
-                    tmp.put("EndTime", end);
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                endpoint.attachCloudAwaitObject(
-                        null,
-                        statTmpForNikki
-                ).send(view.getContext(), "RAW", tmp);
-                dialog.show();
-            }
-        });
-        all.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setColor(all);
-                JSONObject tmp = new JSONObject();
-                try {
-                    tmp.put("Username", UserManager.getViewedUser());
-                    tmp.put("StartTime", start);
-                    tmp.put("EndTime", end);
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                endpoint.attachCloudAwaitObject(
-                        null,
-                        statTmpForNikki
-                ).send(view.getContext(), "RAW", tmp);
-                dialog.show();
-            }
-        });
 
 //MainActivity-- for stats
         JSONObject obj = new JSONObject();

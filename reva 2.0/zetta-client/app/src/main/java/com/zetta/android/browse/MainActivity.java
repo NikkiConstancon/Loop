@@ -228,9 +228,9 @@ public class MainActivity extends AppCompatActivity {
                         String name = drawerItem.toString();
                         Log.d("--Name of name", name);
                         if(tag instanceof PatientTag){
+                            UserManager.setViewedUser(((PatientTag)tag).name);
                             dList.setUser(((PatientTag)tag).name);
                             setupViewPager(mViewPager);
-                            UserManager.setViewedUser(((PatientTag)tag).name);
                             result.closeDrawer();
                         }
 
