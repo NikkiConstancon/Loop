@@ -124,6 +124,12 @@ console.log(_info);
                         return first.x - second.x;
                     });
                     result.push({Min: minimum, Max: maximum, Avg: (avg/count) })
+                    if(minimum == Number.POSITIVE_INFINITY){
+                     result = false;   
+                    }
+                    if(maximum == Number.NEGATIVE_INFINITY){
+                     result = false;   
+                    }
                     //console.log(result);
                     resolve(result);
 

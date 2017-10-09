@@ -94,25 +94,30 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                 console.log(params);
                 patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
                     dataManager.getGraphPoints(params).then(function(result){
-                        var endResult = {};
-                        var size = 1;
-                        if(!tmp.DeviceID)
-                            size = Object.keys(pat).length;
-                        console.log(size);
-                        for(var i= 0; i < size; i ++){
-                            var id = Object.keys(pat)[i];
-                            if(tmp.DeviceID)
-                                id = tmp.DeviceID
-                            endResult[id] = [];
-                            for(var j = 0; j <  Object.keys(result).length - 1; j++){
-                                endResult[id].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
-                            }
+                        if(result == false){
+                            cahnnel(false);
                             
-                            endResult[id].push({Min: result[Object.keys(result)[j]].Min, Max: result[Object.keys(result)[j]].Max, Avg: result[Object.keys(result)[j]].Avg});
+                        }else{
+                            var endResult = {};
+                            var size = 1;
+                            if(!tmp.DeviceID)
+                                size = Object.keys(pat).length;
+                            console.log(size);
+                            for(var i= 0; i < size; i ++){
+                                var id = Object.keys(pat)[i];
+                                if(tmp.DeviceID)
+                                    id = tmp.DeviceID
+                                endResult[id] = [];
+                                for(var j = 0; j <  Object.keys(result).length - 1; j++){
+                                    endResult[id].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
+                                }
+                                
+                                endResult[id].push({Min: result[Object.keys(result)[j]].Min, Max: result[Object.keys(result)[j]].Max, Avg: result[Object.keys(result)[j]].Avg});
+                            }
+                            endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
+                            console.log(endResult);
+                            channel(endResult);
                         }
-                        endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
-                        console.log(endResult);
-                        channel(endResult);
                     }).catch(function (e) {
                         logger.error('GraphRetievalError', e)
                         channel(false)
