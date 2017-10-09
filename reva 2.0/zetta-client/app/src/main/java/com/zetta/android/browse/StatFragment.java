@@ -279,81 +279,84 @@ public class StatFragment extends android.support.v4.app.Fragment
             Log.d("object", obj.toString());
             final String startDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(start));
             final String endDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(end));
-            if (obj.toString().equals("false")) {
-                dialog.dismiss();
-                List<StatItem> items = new ArrayList<>();
-                items.add(new SimpleStatItem("No stats for given period", "", "", "", "", "", 0));
-                statListAdapter.updateList(items);
-                statListAdapter.notifyDataSetChanged();
-                dialog.dismiss();
-                statList.smoothScrollBy(0,1);
-            } else {
+
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            Map<String, List<Map<String, Double>>> stats = (Map<String, List<Map<String, Double>>>) obj;
-                            List<StatItem> items = new ArrayList<>();
+                            if (obj.toString().equals("false")) {
+                                dialog.dismiss();
+                                List<StatItem> items = new ArrayList<>();
+                                items.add(new SimpleStatItem("No stats for given period", "", "", "", "", "", 0));
+                                statListAdapter.updateList(items);
+                                statListAdapter.notifyDataSetChanged();
+                                dialog.dismiss();
+                                statList.smoothScrollBy(0,1);
+                            } else {
+                                Map<String, List<Map<String, Double>>> stats = (Map<String, List<Map<String, Double>>>) obj;
+                                List<StatItem> items = new ArrayList<>();
 
-                            for (Map.Entry<String, List<Map<String, Double>>> stat : stats.entrySet()) {
-                                Log.d("ENTRYK", stat.getKey());
-                                Log.d("ENTRYV", ""+ stat.getValue());
-                                LinkedList<GraphEntry> entries = new LinkedList<GraphEntry>();
-                                Boolean x = true;
-                                double first = 0;
-                                boolean isFirst = true;
-                                // if (stat.getValue().isEmpty()) {
-                                for (Map<String, Double> point : stat.getValue()) {
-                                    //GraphEntry tmp = new GraphEntry((float)point.values().toArray()[0], (float)point.values().toArray()[1]);
-                                    Iterator<Double> doubleIterator = point.values().iterator();
-                                    double tmpX = 0.0;
-                                    double tmpY = 0.0;
-                                    if (point.keySet().size() == 2) {
-                                        while (doubleIterator.hasNext()) {
-                                            if (x) {
-                                                tmpX =  doubleIterator.next();
-                                                if (isFirst) {
-                                                    first = tmpX;
-                                                    isFirst = false;
+                                for (Map.Entry<String, List<Map<String, Double>>> stat : stats.entrySet()) {
+                                    Log.d("ENTRYK", stat.getKey());
+                                    Log.d("ENTRYV", "" + stat.getValue());
+                                    LinkedList<GraphEntry> entries = new LinkedList<GraphEntry>();
+                                    Boolean x = true;
+                                    double first = 0;
+                                    boolean isFirst = true;
+                                    // if (stat.getValue().isEmpty()) {
+                                    for (Map<String, Double> point : stat.getValue()) {
+                                        //GraphEntry tmp = new GraphEntry((float)point.values().toArray()[0], (float)point.values().toArray()[1]);
+                                        Iterator<Double> doubleIterator = point.values().iterator();
+                                        double tmpX = 0.0;
+                                        double tmpY = 0.0;
+                                        if (point.keySet().size() == 2) {
+                                            while (doubleIterator.hasNext()) {
+                                                if (x) {
+                                                    tmpX = doubleIterator.next();
+                                                    if (isFirst) {
+                                                        first = tmpX;
+                                                        isFirst = false;
+                                                    }
+                                                    tmpX -= first;
+
+                                                    x = false;
+                                                } else {
+                                                    tmpY = doubleIterator.next();
+                                                    x = true;
                                                 }
-                                                tmpX -= first;
-
-                                                x = false;
-                                            } else {
-                                                tmpY =  doubleIterator.next();
-                                                x = true;
                                             }
+                                            entries.add(new GraphEntry((float) tmpX, (float) tmpY));
+                                        } else if (point.keySet().size() == 3) {
+                                            items.add(new SimpleStatItem(stat.getKey(), "", "min", startDate, endDate, "", doubleIterator.next()));
+                                            items.add(new SimpleStatItem(stat.getKey(), "", "max", startDate, endDate, "", doubleIterator.next()));
+                                            items.add(new SimpleStatItem(stat.getKey(), "", "avg", startDate, endDate, "", round(doubleIterator.next(), 2)));
                                         }
-                                        entries.add(new GraphEntry((float)tmpX, (float)tmpY));
-                                    } else if (point.keySet().size() == 3){
-                                        items.add(new SimpleStatItem(stat.getKey(), "", "min", startDate, endDate, "", doubleIterator.next()));
-                                        items.add(new SimpleStatItem(stat.getKey(), "", "max", startDate, endDate, "", doubleIterator.next()));
-                                        items.add(new SimpleStatItem(stat.getKey(), "", "avg", startDate, endDate, "", round(doubleIterator.next(),2)));
+
                                     }
+                                    if (entries.size() != 0)
+                                        items.add(new GraphStatItem(stat.getKey(), "", "line-graph", startDate, endDate, "", entries));
+                                    // }
 
                                 }
-                                if (entries.size() != 0)
-                                    items.add(new GraphStatItem(stat.getKey(), "", "line-graph", startDate, endDate, "", entries ));
-                                // }
+                                //items.add(new SimpleStatItem("There are no stats for the requested time", "", "", "", "", "", 0));
 
+
+                                statListAdapter.updateList(items);
+                                statListAdapter.notifyDataSetChanged();
+                                dialog.dismiss();
+                                statList.smoothScrollBy(0, 1);
                             }
-                            //items.add(new SimpleStatItem("There are no stats for the requested time", "", "", "", "", "", 0));
-
-
-                            statListAdapter.updateList(items);
-                            statListAdapter.notifyDataSetChanged();
-                            dialog.dismiss();
-                            statList.smoothScrollBy(0,1);
                         } catch (ClassCastException e ) {
                             Log.e("BIGD", e.toString());
                         }
 
                     }
                 });
+            return null;
             }
 
-            return null;
-        }
-    };
+
+        };
+
 }
 

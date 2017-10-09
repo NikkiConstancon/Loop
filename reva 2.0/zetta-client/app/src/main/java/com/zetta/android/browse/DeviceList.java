@@ -82,8 +82,7 @@ class DeviceList {
 
 
                     if (!hasServer && !servers.isEmpty()) {
-                        ZettaStyle serverStyle = zettaStyleParser.parseStyle(servers.get(0));
-                        items.add(createEmptyServerListItem(serverStyle));
+                        items.add(new NewListItem("This server is not online at the moment"));
                     }
                 }
 
