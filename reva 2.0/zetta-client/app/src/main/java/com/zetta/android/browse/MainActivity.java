@@ -284,6 +284,23 @@ public class MainActivity extends AppCompatActivity {
     }
     // Set up the input
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        Log.d("RESU", "RESULT IS HAPPEN");
+        Log.d("RESCODE", resultCode + "");
+        Log.d("REQCODE", requestCode + ""); //TODO: get this to actually work
+        mViewPager.setCurrentItem(1);
+        mViewPager.getAdapter().notifyDataSetChanged();
+
+        /*if (resultCode == 0) {
+
+            //mViewPager.;
+        }*/
+        // else... other cases
+    }
+
     /**
      * Function to get user from server
      *
@@ -297,8 +314,8 @@ public class MainActivity extends AppCompatActivity {
      * Method that sets up tab titles
      *
      * @param viewPager the pager of the views to be tabbed
+    getTab
      */
-
 
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
@@ -307,7 +324,9 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(dList, "Vitals");
         adapter.addFragment(new StatFragment(), "Stats");
         adapter.addFragment(new notifications(), "Alerts");
+
         viewPager.setAdapter(adapter);
+
     }
 
     UserManager.MainActivityEndpoint userManagerEndpoint = new UserManager.MainActivityEndpoint(this);
@@ -366,6 +385,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
     );
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

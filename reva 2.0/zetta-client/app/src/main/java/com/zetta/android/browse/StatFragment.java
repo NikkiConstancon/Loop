@@ -1,5 +1,6 @@
 package com.zetta.android.browse;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +29,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,6 +52,7 @@ public class StatFragment extends android.support.v4.app.Fragment
     public static final String Tag = "StatFragment";
     private RecyclerView statList;
     private StatListAdapter statListAdapter;
+    private ProgressDialog dialog;
 
     Button min5;
     Button hour1;
@@ -75,10 +79,12 @@ public class StatFragment extends android.support.v4.app.Fragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.stat_hist_fragment, container, false);
+        final View view = inflater.inflate(R.layout.stat_hist_fragment, container, false);
         super.onCreate(savedInstanceState);
         //final FloatingActionButton myFab = (FloatingActionButton) view.findViewById(R.id.myFAB);
         endpoint.bind(view.getContext());
+        dialog = new ProgressDialog(view.getContext());
+        dialog.setTitle("Loading stats...");
 
         min5 = (Button) view.findViewById(R.id.min5);
         hour1 = (Button) view.findViewById(R.id.hour1);
@@ -90,37 +96,149 @@ public class StatFragment extends android.support.v4.app.Fragment
         min5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 setColor(min5);
+                start = new java.util.Date().getTime() - 300000;
+                end = new java.util.Date().getTime();
+                JSONObject tmp = new JSONObject();
+                try {
+                    tmp.put("Username", UserManager.getViewedUser());
+                    tmp.put("StartTime", start);
+                    tmp.put("EndTime", end);
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                endpoint.attachCloudAwaitObject(
+                        null,
+                        statTmpForNikki
+                ).send(view.getContext(), "RAW", tmp);
+
+                dialog.show();
             }
         });
         hour1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setColor(hour1);
+
+                start = new java.util.Date().getTime() - 3600000;
+                end = new java.util.Date().getTime();
+
+                JSONObject tmp = new JSONObject();
+                try {
+                    tmp.put("Username", UserManager.getViewedUser());
+                    tmp.put("StartTime", start);
+                    tmp.put("EndTime", end);
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                endpoint.attachCloudAwaitObject(
+                        null,
+                        statTmpForNikki
+                ).send(view.getContext(), "RAW", tmp);
+
+                dialog.show();
             }
         });
         hour24.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setColor(hour24);
+
+                start = new java.util.Date().getTime() - 86400000;
+                end = new java.util.Date().getTime();
+
+                JSONObject tmp = new JSONObject();
+                try {
+                    tmp.put("Username", UserManager.getViewedUser());
+                    tmp.put("StartTime", start);
+                    tmp.put("EndTime", end);
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                endpoint.attachCloudAwaitObject(
+                        null,
+                        statTmpForNikki
+                ).send(view.getContext(), "RAW", tmp);
+                dialog.show();
             }
         });
         week1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setColor(week1);
+
+                start = new java.util.Date().getTime() - 86400000*7;
+                end = new java.util.Date().getTime();
+
+                JSONObject tmp = new JSONObject();
+                try {
+                    tmp.put("Username", UserManager.getViewedUser());
+                    tmp.put("StartTime", start);
+                    tmp.put("EndTime", end);
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                endpoint.attachCloudAwaitObject(
+                        null,
+                        statTmpForNikki
+                ).send(view.getContext(), "RAW", tmp);
+                dialog.show();
             }
         });
         month1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setColor(month1);
+
+
+                start = new java.util.Date().getTime() - 86400000*7*4;
+                end = new java.util.Date().getTime();
+
+                JSONObject tmp = new JSONObject();
+                try {
+                    tmp.put("Username", UserManager.getViewedUser());
+                    tmp.put("StartTime", start);
+                    tmp.put("EndTime", end);
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                endpoint.attachCloudAwaitObject(
+                        null,
+                        statTmpForNikki
+                ).send(view.getContext(), "RAW", tmp);
+                dialog.show();
             }
         });
         all.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setColor(all);
+                JSONObject tmp = new JSONObject();
+                try {
+                    tmp.put("Username", UserManager.getViewedUser());
+                    tmp.put("StartTime", start);
+                    tmp.put("EndTime", end);
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                endpoint.attachCloudAwaitObject(
+                        null,
+                        statTmpForNikki
+                ).send(view.getContext(), "RAW", tmp);
+                dialog.show();
             }
         });
 
@@ -161,10 +279,10 @@ public class StatFragment extends android.support.v4.app.Fragment
                 for (int i = 0; i < card.getEntries().size(); i++) {
                     aray.add(card.getEntries().get(i));
                 }
-                Intent intent = new Intent(getContext(), MoreGraph.class);
+                Intent intent = new Intent(view.getContext(), MoreGraph.class);
                 intent.putExtra("title", card.getDeviceName() + " " + card.getStatName());
                 intent.putExtra("entries",  aray);
-                startActivity(intent);
+                startActivityForResult(intent,1);
             }
         });
 
@@ -198,64 +316,93 @@ public class StatFragment extends android.support.v4.app.Fragment
             return "Stats";
         }
     }
+
+    public double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
     public CloudAwaitObject statTmpForNikki = new CloudAwaitObject("GRAPH_POINTS") {
         @Override
         public Object get(final Object obj, Object localMsg, CloudAwaitObject cao) {
             Log.d("object", obj.toString());
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Map<String, List<Map<String, Double>>> stats = (Map<String, List<Map<String, Double>>>) obj;
-                        List<StatItem> items = new ArrayList<>();
-                        String startDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(start));
-                        String endDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(end));
-                        for (Map.Entry<String, List<Map<String, Double>>> stat : stats.entrySet()) {
-                            Log.d("ENTRYK", stat.getKey());
-                            Log.d("ENTRYV", ""+ stat.getValue());
-                            LinkedList<GraphEntry> entries = new LinkedList<GraphEntry>();
-                            Boolean x = true;
-                            double first = 0;
-                            boolean isFirst = true;
-                            for (Map<String, Double> point : stat.getValue()) {
-                                //GraphEntry tmp = new GraphEntry((float)point.values().toArray()[0], (float)point.values().toArray()[1]);
-                                Iterator<Double> doubleIterator = point.values().iterator();
-                                double tmpX = 0.0;
-                                double tmpY = 0.0;
-                                if (point.keySet().size() == 2) {
-                                    while (doubleIterator.hasNext()) {
-                                        if (x) {
-                                            tmpX =  doubleIterator.next();
-                                            if (isFirst) {
-                                                first = tmpX;
-                                                isFirst = false;
-                                            }
-                                            tmpX -= first;
+            final String startDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(start));
+            final String endDate = new SimpleDateFormat("MM.dd HH:mm").format(new java.util.Date(end));
+            if (obj.toString().equals("false")) {
+                List<StatItem> items = new ArrayList<>();
+                items.add(new SimpleStatItem("No stats for given period", "", "", "", "", "", 0));
+                statListAdapter.updateList(items);
+                statListAdapter.notifyDataSetChanged();
+                dialog.dismiss();
+                statList.smoothScrollBy(0,1);
+            } else {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Map<String, List<Map<String, Double>>> stats = (Map<String, List<Map<String, Double>>>) obj;
+                            List<StatItem> items = new ArrayList<>();
 
-                                            x = false;
-                                        } else {
-                                            tmpY =  doubleIterator.next();
-                                            x = true;
+                            for (Map.Entry<String, List<Map<String, Double>>> stat : stats.entrySet()) {
+                                Log.d("ENTRYK", stat.getKey());
+                                Log.d("ENTRYV", ""+ stat.getValue());
+                                LinkedList<GraphEntry> entries = new LinkedList<GraphEntry>();
+                                Boolean x = true;
+                                double first = 0;
+                                boolean isFirst = true;
+                                // if (stat.getValue().isEmpty()) {
+                                for (Map<String, Double> point : stat.getValue()) {
+                                    //GraphEntry tmp = new GraphEntry((float)point.values().toArray()[0], (float)point.values().toArray()[1]);
+                                    Iterator<Double> doubleIterator = point.values().iterator();
+                                    double tmpX = 0.0;
+                                    double tmpY = 0.0;
+                                    if (point.keySet().size() == 2) {
+                                        while (doubleIterator.hasNext()) {
+                                            if (x) {
+                                                tmpX =  doubleIterator.next();
+                                                if (isFirst) {
+                                                    first = tmpX;
+                                                    isFirst = false;
+                                                }
+                                                tmpX -= first;
+
+                                                x = false;
+                                            } else {
+                                                tmpY =  doubleIterator.next();
+                                                x = true;
+                                            }
                                         }
+                                        entries.add(new GraphEntry((float)tmpX, (float)tmpY));
+                                    } else if (point.keySet().size() == 3){
+                                        items.add(new SimpleStatItem(stat.getKey(), "", "min", startDate, endDate, "", doubleIterator.next()));
+                                        items.add(new SimpleStatItem(stat.getKey(), "", "max", startDate, endDate, "", doubleIterator.next()));
+                                        items.add(new SimpleStatItem(stat.getKey(), "", "avg", startDate, endDate, "", round(doubleIterator.next(),2)));
                                     }
-                                    entries.add(new GraphEntry((float)tmpX, (float)tmpY));
-                                } else if (point.keySet().size() == 3){
-                                    items.add(new SimpleStatItem(stat.getKey(), "", "min", startDate, endDate, "", doubleIterator.next()));
-                                    items.add(new SimpleStatItem(stat.getKey(), "", "max", startDate, endDate, "", doubleIterator.next()));
-                                    items.add(new SimpleStatItem(stat.getKey(), "", "avg", startDate, endDate, "", doubleIterator.next()));
+
                                 }
+                                if (entries.size() != 0)
+                                    items.add(new GraphStatItem(stat.getKey(), "", "line-graph", startDate, endDate, "", entries ));
+                                // }
 
                             }
+                            //items.add(new SimpleStatItem("There are no stats for the requested time", "", "", "", "", "", 0));
 
-                            items.add(new GraphStatItem(stat.getKey(), "", "line-graph", startDate, endDate, "", entries ));
+
                             statListAdapter.updateList(items);
+                            statListAdapter.notifyDataSetChanged();
+                            dialog.dismiss();
+                            statList.smoothScrollBy(0,1);
+                        } catch (ClassCastException e ) {
+                            Log.e("BIGD", e.toString());
                         }
-                    } catch (ClassCastException e ) {
-                        Log.e("BIGD", e.toString());
-                    }
 
-                }
-            });
+                    }
+                });
+            }
+
             return null;
         }
     };

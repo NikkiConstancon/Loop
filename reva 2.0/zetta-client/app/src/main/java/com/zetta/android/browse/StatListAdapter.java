@@ -30,19 +30,24 @@ import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.zetta.android.ImageLoader;
 import com.zetta.android.R;
 import com.zetta.android.StatItem;
 import com.zetta.android.settings.SettingsItem;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by Gregory Austin 22/08/2017
@@ -51,6 +56,8 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
     public MyAdapterListener onClickListener;
+
+    private long referenceTime;
 
     public interface MyAdapterListener {
         void moreInfoOnClick(View v, int position);
@@ -68,6 +75,11 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public StatListAdapter(List<StatItem> cards, MyAdapterListener listener ) {
         this.cards = cards;
         this.onClickListener = listener;
+        referenceTime = 0;
+    }
+
+    public void setRefTime(long refTime ){
+        referenceTime = refTime;
     }
 
     public List<StatItem> getCards() {
@@ -201,7 +213,12 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             stat_simple.setText("" + item.getStatistic());
             units_simple_stat.setText("" + item.getUnits());
             stat_title.setText("" + item.deviceName + " " + item.getStatName());
-            stat_subtitle.setText("Start: " + item.getStart() +"\nEnd:   " + item.getEnd());
+            if (item.deviceName.equals("No stats for given period")) {
+                stat_subtitle.setText("");
+            } else {
+                stat_subtitle.setText("Start: " + item.getStart() +"\nEnd:   " + item.getEnd());
+            }
+
             if (item.getImgURL() != "")
                 imageLoader.load(Uri.parse(item.getImgURL()), stateImageWidget);
         }
@@ -261,11 +278,16 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
             LineData lineData = new LineData(dataSet);
+            //AxisValueFormatter xAxisFormatter = new HourAxisValueFormatter(referenceTimestamp);
+
+
             XAxis xAxis = chart.getXAxis();
+            //xAxis.setValueFormatter(createDateFormatter());
             xAxis.setDrawGridLines(false);
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis.setTextColor(R.color.colorSecondaryText);
             xAxis.setDrawAxisLine(false);
+            xAxis.setGranularity(20f);
 
             YAxis leftAxis = chart.getAxisLeft();
             leftAxis.setTextColor(R.color.colorSecondaryText);
@@ -279,6 +301,7 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             chart.setDescription(description);
 
             chart.getLegend().setEnabled(false);
+            chart.getXAxis().setEnabled(false);
             chart.getAxisRight().setEnabled(false);
 
             chart.setTouchEnabled(false);
@@ -287,5 +310,64 @@ public class StatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             chart.invalidate();
         }
+    }
+    IAxisValueFormatter createDateFormatter() {
+        IAxisValueFormatter formatter = new IAxisValueFormatter() {
+
+
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                Date date = new Date((long) value*1000);
+
+                SimpleDateFormat fmt;
+
+
+//                switch (labelModeSelected) {
+//                    case HOURS_FORMAT:
+//                        fmt = new SimpleDateFormat("h:mm a");
+//                        break;
+//
+//                    case DAYS_FORMAT:
+//                        fmt = new SimpleDateFormat("E d");
+//                        break;
+//
+//                    case WEEKS_FORMAT:
+//                        fmt = new SimpleDateFormat("d MMM");
+//                        break;
+//
+//                    case MONTHS_FORMAT:
+//                        fmt = new SimpleDateFormat("MMM yyyy");
+//                        break;
+//
+//                    case YEARS_FORMAT:
+//                        fmt = new SimpleDateFormat("yyyy");
+//
+//                        break;
+//
+//                    default:
+//                        fmt = new SimpleDateFormat("E d MMM");
+//                        break;
+//                }
+
+
+                fmt = new SimpleDateFormat("H:mm"); //TODO remove after tests and add switch
+                fmt.setTimeZone(TimeZone.getDefault()); // sets time zone... I think I did this properly...
+
+
+                String s = fmt.format(date);
+
+
+                return s;
+            }
+
+            // we don't draw numbers, so no decimal digits needed
+            public int getDecimalDigits() {
+                return 0;
+            }
+
+
+        };
+
+        return formatter;
     }
 }
