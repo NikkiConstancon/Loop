@@ -80,11 +80,14 @@ function get(msg) {
                 var endResult = {};
                 var minMax = {};
                 for(var device in result){
+                    console.log(result[device]);
                     var id = result[device].device;
                     if(tmp.DeviceID)
                         id = tmp.DeviceID
-                    endResult[id] = [];
-                    minMax[id] = [];
+                    if(! endResult[id])
+                        endResult[id] = [];
+                    if(!minMax[id])
+                        minMax[id] = [];
                     if(result[device])
                         minMax[id].push({Min: Number.POSITIVE_INFINITY, Max: Number.NEGATIVE_INFINITY, Avg: 0, count: 0});
                          
@@ -96,7 +99,8 @@ function get(msg) {
                         }
                         minMax[id][0].Avg += result[device].y
                         minMax[id][0].count ++;
-                        endResult[id].push({x: result[device].x, y: result[device].y});    
+                        endResult[id].push({x: result[device].x, y: result[device].y});  
+                        console.log(endResult[id]);
                 }
                var average;
                 for(var device in minMax){
