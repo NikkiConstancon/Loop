@@ -111,6 +111,7 @@ function Publisher(PublisherHandler, publisherUsername) {
 }
 Publisher.prototype.publish = function (msg, errcb) {
     try {
+console.log(this.subscriberList)
         for (var i in this.subscriberList) {
             var subUid = this.subscriberList[i]
             for (var deviceUid in userSocketContextMap[subUid]) {
