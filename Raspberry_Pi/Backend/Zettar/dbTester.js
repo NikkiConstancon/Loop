@@ -14,57 +14,43 @@ var dataManager = require("./patientDataManager")
 var CryptoJS = require("crypto-js");
 
 function compress(StartTime, EndTime, endResult){
+    console.log(endResult);
     var result = {};
-    for(var device in endResult){ //compress each device
-       // console.log("device ID: " + device);
+    for(var device in endResult){
         result[device] = [];
-       // console.log("Start time : " + StartTime);
-       // console.log("End time : " + EndTime);
-        var segment = (EndTime - StartTime ) / 6;
-       // console.log("Segment: " + segment);
+        var segment = (EndTime - StartTime ) / 600;
         var midEnd = StartTime;
         var midStart = StartTime;
         while(midStart < EndTime){ //for each segment that is there
             midEnd += segment;
-          //  console.log("Compress: " + midStart + "  " + midEnd);
             var avgX = 0;
             var avgY = 0;
             var count = 0;
             var minMaxAvg = {};
-            //console.log("device")
-            //console.log(endResult[device]);
             for(var key in endResult[device]){
-                //console.log("KEY" + key);
-               // console.log("end")
-               // console.log(endResult[device][key]);
                 if(endResult[device][key].x > midStart && endResult[device][key].x < midEnd){
-                   // console.log("TRUE" );
-                    //key in range   
                     count ++;
                     avgX += endResult[device][key].x;
                     avgY += endResult[device][key].y;
-                }else if(endResult[device][key].Min) {
-                    //console.log("HERE");
-                    //console.log(endResult[device][key]);
-                    minMaxAvg = endResult[device][key];
-                    
                 }
+                minMaxAvg = endResult[device][key];
                     
             }
-          //  console.log(avgX + "   " + avgY);
-            if(count == 0)
-                count = 1;
-            avgX /= count;
-            avgY /= count;
-         //   console.log(avgX + "   " + avgY);
-            result[device].push({x: avgX, y:avgY});  
+            if(count == 0){
+                avgX = (midEnd + midStart ) / 2
+            } else{
+                avgX /= count;
+                avgY /= count;
+                result[device].push({x: avgX, y:avgY});  
+                
+            } 
             midStart = midEnd;
         }
         result[device].push(minMaxAvg); 
+                    
     }
     return result;
 }
-
 function get(msg) {
     var tmp = msg
     var params
@@ -86,25 +72,43 @@ function get(msg) {
     console.log(params);
     patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
         dataManager.getGraphPoints(params).then(function(result){
-            var endResult = {};
-            var size = 1;
-            if(!tmp.DeviceID)
-                size = Object.keys(pat).length;
-            console.log(size);
-            for(var i= 0; i < size; i ++){
-                var id = Object.keys(pat)[i];
-                if(tmp.DeviceID)
-                    id = tmp.DeviceID
-                endResult[id] = [];
-                for(var j = 0; j <  Object.keys(result).length - 1; j++){
-                    endResult[id].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
-                }
+             if(result == false){
+                channel(false);
                 
-                endResult[id].push({Min: result[Object.keys(result)[j]].Min, Max: result[Object.keys(result)[j]].Max, Avg: result[Object.keys(result)[j]].Avg});
+            }else{
+                //console.log(result);
+                var endResult = {};
+                var minMax = {};
+                for(var device in result){
+                    var id = result[device].device;
+                    if(tmp.DeviceID)
+                        id = tmp.DeviceID
+                    endResult[id] = [];
+                    minMax[id] = [];
+                    if(result[device])
+                        minMax[id].push({Min: Number.POSITIVE_INFINITY, Max: Number.NEGATIVE_INFINITY, Avg: 0, count: 0});
+                         
+                        if(minMax[id][0].Min > result[device].y){
+                            minMax[id][0].Min = result[device].y
+                        }
+                        if(minMax[id][0].Max < result[device].y){
+                            minMax[id][0].Max = result[device].y
+                        }
+                        minMax[id][0].Avg += result[device].y
+                        minMax[id][0].count ++;
+                        endResult[id].push({x: result[device].x, y: result[device].y});    
+                }
+               var average;
+                for(var device in minMax){
+                    average =  minMax[device][0].Avg/ minMax[device][0].count
+                    endResult[device].push({Min: minMax[device][0].Min, Max: minMax[device][0].Max, Avg: average});
+                    
+                }
+               endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
+               console.log("\n\n");
+                console.log(endResult);
+                //channel(endResult);
             }
-            endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
-            console.log(endResult);
-            //channel(endResult);
         }).catch(function (e) {
             console.log(e);
             //logger.error('GraphRetievalError', e)

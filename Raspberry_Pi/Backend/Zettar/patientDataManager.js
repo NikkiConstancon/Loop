@@ -93,18 +93,19 @@ console.log(_info);
                 var query;
                 console.log(_info.DeviceID);
                 console.log(_info.DeviceID);
-                if(!_info.DeviceID){
+              // if(!_info.DeviceID){
                     query = {
                         PatientUsername: _info.Username,
                         TimeStamp : { '$gt':start, '$lte':end}
                     }
-                } else{
+              //  }
+                /*else{
                     query = {
                         PatientUsername: _info.Username,
                         DeviceID: _info.DeviceID,
                         TimeStamp : { '$gt':start, '$lte':end}
                     }
-                }
+                }*/
                 console.log(query);
                 dbMan.models.instance.patientData.stream(query, {raw: true, allow_filtering: true}, function(data){
                     var row;
@@ -123,7 +124,7 @@ console.log(_info);
                     result.sort(function(first, second) {
                         return first.x - second.x;
                     });
-                    result.push({Min: minimum, Max: maximum, Avg: (avg/count) })
+                   // result.push({Min: minimum, Max: maximum, Avg: (avg/count) })
                     if(minimum == Number.POSITIVE_INFINITY){
                      result = false;   
                     }
