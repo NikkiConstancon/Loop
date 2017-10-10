@@ -8,7 +8,7 @@ const logger = require('../revaLog')
 const serviceName = 'Stats'
 
 function compress(StartTime, EndTime, endResult){
-        var result = {};
+    var result = {};
     for(var device in endResult){
         result[device] = [];
         var segment = (EndTime - StartTime ) / 600;
@@ -25,16 +25,12 @@ function compress(StartTime, EndTime, endResult){
                     count ++;
                     avgX += endResult[device][key].x;
                     avgY += endResult[device][key].y;
-                }else if(endResult[device][key].Min) {
-                    minMaxAvg = endResult[device][key];
-                    
                 }
+                minMaxAvg = endResult[device][key];
                     
             }
             if(count == 0){
                 avgX = (midEnd + midStart ) / 2
-  //              console.log('pushing : ' + avgX + "  " + avgY);
-//                result[device].push({x: avgX, y:0});  
             } else{
                 avgX /= count;
                 avgY /= count;
@@ -44,6 +40,7 @@ function compress(StartTime, EndTime, endResult){
             midStart = midEnd;
         }
         result[device].push(minMaxAvg); 
+                    
     }
     return result;
 }
@@ -98,23 +95,36 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                             channel(false);
                             
                         }else{
+                            //console.log(result);
                             var endResult = {};
-                            var size = 1;
-                            if(!tmp.DeviceID)
-                                size = Object.keys(pat).length;
-                            console.log(size);
-                            for(var i= 0; i < size; i ++){
-                                var id = Object.keys(pat)[i];
+                            var minMax = {};
+                            for(var device in result){
+                                var id = result[device].device;
                                 if(tmp.DeviceID)
                                     id = tmp.DeviceID
                                 endResult[id] = [];
-                                for(var j = 0; j <  Object.keys(result).length - 1; j++){
-                                    endResult[id].push({x: result[Object.keys(result)[j]].x, y: result[Object.keys(result)[j]].y});
-                                }
-                                
-                                endResult[id].push({Min: result[Object.keys(result)[j]].Min, Max: result[Object.keys(result)[j]].Max, Avg: result[Object.keys(result)[j]].Avg});
+                                minMax[id] = [];
+                                if(result[device])
+                                    minMax[id].push({Min: Number.POSITIVE_INFINITY, Max: Number.NEGATIVE_INFINITY, Avg: 0, count: 0});
+                                    
+                                    if(minMax[id][0].Min > result[device].y){
+                                        minMax[id][0].Min = result[device].y
+                                    }
+                                    if(minMax[id][0].Max < result[device].y){
+                                        minMax[id][0].Max = result[device].y
+                                    }
+                                    minMax[id][0].Avg += result[device].y
+                                    minMax[id][0].count ++;
+                                    endResult[id].push({x: result[device].x, y: result[device].y});    
                             }
-                            endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
+                            var average;
+                            for(var device in minMax){
+                                average =  minMax[device][0].Avg/ minMax[device][0].count
+                                endResult[device].push({Min: minMax[device][0].Min, Max: minMax[device][0].Max, Avg: average});
+                                
+                            }
+                        endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
+                        console.log("\n\n");
                             console.log(endResult);
                             channel(endResult);
                         }
