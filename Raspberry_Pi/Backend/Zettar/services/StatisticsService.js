@@ -102,8 +102,10 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                                 var id = result[device].device;
                                 if(tmp.DeviceID)
                                     id = tmp.DeviceID
-                                endResult[id] = [];
-                                minMax[id] = [];
+                                 if(! endResult[id])
+                                    endResult[id] = [];
+                                if(!minMax[id])
+                                    minMax[id] = [];
                                 if(result[device])
                                     minMax[id].push({Min: Number.POSITIVE_INFINITY, Max: Number.NEGATIVE_INFINITY, Avg: 0, count: 0});
                                     
