@@ -65,27 +65,35 @@ var hook = new Hook(initializedZetta)
         cb: function (info, response) {
 //            console.log(this.result.state);
 //            console.log(response.data);
-            realtimeDataService.publish(info, response)
-            notificationDataService.analyze(info, response)
-            patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.name, TimeStamp: parseFloat(response.timestamp), Value: parseFloat(response.data) });
+            try {
+                realtimeDataService.publish(info, response)
+                notificationDataService.analyze(info, response)
+                patientDataManager.addInstance({ PatientUsername: info.from, DeviceID: info.name, TimeStamp: parseFloat(response.timestamp), Value: parseFloat(response.data) });
+            } catch (e) { logger.error(e) }
         },
         errcb: function (e) {
             console.log(e)
         },
         connect: function (peer) {
-            realtimeDataService.connectZettalet(peer.name)
+            try {
+                realtimeDataService.connectZettalet(peer.name)
+            } catch (e) { logger.error(e) }
         },
         disconnect: function (peer) {
-            realtimeDataService.disconnectZettalet(peer.name)
-            patientManager.getPatient({ Username: peer.name }).then(function (pat) {
-                pat.disconnectAllDevices();
-            })
+            try {
+                realtimeDataService.disconnectZettalet(peer.name)
+                patientManager.getPatient({ Username: peer.name }).then(function (pat) {
+                    pat.disconnectAllDevices();
+                })
+            } catch (e) { logger.error(e) }
         },
         deviceConnect: function (info) {
-            realtimeDataService.connectDevice(info.from, info)
-            patientManager.getPatient({ Username: info.from }).then(function (pat) {
-                pat.connectDevice(info.name);
-            })
+            try {
+                realtimeDataService.connectDevice(info.from, info)
+                patientManager.getPatient({ Username: info.from }).then(function (pat) {
+                    pat.connectDevice(info.name);
+                })
+            } catch (e) { logger.error(e) }
         }
     })
 
