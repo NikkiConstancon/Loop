@@ -10,6 +10,8 @@ const serviceName = 'RTDS'
 var sevice = module.exports = {
     publish: function (info, response) {
         publisher = publisherHandler.getPublisher(info.from)
+        publisher.publish({ [info.from]: { [info.name]: response.data.toPrecision(3) } })
+        /*
         if (!publisher.realTimeCollectorMap) {
             publisher.realTimeCollectorMap = {}
             setTimeout(() => {
@@ -18,6 +20,7 @@ var sevice = module.exports = {
             }, 750)
         }
         publisher.realTimeCollectorMap[info.name] = response.data.toPrecision(3)
+        */
     },
     connectZettalet: function (zettaletName) {
     },
