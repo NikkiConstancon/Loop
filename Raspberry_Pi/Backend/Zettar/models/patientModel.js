@@ -109,6 +109,8 @@ module.exports = {
                 typeDef: '<text, text>',
 
                 default: function () {
+                    //Removing this because it too vestigial at this point and will give a bad impression
+                    /*
                     const dbMan = require('../databaseManager')
                     var name = this.Username;
                     var context = { c: 'sending', k1: keys.userEmailEncrypt(name), k2: uuidv1(), k3: uuidv1() }
@@ -121,6 +123,7 @@ module.exports = {
                         dbMan.models.instance.patient.update({ Username: name }, { RegistrationObject: context });
                     })
                     return context
+                    */
                 }
             },
             DeviceMap: {
