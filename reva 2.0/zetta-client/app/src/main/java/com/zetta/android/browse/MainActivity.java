@@ -193,12 +193,12 @@ public class MainActivity extends AppCompatActivity {
         signOutItem.withTag(R.string.drawerNameSignOut);
 
         SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1)
-                .withName("My Connections" + (pendingRequestCount > 0 ? " (" + Integer.toString(pendingRequestCount) + ")" : ""))
+                .withName("My Patients" + (pendingRequestCount > 0 ? " (" + Integer.toString(pendingRequestCount) + ")" : ""))
                 .withIcon(R.drawable.ic_user_manage)
                 .withTag(5);
 
         if(pendingRequestCount > 0){
-            settings.withName("My Connections   (" + Integer.toString(pendingRequestCount) + ")")
+            settings.withName("My Patients   (" + Integer.toString(pendingRequestCount) + ")")
                     .withTextColor(getResources().getColor(R.color.colorAccent));
         }
 

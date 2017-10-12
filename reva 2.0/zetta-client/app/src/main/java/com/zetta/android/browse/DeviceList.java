@@ -60,7 +60,7 @@ class DeviceList {
                 boolean hasServer = false; //hotfix
                 if (name.equals("new") || name.equals("")) {
 
-                    items.add(new NewListItem("You have no patients yet, go to settings to send a patient a request.")); //TODO: add item to devicelistadapter so you can show tips
+                    items.add(new NewListItem("You have no patients yet, go to My Patients to send a patient a request.")); //TODO: add item to devicelistadapter so you can show tips
                 } else {
                     for (ZIKServer server : servers) {
                         if (server.getName().equals(name)) { //hotfix
