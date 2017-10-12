@@ -50,7 +50,7 @@ public class settingsPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("My connections");
+        toolbar.setTitle("My patients");
         setSupportActionBar(toolbar);
 
 
@@ -137,7 +137,7 @@ public class settingsPage extends AppCompatActivity {
 
     public void addAlert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ThemeOverlay_AppCompat_Dialog_Alert);
-        builder.setTitle(Html.fromHtml("<font color='#38ACEC'>Type in the email of the person you wish to add</font>"));
+        builder.setTitle(Html.fromHtml("<font color='#38ACEC'>Type in the email or username (if it's a patient) of the person you wish to add</font>"));
 
         final EditText input = new EditText(this);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text

@@ -82,7 +82,7 @@ class DeviceList {
 
 
                     if (!hasServer && !servers.isEmpty()) {
-                        items.add(new NewListItem(name + " server is not online at the moment"));
+                        items.add(new NewListItem(name + "'s devices are not online at the moment"));
                     }
                 }
 
