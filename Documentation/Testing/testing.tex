@@ -176,7 +176,7 @@
 
 	\section{User Management Subsystem }
 	\textbf{Modules involved} User Management, User Interface
-	\textbf{Implementation status:} partly-implemented
+	\textbf{Implementation status:} implemented
 
 
 	\subsubsection{User Management}
@@ -208,8 +208,8 @@
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!BREAK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	\subsubsection{User Interface}
-	\textbf{Implementation status:} partly-implemented \\
-	\textbf{Primary Actors:} non-users \\
+	\textbf{Implementation status:} implemented \\
+	\textbf{Primary Actors:} all users \\
 	\textbf{Functionality} Type in details and register to become a new user. There is only local validation and forms currently implemented. Client-server communication for registration and user management is not yet implemented.
 	\subsubsection{Description of current tests}
 	There are unit tests for each input that test the validation of those inputs. So there are tests for email, passwords, usernames etc. All to make sure that the validation is correct. \\
@@ -244,12 +244,6 @@
 	\textbf{Implementation status:} unimplemented \\
 	\subsubsection{Future tests:}
 	Unit tests for each individual module as well as integration tests to be sure messages are being passed properly between modules. 
-
-	\section{Advice Subsystem}
-	\textbf{Modules involved:} Advice and User Interface \\
-	\textbf{Implementation status:} unimplemented \\
-	\subsubsection{Future tests:}
-	Unit tests for each individual module as well as integration tests to be sure messages are being passed properly between modules. This is made easier because both of these modules are local to the application. 
 
 	\section{Tests based on non-functional requirements}
 	\subsection{Usability study}
@@ -345,7 +339,16 @@ Overall the feedback was positive with an overall score of 80.09 for the PSSUQ. 
 \\
 
 	\section{Platform compatibility test}
-	Platform compatibility will be tested, so that we know devices of different screen sizes and different android versions work correctly with our application. 
+	We have tested the ReVA app on several android devices with different versions of android, totalling to 6. We have tested on: 
+	\begin{itemize}
+		\item Samsung S8 (Nougat)
+		\item Xiaomi MI5 (Marshmellow)
+		\item Hris's phone (KitKat)
+		\item Hauwei P8 Lite (Marshmellow)
+		\item (Nikkisphone)
+		\item Bens phone )
+	\end{itemize}
+	This shows a wide variety of supported versions of the application. Which we have tested on and seen work empirically. We have even scrapped a few nice to haves of the newer development kits to support older versions like KitKat. 
 
 
 \end{document}
