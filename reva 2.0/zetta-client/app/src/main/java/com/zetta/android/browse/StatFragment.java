@@ -289,7 +289,10 @@ public class StatFragment extends android.support.v4.app.Fragment
                             if (obj.toString().equals("false")) {
                                 dialog.dismiss();
                                 List<StatItem> items = new ArrayList<>();
-                                items.add(new StatTitle(UserManager.getViewedUser() + " has no stats for given period"));
+                                if (UserManager.getViewedUser().equals(""))
+                                    items.add(new StatTitle("Currently no selected patient. "));
+                                else
+                                    items.add(new StatTitle(UserManager.getViewedUser() + " has no stats for given period"));
                                 statListAdapter.updateList(items);
                                 statListAdapter.notifyDataSetChanged();
                                 dialog.dismiss();

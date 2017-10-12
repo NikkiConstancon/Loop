@@ -139,8 +139,8 @@ public class MainActivity extends AppCompatActivity {
 
     PrimaryDrawerItem drawerItemMe = null;
     void bootstrap(final String userUid) {
-        zettaUser = userUid;//getIntent().getStringExtra("Username");
-        UserManager.setViewedUser(userUid);//view self at start
+        //zettaUser = userUid;//getIntent().getStringExtra("Username");
+        //UserManager.setViewedUser(userUid);//view self at start
 
         Log.d("--for stats--", UserManager.getViewedUser());
 
@@ -149,18 +149,40 @@ public class MainActivity extends AppCompatActivity {
 
         mSectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
 
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPageAdapter);
 
         PrimaryDrawerItem adder = null;
         PrimaryDrawerItem patient = new PrimaryDrawerItem().withIdentifier(1).withName("TMP");
-        if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
-            patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
+
+        if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT) {
             drawerItemMe = adder = new PrimaryDrawerItem().withName("My vitals").withTag(new PatientTag(userUid)).withIcon(R.drawable.ic_profile);
-            if(UserManager.getViewedUser().compareTo(userManagerEndpoint.getService().getAuthId()) == 0)
-                drawerItemMe.withSetSelected(true);
-            dList.setUser(getUser());
         }
+
+
+
+        if (UserManager.getViewedUser().equals("")) {
+            if(userManagerEndpoint.getUserType() == RevaWebSocketService.USER_TYPE.PATIENT){
+                zettaUser = userUid;//getIntent().getStringExtra("Username");
+                UserManager.setViewedUser(userUid);//view self at start
+                patient.withName(R.string.drawerNameAddPatient).withTag(R.string.drawerNameAddPatient);
+                dList.setUser(getUser());
+                if(UserManager.getViewedUser().compareTo(userManagerEndpoint.getService().getAuthId()) == 0)
+                    drawerItemMe.withSetSelected(true);
+            }  else {
+                if (subbedTo.iterator().hasNext()) {
+                    String name = subbedTo.iterator().next();
+                    dList.setUser(name);
+                    UserManager.setViewedUser(name);
+                } else {
+                    UserManager.setViewedUser("");
+                    dList.setUser("new");
+                }
+            }
+        }
+
+
+
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPageAdapter);
 
         setupViewPager(mViewPager);
 
@@ -170,16 +192,28 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem signOutItem = new SecondaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut).withIcon(R.drawable.ic_sign_out);
         signOutItem.withTag(R.string.drawerNameSignOut);
 
-        SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1)
-                .withName("My Connections" + (pendingRequestCount > 0 ? " (" + Integer.toString(pendingRequestCount) + ")" : ""))
-                .withIcon(R.drawable.ic_user_manage)
-                .withTag(5);
+        SecondaryDrawerItem settings = null;
+        if(userManagerEndpoint.getUserType() != RevaWebSocketService.USER_TYPE.PATIENT) {
+            settings = new SecondaryDrawerItem().withIdentifier(1)
+                    .withName("My Patients" + (pendingRequestCount > 0 ? " (" + Integer.toString(pendingRequestCount) + ")" : ""))
+                    .withIcon(R.drawable.ic_user_manage)
+                    .withTag(5);
 
-        if(pendingRequestCount > 0){
-            settings.withName("My Connections   (" + Integer.toString(pendingRequestCount) + ")")
-                    .withTextColor(getResources().getColor(R.color.colorAccent));
+            if (pendingRequestCount > 0) {
+                settings.withName("My Patients   (" + Integer.toString(pendingRequestCount) + ")")
+                        .withTextColor(getResources().getColor(R.color.colorAccent));
+            }
+        } else {
+            settings = new SecondaryDrawerItem().withIdentifier(1)
+                    .withName("My Patients and caregivers" + (pendingRequestCount > 0 ? " (" + Integer.toString(pendingRequestCount) + ")" : ""))
+                    .withIcon(R.drawable.ic_user_manage)
+                    .withTag(5);
+
+            if (pendingRequestCount > 0) {
+                settings.withName("My Patients and caregivers (" + Integer.toString(pendingRequestCount) + ")")
+                        .withTextColor(getResources().getColor(R.color.colorAccent));
+            }
         }
-
         final int shutUpYouAnnoyingNotificationsItemId = 600;
         final SecondaryDrawerItem shutUpYouAnnoyingNotificationsItem = new SecondaryDrawerItem()
                 .withIdentifier(shutUpYouAnnoyingNotificationsItemId)
@@ -227,7 +261,10 @@ public class MainActivity extends AppCompatActivity {
 
                         String name = drawerItem.toString();
                         Log.d("--Name of name", name);
+
+
                         if(tag instanceof PatientTag){
+
                             UserManager.setViewedUser(((PatientTag)tag).name);
                             dList.setUser(((PatientTag)tag).name);
                             setupViewPager(mViewPager);
@@ -290,11 +327,12 @@ public class MainActivity extends AppCompatActivity {
         );
 
 
-
         for(String name : subbedTo)
         {
-            result.addItem(new PrimaryDrawerItem().withName(name).withTag(new PatientTag(name)).withIcon(R.drawable.ic_profile));
+            PatientTag tag = new PatientTag(name);
+            result.addItem(new PrimaryDrawerItem().withName(name).withTag(tag).withIcon(R.drawable.ic_profile));
         }
+
 
         result.addItems(
                 new DividerDrawerItem(),
@@ -407,15 +445,21 @@ public class MainActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                     Log.d("----doneCallback---", "--done--");
+                    if (subbedTo.isEmpty()) {
+                        UserManager.setViewedUser("");
+                        dList.setUser("new");
+                    }
                     if(userManagerEndpoint.getUserType() != RevaWebSocketService.USER_TYPE.PATIENT){
                         if (subbedTo.isEmpty()) {
                             UserManager.setViewedUser("");
                             dList.setUser("new");
                         }
                         else {
-                            String name = subbedTo.iterator().next();
-                            UserManager.setViewedUser(name);
-                            dList.setUser(name);
+                            if (UserManager.getViewedUser().equals("")) {
+                                String name = subbedTo.iterator().next();
+                                UserManager.setViewedUser(name);
+                                dList.setUser(name);
+                            }
                         }
                     }
                     pendingRequestCount = 0;
@@ -427,6 +471,7 @@ public class MainActivity extends AppCompatActivity {
                     if(pendingRequestCount > 0){
                     }
                     userManagerEndpoint.resumeGuardActivityByVerifiedUser(workOnUser);
+                    setupViewPager(mViewPager);
 
                     if(result != null && isOpen){
                         result.openDrawer();
