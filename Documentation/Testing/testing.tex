@@ -249,13 +249,100 @@
 	\subsubsection{Future tests:}
 	Unit tests for each individual module as well as integration tests to be sure messages are being passed properly between modules. This is made easier because both of these modules are local to the application. 
 
-	\section{Other future tests based on non-functional requirements}
-		\subsection{Usability test}
-		A full usability test will be conducted with at least 6 people to determine how usable the UI on the app is. Questionairres and surveys will be used to determine where the fault lies and then improvements can be made. 
-		\subsection{Accessibility test}
-		Determining if the application gives affordance to people with disabilities is important, especially considering who the application is purposed for, the bedredden or very sick patients. It also allows a greater number of people to be comfortable with the app allowing more users. 
+	\section{Tests based on non-functional requirements}
+	\subsection{Usability study}
+	One of the keys to accurate applicable data is that the users need to be relaxed. We planned to make the usability testing as relaxed as possible, to do this
+		\begin{itemize}
+		\item We had lollipops and toffees ready and waiting and as a reward for finishing the test. 
+		\item Clear instructions on how to get to the usability testing location, we meet with testers outside IT and took them to the venue. 
+		\item Get the user familiar with the environment.
+		\item If they can't do something, make sure they know it's not their fault. 
+		\item We reassure that the tests are completely confidential, and for permission to use the data generated during the test as part of our results (do this with a short consent form) 
+		\item To use no terms like usability testing to keep testers at ease.
+		\item Tell them how long it will take.
+		\item Although acting professional, some mild humour and conversation to relax participants.
+		\end{itemize} 
+		We planned to not alter the test results by providing clues, suggesting directions or by reacting to things they say or do. Although taking 5 minutes for a task means the task is too hard (for our app). \\ \\
+		\textbf{The results will only be as good as the people you test}, so we needed to choose people who at least, to some degree, had an interest in medical IoT and the tech. People were be asked if they were interested in the application, and because we don’t know that many people, we picked people we knew (Convenience Sampling). Using our user needs we devised scenarios to carry out. \textbf{People tend to perform more naturally if you provide them with scenarios rather than instructions} so we planned scenarios.
+		\subsubsection{The script}
+		Welcome, we are Loop, I’m Greg, this is Nikki, Hris,and Juan. You were chosen because you have some interest in our app. Our app ReVA helps people see vitals of bedridden or ill people and allows you to do this on the go as well as stats and alerts. You guys are here to test the app to see if it’s easy to use or terrible to use, you’re not here to be tested, you’re here to test the website. We’re aiming for accurate data on the usability of our website, so just take it easy and use it as you would at home. \\ \\
+Before we begin make sure you sign the disclaimer at the top of the questionnaire. You’ll find a small task sheet with tasks you have to do, try your best for each task, but if you’re stuck for more than 5 minutes don’t hesitate to ask for help. If you do get stuck that just means the website needs improving. If you are unsure if you completed a task or not, just ask us and we’ll tell you if you did. After the tasks are done fill out the questionnaire. After you’re done with that just wait for everyone to finish and then you can leave.
+\subsubsection{Process followed}
+We fetched the participants from outside the IT building, one participant was missing, however this was okay as we still had 6 participants. The chosen participants weren’t old or doctors, although they weren’t perfect, data of the navigation of the UI and UI impressions was still collected. We introduced ourselves and put the participants at ease with the script and lollipops and toffees. We gave each participant a task sheet and a phone with the app. We allowed them to begin whenever they felt ready. \\ \\
+The users took longer than expected. This was due to the fact that some tasks on the task sheet needed requests accepted on our side, but we were not doing that. Also some mock data for vitals wasn’t streaming either so halfway through we had to tell them to use another patient for the task. We realised this was a mistake and should’ve been prepared for it. The one application on one specific phone had some particular changes at that time so it crashed on some pages. Which was not good for consistency of the test. 
 
-	\section{Platform compatibility test (future test)}
+\subsubsection{Tasks performed by users} 
+\begin{itemize}
+	\item Task 1: \textbf{Your aunt nikki has recently been bedridden with a terminal illness, she has asked you to register for the app ReVA.} Chosen because this is a common task users have to complete. Registering for the app is essential.
+\item \textbf{Task 2: Now that you’re registered aunt Nikki has asked you to add her as a patient in the app, she sent you a message with her username “nikki”.} Chosen because adding patients is imperative for the purposes of ReVA. 
+\item \textbf{Task 3: You need to see how your aunt is doing, check your aunts vitals.} Chosen because patient vitals is the core requirement of the application and seeing how easy it is to navigate here is important. 
+\item \textbf{Task 4: You need to see your aunts average heart rate for the last day, find out what her average heart rate is.} Chosen to see that stats is easy to navigate to and that users can easily tell where statistics is. 
+\item \textbf{Task 5: Your Grampa Greg has been overcome with illness, he too asks you to add him on the app ReVA his username is ‘greg’.} Chosen so that we could see how difficult it was to change between patients and the statistics of those patients. 
+\item \textbf{Task 6: Have a look at Grampa Gregs body glucose graph for the last hour and try and get a closer look at the last 15 minutes.} Chosen so that we could see that people found the graphs easy to use and intuitive to find out. 
+\item \textbf{Task 7: Leave the app as you normally would, you should get a notification warning you about one of your family members. Get back to the app through the notification.} Chosen to see that alerts are intuitive and show you when there is a problem. 
+\item \textbf{Task 8: Notifications have started to annoy you, turn them off.} Chosen to see that this setting was easy to find and important because not all caretakers/subscribers want or need notifications. 
+\item \textbf{Task 9: Your aunt Nikki has passed away, you decide to delete her off the app reva.} Chosen for user management sake and to see that it was easy to do. 
+\end{itemize}
+
+\subsubsection{Evaluation Methods}
+\textbf{Survey} \\
+We used the PSSUQ because it was designed specifically for scenario-based usability studies (like ours), so some questions are more targeted, like “I was able to complete the tasks and scenarios quickly using this system.”. We used it to give us accurate data on how easy our system is to use/to navigate. The answering scale is also more complex, ranging from 1 to 7 instead of 1 to 5. This allows testers to give more nuanced responses to each question. \\
+\\
+The end outcome is a score from 0 to 100, reflecting the overall usability of the website or app based on the respondent’s experience. PSSUQ also has 3 sub-scores, derived from subsets of the 16 questions, which reflect system usefulness, information quality, and interface quality. System Quality (the average of items 1-6), Information Quality (the average of items 7-12), and Interface Quality (the average of items 13-16) \\
+\\
+\textbf{Averaged survey results} \\ 
+Taking an average of the results give you a basic idea on how people perform on average. Although there can be outliers, this gives us nice easy to read data so that we can see where the problematic areas of the app are. \\ 
+\\ 
+\textbf{Interview with testers} \\
+We did a conversational interview after everyone was done with the usability test in order to illicit any comments, criticisms or advice about the application. \\
+\subsubsection{The results}
+\begin{center}
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=5cm]{tests/usab/questions.png}
+	\end{figure}
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=5cm]{tests/usab/results.png}
+	\end{figure}
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=5cm]{tests/usab/avgs.png}
+	\end{figure}
+	\begin{figure}[h]
+		\includegraphics[width=15cm, height=5cm]{tests/usab/pssuq.png}
+	\end{figure}
+\end{center}
+
+\textbf{Comments on the survey (only where there were comments)}\\
+\\
+\textbf{User 2 comments:}  Some serious connectivity issues on my end, but the actual functionality of the system was highly intuitive. (Maybe could be more colourful…) Also it crashed a number of times while using it (usually when loading/connecting to patient information). \\
+\textbf{User 3 comments:}  Possibly a link for cellphone number for those using the app. Also medical information on where the hospital is and contact numbers linked to if there is an emergency (automatic msgs/emails) \\
+\textbf{User 4 comments:} Reva stopped working when I gave the wrong password. “My connections’ had me confused when trying to add patients, but clicking it made it clear what it is. \\
+\textbf{User 6 comments:} Very very nice UI and pleasant feedback when pushing buttons. Only one suggestion for enable/disable notification is have a slide lock thing just to help user’s not get confused between the enable/disable things.  \\ \\
+
+\textbf{Results of interview with the room: } \\
+There were five suggestions from the interview with the room: 
+\begin{itemize}
+	\item Prompt when adding a person asks for an email, but you can use username as well
+	\item ‘My connections’ is a bad name for user management and should be called something like “Patient management” or “Friends management” or something
+	\item Message when you’re a new user, saying what to do
+	\item Refresh for the patient vitals page
+	\item Partition the vitals section better so that you can easily access what you want to see
+\end{itemize}	
+
+\subsubsection{Conclusions}
+Looking at the PSSUQ scores, the highest score was for the interface, however we got some lower scores for system quality and information quality. Looking at some of the lowest avg scores for some questions you can see that 3,6,7,8 are all the lowest. The first  q3: I was able to complete the tasks and scenarios quickly using this system  - the reason this may have been low was because of a mistake with the tasks and us being ready to serve that information or accept requests for specific users. It also could be because the interface is hard to navigate but in general people claimed it was easy to use so this could’ve been a mistake on our part. \\
+\\
+The next question, question 6 with the 2nd lowest avg score, is: I believe I could become productive quickly using this system - this has to do with productivity and how fast actions can be completed. There is no real productivity to the app, you just look at patient vitals, however this could be indicative of information overload because of many different vitals to look at it. A possible partitioning of the vitals and stats screen will be considered. \\
+\\
+The lowest item score was q7: The system gave error messages that clearly told me how to fix problems - this means that some messages and items in the navigation were not named clearly. For example User 4 mentioned that “My connections” was a confusing name that could be related to networking. We will consider changing that to something else as well as messages for new users on how to add new patients and helpful messages like that for navigation in future iterations. \\
+\\
+Another item with the 2nd lowest item score is q8: Whenever I made a mistake using the system, I could recover easily and quickly - we believe this has to do with interaction behaviour and the flow of screens but also has to do with the server not being up and the resulting confusion from sending a patient request, and not getting accepted and then even if they were accepted, the devices not being up. The message for devices not being up is also ambiguous as it just says the server is not online without describing which particular user it is about. These are considerations to take into account. \\
+\\
+With the room interview, there was some valid feedback and all five points will be taken into consideration with further iterations of ReVA. Specifically things to do with error messages and tips or help messages. \\
+\\
+Overall the feedback was positive with an overall score of 80.09 for the PSSUQ. This shows our system is indeed quite good, with some needed improvement mostly to do with informational messages, i.e., informational quality - this was our lowest score at 76.61. This means that we should focus on changing the informational messages with better error messages, better help messages and better state messages for when users navigate to somewhere by accident. 
+\\
+
+	\section{Platform compatibility test}
 	Platform compatibility will be tested, so that we know devices of different screen sizes and different android versions work correctly with our application. 
 
 
