@@ -58,9 +58,9 @@ class DeviceList {
             List<ListItem> items = new ArrayList<>();
             try {
                 boolean hasServer = false; //hotfix
-                if (name.equals("new")) {
+                if (name.equals("new") || name.equals("")) {
 
-                    items.add(new NewListItem("You have no patients yet, go to settings to send a patient a request.")); //TODO: add item to devicelistadapter so you can show tips
+                    items.add(new NewListItem("You have no patients yet, go to My Patients to send a patient a request.")); //TODO: add item to devicelistadapter so you can show tips
                 } else {
                     for (ZIKServer server : servers) {
                         if (server.getName().equals(name)) { //hotfix
@@ -82,7 +82,7 @@ class DeviceList {
 
 
                     if (!hasServer && !servers.isEmpty()) {
-                        items.add(new NewListItem("This server is not online at the moment"));
+                        items.add(new NewListItem(name + "'s devices are not online at the moment"));
                     }
                 }
 

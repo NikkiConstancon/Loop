@@ -10,8 +10,8 @@ const serviceName = 'RTDS'
 var sevice = module.exports = {
     publish: function (info, response) {
         publisher = publisherHandler.getPublisher(info.from)
-   
-publisher.publish({[info.from]:{[info.name]:response.data.toPrecision(3)}})  /*   if (!publisher.realTimeCollectorMap) {
+	publisher.publish({[info.from]:{[info.name]:response.data.toPrecision(3)}})  
+/*   if (!publisher.realTimeCollectorMap) {
             publisher.realTimeCollectorMap = {}
             setTimeout(() => {
                 publisher.publish({ [info.from]: publisher.realTimeCollectorMap })
