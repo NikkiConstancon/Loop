@@ -192,16 +192,28 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem signOutItem = new SecondaryDrawerItem().withIdentifier(1).withName(R.string.drawerNameSignOut).withIcon(R.drawable.ic_sign_out);
         signOutItem.withTag(R.string.drawerNameSignOut);
 
-        SecondaryDrawerItem settings = new SecondaryDrawerItem().withIdentifier(1)
-                .withName("My Patients" + (pendingRequestCount > 0 ? " (" + Integer.toString(pendingRequestCount) + ")" : ""))
-                .withIcon(R.drawable.ic_user_manage)
-                .withTag(5);
+        SecondaryDrawerItem settings = null;
+        if(userManagerEndpoint.getUserType() != RevaWebSocketService.USER_TYPE.PATIENT) {
+            settings = new SecondaryDrawerItem().withIdentifier(1)
+                    .withName("My Patients" + (pendingRequestCount > 0 ? " (" + Integer.toString(pendingRequestCount) + ")" : ""))
+                    .withIcon(R.drawable.ic_user_manage)
+                    .withTag(5);
 
-        if(pendingRequestCount > 0){
-            settings.withName("My Patients   (" + Integer.toString(pendingRequestCount) + ")")
-                    .withTextColor(getResources().getColor(R.color.colorAccent));
+            if (pendingRequestCount > 0) {
+                settings.withName("My Patients   (" + Integer.toString(pendingRequestCount) + ")")
+                        .withTextColor(getResources().getColor(R.color.colorAccent));
+            }
+        } else {
+            settings = new SecondaryDrawerItem().withIdentifier(1)
+                    .withName("My Patients and caregivers" + (pendingRequestCount > 0 ? " (" + Integer.toString(pendingRequestCount) + ")" : ""))
+                    .withIcon(R.drawable.ic_user_manage)
+                    .withTag(5);
+
+            if (pendingRequestCount > 0) {
+                settings.withName("My Patients and caregivers (" + Integer.toString(pendingRequestCount) + ")")
+                        .withTextColor(getResources().getColor(R.color.colorAccent));
+            }
         }
-
         final int shutUpYouAnnoyingNotificationsItemId = 600;
         final SecondaryDrawerItem shutUpYouAnnoyingNotificationsItem = new SecondaryDrawerItem()
                 .withIdentifier(shutUpYouAnnoyingNotificationsItemId)

@@ -50,7 +50,8 @@ public class settingsPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("My patients");
+
+        toolbar.setTitle("User management");
         setSupportActionBar(toolbar);
 
 
