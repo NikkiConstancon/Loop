@@ -1,4 +1,7 @@
-\subsection{Visual Guide to Mobile Application}
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\begin{document}
+	\subsection{Visual Guide to Mobile Application}
 \begin{figure}[ht!]
 \centering
 \begin{minipage}{.5\textwidth}
@@ -56,7 +59,31 @@
 \end{minipage}
 \end{figure}
 
-\newpage
+\begin{figure}[h!]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{manual/slideout.png}
+  \caption{\label{fig:slideout}The slide-out screen}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{manual/mycon1.png}
+  \caption{\label{fig:mycon1}My Connections screen 1}
+\end{minipage}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{manual/mycon2.png}
+  \caption{\label{fig:mycon2}My Connections screen 2}
+\end{minipage}%
+\end{figure}
+
+
+\clearpage
 \pagebreak
 \subsubsection{Main Login Screen (figure 1)}
 \begin{enumerate}
@@ -114,11 +141,11 @@ NOTE: meant only for subscribers (see description section)
 NOTE:  Displays real time vitals data represented by an icon, a tag and a value.
 \begin{enumerate}
 \setcounter{enumi}{25}
-	\item The current real time value of the vital beig monitored. 
+	\item The current real time value of the vital being monitored. 
 \end{enumerate}
 
 \subsubsection{Statistics and History Screen (figure 8)}
-NOTE: . Displays statistical and historical vitals information in the form of a graph as well as minimum, maximum and average values for the vitals.
+NOTE: Displays statistical and historical vitals information in the form of a graph as well as minimum, maximum and average values for the vitals.
 \begin{enumerate}
 \setcounter{enumi}{26}
 	\item The average value of the vital. 
@@ -126,3 +153,26 @@ NOTE: . Displays statistical and historical vitals information in the form of a 
 	\item The maximum value of the vital. 
 	\item The graph representing the historical data of the vital. 
 \end{enumerate}
+
+\subsubsection{Slide-out Screen (figure 9)}
+NOTE: Displays a slide-out showing who you are logged in as, which patients you may currently view and options to disable notifications, logout, and view your connections. 
+\begin{enumerate}
+\setcounter{enumi}{30}
+	\item Displays the current account you are logged in with. 
+	\item Displays the current patients you may view and which is currently displayed . 
+	\item If clicked, takes you to the My Connections screen and also shows the number of new connections that have not been accepted (is red and displays a number if there are unresolved connections). 
+	\item If clicked, enables or disables notifications from the application. 
+    \item If clicked, signs you out of the application and takes you back to the login screen. 
+\end{enumerate}
+
+\subsubsection{My Connections Screen (figure 10 and 11)}
+NOTE: Displays a screen that shows who wishes to subscribe to you, whom you are currently subscribed to, and your requests for subscription that are awaiting confirmation. It also provides functionality to add patients, delete patients and accept or deny requests from other users. 
+\begin{enumerate}
+\setcounter{enumi}{35}
+	\item Back button that takes you back to the main screen (slide-out still shown). 
+	\item Displays which patients you are currently subscribed to and allows you to delete them. 
+	\item If clicked, allows you to add a patient by displaying a pop-up dialog requesting the email of the wanted patient. 
+	\item Displays your pending requests (i.e. requests you have sent to patients that have not been accepted yet). 
+    \item Displays incoming requests and allows you to either accept or deny them. 
+\end{enumerate}
+\end{document}
