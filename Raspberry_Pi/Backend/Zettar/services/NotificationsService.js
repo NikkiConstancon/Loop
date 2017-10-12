@@ -37,21 +37,30 @@ const THRESHOLD_MAP = {
 
 
 
-    "dummy dev": new Threshold(2, 5, defaultSmoothFactor, false),
+    "dummy dev": new Threshold(2.5, 2.5, defaultSmoothFactor, false),
 }
 
 setInterval(function () {
-    sevice.analyze({ from: "greg", name: "dummy dev" }, { data: 1 })
-    sevice.analyze({ from: "nikki", name: "dummy dev" }, { data: 2 })
-    sevice.analyze({ from: "juan", name: "dummy dev" }, { data: 3 })
-    sevice.analyze({ from: "rinus", name: "dummy dev" }, { data: 4 })
-}, 3000)
+    try {
+        sevice.analyze({ from: "greg", name: "dummy dev" }, { data: 2 + Math.random() })
+    } catch (e) { logger.error(e) }
+}, 2 * 60 * 1000)
 
-function Threshold(min, max, smoothFactor, flagRealtimeAnalysis){
+
+setInterval(function () {
+    try {
+        sevice.analyze({ from: "nikki", name: "dummy dev" }, { data: 2 + Math.random() })
+        sevice.analyze({ from: "juan", name: "dummy dev" }, { data: 2 + Math.random() })
+        sevice.analyze({ from: "rinus", name: "dummy dev" }, { data: 2 + Math.random() })
+    } catch (e) { logger.error(e) }
+}, 4.13 * 60 * 1000)
+
+function Threshold(min, max, smoothFactor, flagRealtimeAnalysis, unit){
     this.min = min
     this.max = max
     this.smoothFactor = smoothFactor
     this.flagRealtimeAnalysis = flagRealtimeAnalysis
+    this.unit = unit
 }
 Threshold.prototype.newAnalyser = function(publisher, info) {
     return new Analyser(this, publisher, info)
@@ -65,10 +74,12 @@ function Analyser(threshold, publisher, info) {
     this.value = null
     this.smooth = null
     this.lastTimeNotificationSent = 0
-    this.thrashGuardDelay = 40 * 1000
+    this.thrashGuardDelay = 3 * 60 * 1000
 }
 
-
+function RandLevel() {
+    return (Math.random() * 3).toPrecision(1)
+}
 
 Analyser.prototype.analyze = function (now) {
     if (((new Date()).getTime() - this.lastTimeNotificationSent) > this.thrashGuardDelay) {
@@ -81,15 +92,15 @@ Analyser.prototype.analyze = function (now) {
             this.updateSmooth(now)
             
             if (this.smooth < this.threshold.min) {
-                this.publishThresholdDeviation(1, this.deviceName + " is below the set threshold at " + this.valueWithUnit(now))
+                this.publishThresholdDeviation(RandLevel(), this.deviceName + " is below the set threshold at " + this.valueWithUnit(now))
             } else if (this.smooth > this.threshold.max) {
-                this.publishThresholdDeviation(1, this.deviceName + " is above the set threshold at " + this.valueWithUnit(now))
+                this.publishThresholdDeviation(RandLevel(), this.deviceName + " is above the set threshold at " + this.valueWithUnit(now))
             }
         } else {
             if (this.value < this.threshold.min) {
-                this.publishThresholdDeviation(1, this.deviceName + " is below the set threshold at " + this.valueWithUnit(now))
+                this.publishThresholdDeviation(RandLevel(), this.deviceName + " is below the set threshold at " + this.valueWithUnit(now))
             } else if (this.value > this.threshold.max) {
-                this.publishThresholdDeviation(1, this.deviceName + " is above the set threshold at " + this.valueWithUnit(now))
+                this.publishThresholdDeviation(RandLevel(), this.deviceName + " is above the set threshold at " + this.valueWithUnit(now))
             }
         }
     }
@@ -129,7 +140,7 @@ Publisher.prototype.publish = function (msg) {
                 transmitters[i].transmit(msg)
             }
         }
-    })
+    }).catch(function (e) { logger.error(e) })
 }
 var sevice = module.exports = {
     analyze: function (info, response) {
