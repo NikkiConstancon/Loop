@@ -64,7 +64,7 @@
 \pagebreak
 	\section{Introduction}
 
-	The testing report is designed to describe all tests that have been done on the system and future tests to be done on the system.
+	The testing report is designed to describe all tests that have been done on the system.
 
 		\subsection{Purpose}
 
@@ -118,14 +118,13 @@
 
 		\subsection{Additional Information}
 
-		The code being tested is written by different developers, thus this document serves as a way in order to review the functionality and tests done, and to provide information about future tests on future or current functionality.\\\\
+		The code being tested is written by different developers, thus this document serves as a way in order to review the functionality and tests done, and to provide information about said tests on current functionality.\\\\
 
 
 	\pagebreak
 
 	\section{Real-time subsystem}
 	\textbf{Modules involved:} Data Collection,  Pub/Sub Server, Data Pull, and User Interface \\
-	\textbf{Implementation status:} implemented \\
 	\textbf{Primary Actors:} All users \\
 	\textbf{Functionality:} View real time data on patient(s)\\
 	\subsubsection{Description of current tests}
@@ -166,22 +165,20 @@
 
 	\section{Data Storage Subsystem}
 	\textbf{Modules involved: } Data Storage, Pub/Sub Server \\
-	\textbf{Implementation status:} implemented \\
-	\subsubsection{Future tests:} Unit tests for individual modules, Data Storage in particular because the Pub/Sub server is zetta. There will also be Integration Testing to make sure that data storage and the pub/sub server are passing messages as expected. 
+	\textbf{Functionality:} Persist patient's data\\
+	Unit tests where executed to verify that the zetta kit was integrated seamlessly, allowing the system to pass timestamped real-time data to the associated Cassandra. Unit tests where also executed to ensure that obtained data is persisted correctly.
 
 	\section{History/Statistics subsystem}
-	\textbf{Modules involved:} Data Storage, Statistics, Pub/Sub Server, and User Interface
-	\textbf{Implementation status:} unimplemented
-	\subsubsection{Future tests:} Unit tests for data-storage, statistics and the user interface. For data-storage this will include unit tests to verify statistical/historical data is stored and timestamped correctly. For statistics this will include unit testing for verification of getting the right data from queries, as well as any mathematics done by the statistics module, e.g., min, max, avg, mean etc. The user-interface will need unit-testing to make sure that graphs are being shown as specified, or statistics about the patient are indeed correct. Other tests will include integration testing in the future to make sure everything is communicating as expected. There will also be functionality testing to be sure that the History/Statistics subsystem meets the SRS accurately. 
+	\textbf{Modules involved:} Data Storage, Statistics, Pub/Sub Server, and User Interface\\
+	\textbf{Functionality:} View statistical data of patient(s)\\
+	Unit tests for each coupled module where executed. For statistics this included unit testing for verification of getting the right data from queries, as well as any mathematics done by the statistics module, e.g., min, max, avg, mean etc. The user-interface performed unit-testing to make sure that graphs are being shown as specified, or statistics about the patient are indeed correct. Other tests where included to test integration to make sure everything is communicating as expected. There was also be functionality testing to ensure that the History/Statistics subsystem meets the SRS accurately. 
 
 	\section{User Management Subsystem }
 	\textbf{Modules involved} User Management, User Interface
-	\textbf{Implementation status:} implemented
 
 
 	\subsubsection{User Management}
 
-	\textbf{Implementation status:} partly-implemented \\
 	\textbf{Primary Actors:} users, admin users \\
 	\textbf{Functionality} Create, Remove, Update or Delete items related to data storage, e.g., user info, users, user relationships etc.  \\
 	\subsubsection{Description of current tests}
@@ -208,42 +205,38 @@
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!BREAK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	\subsubsection{User Interface}
-	\textbf{Implementation status:} implemented \\
 	\textbf{Primary Actors:} all users \\
 	\textbf{Functionality} Type in details and register to become a new user. There is only local validation and forms currently implemented. Client-server communication for registration and user management is not yet implemented.
 	\subsubsection{Description of current tests}
 	There are unit tests for each input that test the validation of those inputs. So there are tests for email, passwords, usernames etc. All to make sure that the validation is correct. \\
+	Integration tests to verify client-server communication was executed together with functionality tests to confirm the User Management subsystem adheres to the requirements. 
 	\textbf{Following is the code for each unit test to show what is tested.}
 	\begin{center}
 	\begin{figure}[h]
-		\includegraphics[width=15cm, height=5cm]{tests/usrUI/TestAge.JPG}
+		\includegraphics[width=\textwidth]{tests/usrUI/TestAge.JPG}
 	\end{figure}
 
 	\begin{figure}[h]
-		\includegraphics[width=15cm, height=4cm]{tests/usrUI/TestLogin.JPG}
+		\includegraphics[width=\textwidth]{tests/usrUI/TestLogin.JPG}
 	\end{figure}
 
 	\begin{figure}[h]
-		\includegraphics[width=15cm, height=7cm]{tests/usrUI/TestLoginFunction.JPG}
+		\includegraphics[width=\textwidth]{tests/usrUI/TestLoginFunction.JPG}
 	\end{figure}
 
 	\begin{figure}[h]
-		\includegraphics[width=15cm, height=5cm]{tests/usrUI/TestRegister.JPG}
+		\includegraphics[width=\textwidth]{tests/usrUI/TestRegister.JPG}
 	\end{figure}
 
 	\begin{figure}[h]
-		\includegraphics[width=15cm, height=4cm]{tests/usrUI/TestUsername.JPG}
+		\includegraphics[width=\textwidth]{tests/usrUI/TestUsername.JPG}
 	\end{figure}
 	\end{center}
 
-	\subsubsection{Future tests:}
-	Integration tests that verify client-server communication is happening correctly. Functionality Tests to confirm the User Management subsystem adheres to the requirements. 
 
 	\section{Notification Subsystem }
 	\textbf{Modules involved:} Pub/Sub Server, Notification, and User Interface \\
-	\textbf{Implementation status:} unimplemented \\
-	\subsubsection{Future tests:}
-	Unit tests for each individual module as well as integration tests to be sure messages are being passed properly between modules. 
+	Unit tests for each individual module as well as integration tests to be sure messages are being passed properly between modules was executed. 
 
 	\section{Tests based on non-functional requirements}
 	\subsection{Usability study}
@@ -294,16 +287,16 @@ We did a conversational interview after everyone was done with the usability tes
 \subsubsection{The results}
 \begin{center}
 	\begin{figure}[h]
-		\includegraphics[width=15cm, height=5cm]{tests/usab/questions.png}
+		\includegraphics[width=\textwidth]{tests/usab/questions.png}
 	\end{figure}
 	\begin{figure}[h]
-		\includegraphics[width=15cm, height=5cm]{tests/usab/results.png}
+		\includegraphics[width=\textwidth]{tests/usab/results.png}
 	\end{figure}
 	\begin{figure}[h]
-		\includegraphics[width=15cm, height=5cm]{tests/usab/avgs.png}
+		\includegraphics[width=\textwidth]{tests/usab/avgs.png}
 	\end{figure}
 	\begin{figure}[h]
-		\includegraphics[width=15cm, height=5cm]{tests/usab/pssuq.png}
+		\includegraphics[width=\textwidth]{tests/usab/pssuq.png}
 	\end{figure}
 \end{center}
 
