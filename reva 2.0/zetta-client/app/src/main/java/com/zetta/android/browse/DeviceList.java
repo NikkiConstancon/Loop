@@ -58,7 +58,7 @@ class DeviceList {
             List<ListItem> items = new ArrayList<>();
             try {
                 boolean hasServer = false; //hotfix
-                if (name.equals("new")) {
+                if (name.equals("new") || name.equals("")) {
 
                     items.add(new NewListItem("You have no patients yet, go to settings to send a patient a request.")); //TODO: add item to devicelistadapter so you can show tips
                 } else {
