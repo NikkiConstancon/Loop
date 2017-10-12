@@ -100,7 +100,7 @@ public class NotificationsService extends RevaWebsocketEndpoint {
                         note.id,
                         note.deviceName + " alert" + (isSelf ? "" : " from " + note.userUid),
                         note.message,
-                        "?",
+                        note.deviceName,
                         note.level
                         );
             }

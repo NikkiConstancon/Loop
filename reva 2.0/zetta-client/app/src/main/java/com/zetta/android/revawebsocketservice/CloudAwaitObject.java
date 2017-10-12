@@ -3,6 +3,7 @@ package com.zetta.android.revawebsocketservice;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Build;
 
 import com.zetta.android.lib.DelayedUiAction;
 import com.zetta.android.lib.Interval;
@@ -44,9 +45,9 @@ public abstract class CloudAwaitObject {
     public CloudAwaitObject(String channelKey_) {
         channelKey = channelKey_;
         publisher = new ChannelPublisher(channelKey);
-        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.LOLLIPOP){
-            silent = true;
+        if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB){
         }
+        silent = true;
     }
     public CloudAwaitObject(String channelKey_, boolean silent_) {
         channelKey = channelKey_;

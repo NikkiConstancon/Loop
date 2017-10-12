@@ -112,7 +112,7 @@ public class notifications extends android.support.v4.app.Fragment
                                     addNotification(
                                             note.deviceName + " alert" + (isPatient ? "" : " from " + note.userUid),
                                             note.message,
-                                            "?",
+                                            note.deviceName,
                                             note.level
                                     );
                                 }
@@ -146,72 +146,21 @@ public class notifications extends android.support.v4.app.Fragment
     {
         int res = getIconResource(resource);
 
-        int severity = 0;
-
-        if(level == 1)
-        {
-            severity = GREEN;
-        }
-        else if(level == 2)
-        {
-            severity = YELLOW;
-        }
-        else
-        {
-            severity = RED;
-        }
+        int severity = getColorFromLevel(level);
 
         NotificationsObject newNotif = new NotificationsObject(title, content, res, severity);
 
-        if(list == null || list.size() == 0)
-        {
             list = new ArrayList<NotificationsObject>();
             list.add(newNotif);
-
+            list.addAll(adapter.getCurrentList());
             adapter.updateList(list);
             adapter.notifyDataSetChanged();
-        }
-        else
-        {
-            ArrayList<NotificationsObject> newList = new ArrayList<NotificationsObject>();
-            list.clear();
-            list.addAll(adapter.getCurrentList());
-            newList.addAll(list);
-            newList.add(newNotif);
-            list = newList;
-            adapter.updateList(newList);
-            adapter.notifyDataSetChanged();
-            adapter.notifyItemInserted(list.size());
-        }
+            //adapter.notifyItemInserted(list.size());
 
 
-        Gson gson = new Gson();
-        String json;
-
-        //MyPref is the place holder for the username (change it with username of current user)
-        SharedPreferences saved_values = context.getSharedPreferences(sharedPrefId, MODE_PRIVATE);
-        SharedPreferences.Editor editor=saved_values.edit();
-        counter = 0;
-
-        if(list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                json = gson.toJson(list.get(i));
-                editor.putString(Integer.toString(counter), json);
-                counter++;
-            }
-        }
-        else
-        {
-            counter = -1;
-        }
-
-        editor.putInt("counter", counter);
-
-        editor.commit();
         rv.smoothScrollBy(1,0);
 
-        notifs++;
-
+        notifs = list.size();
     }
 
     static int getIconResource(String devName){
