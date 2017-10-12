@@ -88,7 +88,7 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                     }
                     
                 }
-                console.log(params);
+//                console.log(params);
                 patientManager.getDeviceMap({ Username: tmp.Username }).then(function (pat) { 
                     dataManager.getGraphPoints(params).then(function(result){
                         if(result == false){
@@ -126,8 +126,8 @@ const publisherHandler = webSockMessenger.attach(serviceName, {
                                 
                             }
                         endResult = compress(tmp.StartTime, tmp.EndTime, endResult);
-                        console.log("\n\n");
-                            console.log(endResult);
+  //                      console.log("\n\n");
+    //                        console.log(endResult);
                             channel(endResult);
                         }
                     }).catch(function (e) {

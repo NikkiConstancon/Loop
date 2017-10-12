@@ -12,28 +12,28 @@ const THRESHOLD_MAP = {
     "Body Temperature": new Threshold(0, 1000, defaultSmoothFactor, true),
     "Body Insulin": new Threshold(0, 1000, defaultSmoothFactor, true),
     "Heart Rate": new Threshold(0, 1000, defaultSmoothFactor, true),
-    "Body Glucose": new Threshold(37.2, 38.9, defaultSmoothFactor, true),
+    "Body Glucose": new Threshold(0, 38.9, defaultSmoothFactor, true),
     
     
     "Blood Pressure": new Threshold(60, 100, defaultSmoothFactor, false),
     "Diastolic Pressure": new Threshold(60, 79, defaultSmoothFactor, false),
     "Systolic Pressure": new Threshold(90, 119, defaultSmoothFactor, false),
     
-    "Oxygen": new Threshold(75, 100, defaultSmoothFactor, true),
-    "Pulse": new Threshold(60, 100, defaultSmoothFactor, true),
+    "Oxygen": new Threshold(65, 110, defaultSmoothFactor, true),
+    "Pulse": new Threshold(50, 110, defaultSmoothFactor, true),
     
-    "ECG": new Threshold(0, 6, defaultSmoothFactor, true),
+    "ECG": new Threshold(0, 16, defaultSmoothFactor, true),
     
-    "Body Fat": new Threshold(18, 31, defaultSmoothFactor, false),
-    "Bady water": new Threshold(45, 65, defaultSmoothFactor, false),
-    "Calories": new Threshold(900, 1000, defaultSmoothFactor, false),
-    "Bone Density": new Threshold(45, 65, defaultSmoothFactor, false),
-    "Muscle Mass": new Threshold(13, 21, defaultSmoothFactor, false),
-    "Visceral Fat": new Threshold(0, 13, defaultSmoothFactor, false),
-    "Weight": new Threshold(45, 200, defaultSmoothFactor, false),
+    "Body Fat": new Threshold(8, 32, defaultSmoothFactor, false),
+    "Bady water": new Threshold(35, 75, defaultSmoothFactor, false),
+    "Calories": new Threshold(1000, 1100, defaultSmoothFactor, false),
+    "Bone Density": new Threshold(35, 75, defaultSmoothFactor, false),
+    "Muscle Mass": new Threshold(3, 31, defaultSmoothFactor, false),
+    "Visceral Fat": new Threshold(0, 23, defaultSmoothFactor, false),
+    "Weight": new Threshold(35, 300, defaultSmoothFactor, false),
     
-    "Airflow": new Threshold(376, 525, defaultSmoothFactor, false),
-    "Air Volume": new Threshold(2, 5, defaultSmoothFactor, false),
+    "Airflow": new Threshold(386, 535, defaultSmoothFactor, false),
+    "Air Volume": new Threshold(2, 15, defaultSmoothFactor, false),
 
 
 

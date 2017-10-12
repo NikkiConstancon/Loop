@@ -81,8 +81,8 @@ TimeStamp*/
     getGraphPoints: function(_info){
         return new Promise((resolve, reject) => {
             dbMan.try().then(function () {
-console.log("Getting graphPoints");
-console.log(_info);
+//console.log("Getting graphPoints");
+//console.log(_info);
                 var minimum = Number.POSITIVE_INFINITY;
                 var maximum = Number.NEGATIVE_INFINITY;
                 var avg = 0.0;
@@ -91,8 +91,8 @@ console.log(_info);
                 var start = _info.StartTime;
                 var end = _info.EndTime;
                 var query;
-                console.log(_info.DeviceID);
-                console.log(_info.DeviceID);
+//                console.log(_info.DeviceID);
+ //               console.log(_info.DeviceID);
               // if(!_info.DeviceID){
                     query = {
                         PatientUsername: _info.Username,
@@ -106,7 +106,7 @@ console.log(_info);
                         TimeStamp : { '$gt':start, '$lte':end}
                     }
                 }*/
-                console.log(query);
+  //              console.log(query);
                 dbMan.models.instance.patientData.stream(query, {raw: true, allow_filtering: true}, function(data){
                     var row;
                     while (row = data.readRow()) {

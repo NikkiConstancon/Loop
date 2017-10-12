@@ -17,7 +17,7 @@ var sharedKeys = require('../Shared/sharedKeys')
 var Hook = require('./lib/zettaHook')
 
 var logger = require('./revaLog')
-logger.level = 'silly'
+logger.level = 'warning'
 
 var dbManager1 = require("./userManager");
 var patientManager = require("./patientManager");
