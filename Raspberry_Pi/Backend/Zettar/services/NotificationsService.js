@@ -35,7 +35,8 @@ const THRESHOLD_MAP = {
     "Airflow": new Threshold(386, 535, defaultSmoothFactor, false),
     "Air Volume": new Threshold(2, 15, defaultSmoothFactor, false),
 
-
+    "Temperature": new Threshold(20, 38, defaultSmoothFactor, true),
+    "Breathing": new Threshold(-1, 3, defaultSmoothFactor, false),
 
     "dummy dev": new Threshold(2.5, 2.5, defaultSmoothFactor, false),
 }
